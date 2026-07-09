@@ -8,6 +8,8 @@ interface AppShellProps {
   progress: ProgressState;
   onCalmModeToggle: () => void;
   calmMode: boolean;
+  projectorMode: boolean;
+  onProjectorModeToggle: () => void;
 }
 
 export function AppShell({
@@ -15,9 +17,27 @@ export function AppShell({
   progress,
   onCalmModeToggle,
   calmMode,
+  projectorMode,
+  onProjectorModeToggle,
 }: AppShellProps) {
   return (
-    <div className={`app-shell${calmMode ? ' calm-mode' : ''}`}>
+    <div
+      className={`app-shell${calmMode ? ' calm-mode' : ''}${projectorMode ? ' projector-mode' : ''}`}
+    >
+      {projectorMode && (
+        <div className="projector-banner" role="status">
+          <span>
+            📽️ Režim na projektor — pokrok a XP se neukládají.
+          </span>
+          <button
+            type="button"
+            className="btn btn--secondary btn--small"
+            onClick={onProjectorModeToggle}
+          >
+            Vypnout projektor
+          </button>
+        </div>
+      )}
       <header className="app-header">
         <div className="app-header__brand">
           <a href="#/" className="app-header__logo">
@@ -30,6 +50,9 @@ export function AppShell({
         <div className="app-header__controls">
           <ProgressSummary progress={progress} />
           <CalmModeToggle enabled={calmMode} onToggle={onCalmModeToggle} />
+          <a href="#/teacher" className="teacher-link">
+            👩‍🏫 Učitelský režim
+          </a>
         </div>
       </header>
       <main className="app-main">{children}</main>

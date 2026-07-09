@@ -73,7 +73,7 @@ export function MeasurementJudgmentActivity({
                     onClick={() => handleAnswer(scenario.id, 'correct')}
                     disabled={done}
                   >
-                    Zapojení je v pořádku
+                    {activity.correctLabel ?? 'Zapojení je v pořádku'}
                   </button>
                   <button
                     type="button"
@@ -81,7 +81,7 @@ export function MeasurementJudgmentActivity({
                     onClick={() => handleAnswer(scenario.id, 'wrong')}
                     disabled={done}
                   >
-                    Zapojení je chybné
+                    {activity.wrongLabel ?? 'Zapojení je chybné'}
                   </button>
                 </div>
                 {feedback[scenario.id] && (
@@ -97,7 +97,9 @@ export function MeasurementJudgmentActivity({
 
       {completed && (
         <div className="feedback feedback--success" role="status">
-          ✔ Výborně! Rozpoznal jsi správné i chybné zapojení měřicích přístrojů.
+          ✔{' '}
+          {activity.successMessage ??
+            'Výborně! Rozpoznal jsi správné i chybné zapojení měřicích přístrojů.'}
         </div>
       )}
 

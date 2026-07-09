@@ -119,6 +119,12 @@ export interface MeterConnectionActivity {
 export interface MeasurementJudgmentActivity {
   type: 'measurement-judgment';
   instruction: string;
+  /** Popisek tlačítka „v pořádku" — výchozí: „Zapojení je v pořádku". */
+  correctLabel?: string;
+  /** Popisek tlačítka „chybné" — výchozí: „Zapojení je chybné". */
+  wrongLabel?: string;
+  /** Zpráva po vyřešení všech situací. */
+  successMessage?: string;
   scenarios: {
     id: string;
     text: string;
@@ -168,6 +174,8 @@ export interface MicroLesson {
   safetyNote: string;
   memorySentence: string;
   typicalMistake?: string;
+  /** Doporučení pro učitele, kdy lekci použít ve výuce. */
+  teacherTip?: string;
   interactiveDemo?: InteractiveDemo;
   activity: Activity;
   quiz: QuizQuestion[];
@@ -201,7 +209,8 @@ export type Route =
   | { page: 'home' }
   | { page: 'subject'; subjectId: string }
   | { page: 'topic'; subjectId: string; topicId: string }
-  | { page: 'lesson'; lessonId: string };
+  | { page: 'lesson'; lessonId: string }
+  | { page: 'teacher' };
 
 export type LessonStep = 'intro' | 'demo' | 'activity' | 'quiz' | 'complete';
 

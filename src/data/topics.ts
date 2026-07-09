@@ -100,6 +100,15 @@ export const topics: Topic[] = [
     estimatedMinutes: 30,
     mvpAvailable: true,
   },
+  {
+    id: 'merici-pristroje',
+    subjectId: 'mereni',
+    title: 'Rozdělení a princip činnosti měřicích přístrojů',
+    description: 'Jak měřicí přístroje fungují a jak zvolit správný měřicí rozsah.',
+    year: 1,
+    estimatedMinutes: 10,
+    mvpAvailable: true,
+  },
 ];
 
 export function getTopicsBySubject(subjectId: string, year?: number): Topic[] {

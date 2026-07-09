@@ -23,6 +23,8 @@ export const lessons: MicroLesson[] = [
     memorySentence: 'Elektrický proud teče jen tehdy, když má uzavřenou cestu.',
     typicalMistake:
       'Žáci často zapomínají, že obvod musí být uzavřený — stačí jedno přerušení a proud neteče.',
+    teacherTip:
+      'Úplně první lekce — vhodná na začátek 1. ročníku nebo jako rychlé opakování při suplování. Ukázka se spínačem funguje dobře na projektoru.',
     interactiveDemo: {
       type: 'circuit-switch',
       title: 'Sepni a rozpoj obvod',
@@ -107,6 +109,8 @@ export const lessons: MicroLesson[] = [
     memorySentence: 'Napětí tlačí, proud teče, odpor brání.',
     typicalMistake:
       'Žáci často zaměňují napětí a proud — napětí je příčina „tlaku“, proud je důsledek toku náboje.',
+    teacherTip:
+      'Zařaď před Ohmův zákon — bez rozlišení veličin se žáci ve vzorci ztratí. Párování pojmů zvládne i slabší žák.',
     activity: {
       termMatching: {
         type: 'term-matching',
@@ -188,6 +192,8 @@ export const lessons: MicroLesson[] = [
     memorySentence: 'U = R · I — napětí rovná odpor krát proud.',
     typicalMistake:
       'Žáci zaměňují, co dělit — hledáš proud? Dělíš napětí odporem: I = U / R.',
+    teacherTip:
+      'Vhodné po lekci o veličinách. Dobrá společná aktivita na tabuli: nech třídu hlasovat o správném vzorci, pak teprve odkryj řešení.',
     activity: {
       formulaSelect: {
         type: 'formula-select',
@@ -266,6 +272,8 @@ export const lessons: MicroLesson[] = [
     memorySentence: 'Sériově za sebou, paralelně ve větvích.',
     typicalMistake:
       'Žáci si pletou, kde proud „teče stejně“ — sériově je stejný proud všude, paralelně stejné napětí na větvích.',
+    teacherTip:
+      'Časté téma závěrečné zkoušky. Interaktivní ukázka dvou schémat se hodí na projektor; příklad s vánočním řetězem spolehlivě chytne pozornost.',
     interactiveDemo: {
       type: 'series-parallel',
       title: 'Sériové nebo paralelní?',
@@ -358,6 +366,8 @@ export const lessons: MicroLesson[] = [
     memorySentence: 'Schéma čteš po značkách — každý prvek má svůj symbol.',
     typicalMistake:
       'Žáci zaměňují značku zdroje a spotřebiče — zdroj dodává energii, spotřebič ji spotřebovává.',
+    teacherTip:
+      'Krátká opakovací aktivita na začátek hodiny elektrotechnického kreslení. Párování značek jde hrát i společně — třída radí, jeden kliká.',
     interactiveDemo: {
       type: 'symbols-demo',
       title: 'Poznej značky ve schématu',

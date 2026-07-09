@@ -34,7 +34,7 @@ export const badges: Badge[] = [
   {
     id: 'merici-elev',
     title: 'Měřicí elév',
-    description: 'Dokončil jsi všechny mikrolekce o měření v MVP-2.',
+    description: 'Dokončil jsi všechny dostupné mikrolekce o měření.',
     icon: '🎖️',
   },
   {
@@ -54,6 +54,12 @@ export const badges: Badge[] = [
     title: 'Měřák nespálen',
     description: 'Rozpoznáš správné i chybné zapojení měřáků.',
     icon: '🛡️',
+  },
+  {
+    id: 'spravny-rozsah',
+    title: 'Správný rozsah',
+    description: 'Umíš zvolit měřicí rozsah — od většího k menšímu.',
+    icon: '🎚️',
   },
 ];
 

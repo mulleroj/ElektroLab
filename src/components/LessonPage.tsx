@@ -14,9 +14,18 @@ interface LessonPageProps {
   lesson: MicroLesson;
   progress: ProgressState;
   calmMode: boolean;
+  projectorMode: boolean;
   onActivityComplete: () => void;
   onQuizComplete: () => void;
 }
+
+const stepLabels: Record<LessonStep, string> = {
+  intro: 'Úvod',
+  demo: 'Ukázka',
+  activity: 'Úkol',
+  quiz: 'Mini test',
+  complete: 'Hotovo',
+};
 
 function getInitialStep(lessonProgress: ReturnType<typeof getLessonProgress>): LessonStep {
   if (lessonProgress.activityCompleted) {
@@ -29,6 +38,7 @@ export function LessonPage({
   lesson,
   progress,
   calmMode,
+  projectorMode,
   onActivityComplete,
   onQuizComplete,
 }: LessonPageProps) {
@@ -55,8 +65,8 @@ export function LessonPage({
 
   const hasDemo = Boolean(lesson.interactiveDemo);
   const stepOrder: LessonStep[] = hasDemo
-    ? ['intro', 'demo', 'activity', 'quiz']
-    : ['intro', 'activity', 'quiz'];
+    ? ['intro', 'demo', 'activity', 'quiz', 'complete']
+    : ['intro', 'activity', 'quiz', 'complete'];
 
   const stepIndex = stepOrder.indexOf(step);
 
@@ -82,29 +92,35 @@ export function LessonPage({
 
       <SafetyNote text={lesson.safetyNote} />
 
-      {calmMode && step !== 'complete' && stepIndex >= 0 && (
-        <nav className="lesson-steps" aria-label="Kroky lekce">
-          <ol>
-            {stepOrder.map((s, i) => {
-              const labels: Record<LessonStep, string> = {
-                intro: 'Úvod',
-                demo: 'Ukázka',
-                activity: 'Úkol',
-                quiz: 'Mini test',
-                complete: 'Hotovo',
-              };
-              let cls = '';
-              if (step === s) cls = 'lesson-steps__active';
-              else if (stepIndex > i) cls = 'lesson-steps__done';
-              return (
-                <li key={s} className={cls}>
-                  {labels[s]}
-                </li>
-              );
-            })}
-          </ol>
-        </nav>
-      )}
+      <nav className="lesson-steps" aria-label="Kroky lekce">
+        <ol>
+          {stepOrder.map((s, i) => {
+            let cls = '';
+            let stateText = '';
+            if (step === s) {
+              cls = 'lesson-steps__active';
+              stateText = ' (právě zde)';
+            } else if (stepIndex > i) {
+              cls = 'lesson-steps__done';
+              stateText = ' (hotovo)';
+            }
+            return (
+              <li key={s} className={cls} aria-current={step === s ? 'step' : undefined}>
+                <span className="lesson-steps__number" aria-hidden="true">
+                  {i + 1}
+                </span>{' '}
+                {stepLabels[s]}
+                <span className="visually-hidden">{stateText}</span>
+                {stepIndex > i && (
+                  <span className="lesson-steps__check" aria-hidden="true">
+                    {' '}✔
+                  </span>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
 
       {step === 'intro' && (
         <article className="lesson-intro">
@@ -129,13 +145,34 @@ export function LessonPage({
           <blockquote className="memory-sentence">
             <p>„{lesson.memorySentence}"</p>
           </blockquote>
-          <button
-            type="button"
-            className="btn btn--primary btn--large"
-            onClick={() => setStep(getNextStepAfterIntro(lesson))}
-          >
-            {hasDemo ? 'Pokračovat na ukázku' : 'Pokračovat na úkol'}
-          </button>
+          {projectorMode ? (
+            <div className="lesson-intro__projector-actions">
+              {hasDemo && (
+                <button
+                  type="button"
+                  className="btn btn--primary btn--large"
+                  onClick={() => setStep('demo')}
+                >
+                  Spustit ukázku
+                </button>
+              )}
+              <button
+                type="button"
+                className={`btn btn--large ${hasDemo ? 'btn--secondary' : 'btn--primary'}`}
+                onClick={() => setStep('activity')}
+              >
+                Přejít na úkol
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className="btn btn--primary btn--large"
+              onClick={() => setStep(getNextStepAfterIntro(lesson))}
+            >
+              {hasDemo ? 'Pokračovat na ukázku' : 'Pokračovat na úkol'}
+            </button>
+          )}
         </article>
       )}
 
@@ -168,7 +205,14 @@ export function LessonPage({
           <h2>🎉 Lekce dokončena!</h2>
           <p className="lesson-complete__memory">„{lesson.memorySentence}"</p>
           <div className="lesson-complete__rewards">
-            <p>Získáváš celkem {lesson.activityXp + lesson.quizXp} XP za tuto lekci.</p>
+            {projectorMode ? (
+              <p>
+                Režim na projektor — pokrok a XP se neukládají. Žáci si lekci projdou
+                sami ve svém zařízení.
+              </p>
+            ) : (
+              <p>Získáváš celkem {lesson.activityXp + lesson.quizXp} XP za tuto lekci.</p>
+            )}
             {badge && earnedBadge && (
               <div className="badge-earned">
                 <span className="badge-earned__icon" aria-hidden="true">

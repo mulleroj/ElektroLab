@@ -20,6 +20,8 @@ export const mereniLessons: MicroLesson[] = [
     safetyNote: MERENI_SAFETY,
     memorySentence: 'Voltmetr vždy paralelně — měří napětí mezi body.',
     typicalMistake: 'Žák si plete zapojení voltmetru a ampérmetru.',
+    teacherTip:
+      'Zařaď před první praktické měření v dílně. Interaktivní ukázka na projektoru dobře předvede rozdíl sériově/paralelně bez rizika.',
     interactiveDemo: {
       type: 'voltmeter-connection',
       title: 'Kam patří voltmetr?',
@@ -101,6 +103,8 @@ export const mereniLessons: MicroLesson[] = [
       'Tato lekce je školní simulace. Nesprávné zapojení ampérmetru může ve skutečnosti poškodit přístroj nebo způsobit nebezpečnou situaci. Měření prováděj pouze pod dohledem učitele.',
     memorySentence: 'Ampérmetr vždy sériově — proud jím musí téct.',
     typicalMistake: 'Žák se pokusí zapojit ampérmetr paralelně jako voltmetr.',
+    teacherTip:
+      'Navazuje na lekci o voltmetru — ideálně obě v jedné hodině. Zdůrazni bezpečnostní rozdíl: špatně zapojený ampérmetr je zkrat.',
     interactiveDemo: {
       type: 'ammeter-connection',
       title: 'Kam patří ampérmetr?',
@@ -183,6 +187,8 @@ export const mereniLessons: MicroLesson[] = [
     memorySentence: 'Nejdřív si řekni, co měříš — pak teprve zapoj.',
     typicalMistake:
       'Žák bere měřák jako univerzální krabičku a neřeší rozdíl mezi měřením napětí a proudu.',
+    teacherTip:
+      'Souhrnná lekce po voltmetru a ampérmetru — vhodná jako opakování před praktickým cvičením nebo jako rychlá aktivita při suplování.',
     interactiveDemo: {
       type: 'measurement-scenarios',
       title: 'Správně nebo špatně?',
@@ -263,6 +269,106 @@ export const mereniLessons: MicroLesson[] = [
     activityXp: 20,
     quizXp: 15,
     badgeId: 'merak-nespalen',
+    mvpAvailable: true,
+  },
+  {
+    id: 'vyber-rozsahu',
+    subjectId: 'mereni',
+    topicId: 'merici-pristroje',
+    title: 'Výběr správného měřicího rozsahu',
+    year: 1,
+    durationMinutes: 8,
+    difficulty: 'základní',
+    goal:
+      'Žák vysvětlí, proč se měření začíná na největším rozsahu, a rozpozná správnou a chybnou volbu rozsahu.',
+    hook: 'Měříš baterii 12 V a přístroj máš nastavený na rozsah 2 V. Co se stane s ručičkou?',
+    explanation:
+      'Každý měřicí přístroj má **měřicí rozsahy** — největší hodnotu, kterou na daném nastavení umí změřit. Když neznáš měřenou hodnotu, začni vždy na **největším rozsahu** a postupně přepínej na menší, dokud údaj nečteš přesně. Příliš malý rozsah může přístroj přetížit, příliš velký dává nepřesné čtení.',
+    safetyNote:
+      'Tato lekce je školní simulace. Špatně zvolený rozsah může ve skutečnosti poškodit měřicí přístroj. Rozsah nastavuj vždy před připojením a měř jen podle pokynů učitele.',
+    memorySentence: 'Neznáš hodnotu? Začni od největšího rozsahu.',
+    typicalMistake:
+      'Žák nechá přístroj na malém rozsahu z minulého měření a připojí ho na větší napětí — ručička narazí a přístroj se může poškodit.',
+    teacherTip:
+      'Zařaď před první samostatné měření s multimetrem. Scénáře se hodí i jako společné rozhodování třídy na projektoru.',
+    activity: {
+      measurementJudgment: {
+        type: 'measurement-judgment',
+        instruction:
+          'U každé situace rozhodni, jestli je volba rozsahu v pořádku, nebo chybná. Všechny musí být správně.',
+        correctLabel: 'Postup je v pořádku',
+        wrongLabel: 'Postup je chybný',
+        successMessage: 'Výborně! Rozpoznal jsi správnou i chybnou volbu měřicího rozsahu.',
+        scenarios: [
+          {
+            id: 's1',
+            text: 'Žák nezná napětí zdroje, proto začne měřit na největším rozsahu voltmetru.',
+            correct: 'correct',
+            explanation: 'Správně — od největšího rozsahu se postupuje dolů.',
+          },
+          {
+            id: 's2',
+            text: 'Žák měří baterii 12 V na rozsahu 2 V, protože „to je rychlejší“.',
+            correct: 'wrong',
+            explanation: 'Chyba — hodnota je nad rozsahem, přístroj se přetíží.',
+          },
+          {
+            id: 's3',
+            text: 'Údaj je na velkém rozsahu špatně čitelný, žák přepne o rozsah níž a čte přesněji.',
+            correct: 'correct',
+            explanation: 'Správně — postupné snižování rozsahu zpřesňuje čtení.',
+          },
+          {
+            id: 's4',
+            text: 'Žák přepíná rozsah ve chvíli, kdy je přístroj připojený k obvodu, bez pokynu učitele.',
+            correct: 'wrong',
+            explanation:
+              'Chyba — rozsah se nastavuje před připojením a měří se podle pokynů učitele.',
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        id: 'q1',
+        text: 'Neznáš měřenou hodnotu. Na jakém rozsahu začneš?',
+        options: [
+          { id: 'a', text: 'Na největším rozsahu.' },
+          { id: 'b', text: 'Na nejmenším rozsahu.' },
+          { id: 'c', text: 'Na libovolném — nezáleží na tom.' },
+          { id: 'd', text: 'Rozsah se nastavuje až po měření.' },
+        ],
+        correctOptionId: 'a',
+        explanation: 'Od největšího rozsahu postupuješ dolů — přístroj tak nepřetížíš.',
+      },
+      {
+        id: 'q2',
+        text: 'Co hrozí při měření na příliš malém rozsahu?',
+        options: [
+          { id: 'a', text: 'Přetížení a poškození přístroje.' },
+          { id: 'b', text: 'Nic — přístroj se přizpůsobí.' },
+          { id: 'c', text: 'Jen o něco pomalejší měření.' },
+          { id: 'd', text: 'Zvýší se napětí zdroje.' },
+        ],
+        correctOptionId: 'a',
+        explanation: 'Hodnota nad rozsahem přístroj přetíží — může se poškodit.',
+      },
+      {
+        id: 'q3',
+        text: 'Údaj na velkém rozsahu je špatně čitelný. Co uděláš?',
+        options: [
+          { id: 'a', text: 'Postupně přepnu na menší rozsah a čtu přesněji.' },
+          { id: 'b', text: 'Odhadnu hodnotu od oka.' },
+          { id: 'c', text: 'Přepnu rovnou na nejmenší rozsah.' },
+          { id: 'd', text: 'Vypnu přístroj a napíšu nulu.' },
+        ],
+        correctOptionId: 'a',
+        explanation: 'Rozsah se snižuje postupně, dokud není údaj dobře čitelný.',
+      },
+    ],
+    activityXp: 20,
+    quizXp: 15,
+    badgeId: 'spravny-rozsah',
     mvpAvailable: true,
   },
 ];
