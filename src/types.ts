@@ -20,6 +20,92 @@ export interface Topic {
   mvpAvailable: boolean;
 }
 
+export interface CircuitSwitchDemo {
+  type: 'circuit-switch';
+  title: string;
+  description: string;
+}
+
+export interface SeriesParallelDemoConfig {
+  type: 'series-parallel';
+  title: string;
+  description: string;
+}
+
+export interface SymbolsDemoConfig {
+  type: 'symbols-demo';
+  title: string;
+  description: string;
+}
+
+export interface VoltmeterConnectionDemo {
+  type: 'voltmeter-connection';
+  title: string;
+  description: string;
+}
+
+export interface AmmeterConnectionDemo {
+  type: 'ammeter-connection';
+  title: string;
+  description: string;
+}
+
+export interface MeasurementScenariosDemo {
+  type: 'measurement-scenarios';
+  title: string;
+  description: string;
+}
+
+export interface ProtectionDeviceDemoConfig {
+  type: 'protection-device';
+  title: string;
+  description: string;
+}
+
+export interface ResidualCurrentDemoConfig {
+  type: 'residual-current';
+  title: string;
+  description: string;
+}
+
+export interface ProtectionScenarioDemoConfig {
+  type: 'protection-scenario';
+  title: string;
+  description: string;
+}
+
+export interface DiodeDirectionDemoConfig {
+  type: 'diode-direction';
+  title: string;
+  description: string;
+}
+
+export interface TransistorSwitchDemoConfig {
+  type: 'transistor-switch';
+  title: string;
+  description: string;
+}
+
+export interface LogicGateDemoConfig {
+  type: 'logic-gates';
+  title: string;
+  description: string;
+}
+
+export type InteractiveDemo =
+  | CircuitSwitchDemo
+  | SeriesParallelDemoConfig
+  | SymbolsDemoConfig
+  | VoltmeterConnectionDemo
+  | AmmeterConnectionDemo
+  | MeasurementScenariosDemo
+  | ProtectionDeviceDemoConfig
+  | ResidualCurrentDemoConfig
+  | ProtectionScenarioDemoConfig
+  | DiodeDirectionDemoConfig
+  | TransistorSwitchDemoConfig
+  | LogicGateDemoConfig;
+
 export interface CircuitOrderActivity {
   type: 'circuit-order';
   instruction: string;
@@ -63,12 +149,57 @@ export interface SymbolMatchingActivity {
   correctPairs: Record<string, string>;
 }
 
+export interface MeterConnectionActivity {
+  type: 'meter-connection';
+  instruction: string;
+  meterLabel: string;
+  options: { id: string; text: string }[];
+  correctOptionId: string;
+  successExplanation: string;
+}
+
+export interface MeasurementJudgmentActivity {
+  type: 'measurement-judgment';
+  instruction: string;
+  /** Popisek tlačítka „v pořádku" — výchozí: „Zapojení je v pořádku". */
+  correctLabel?: string;
+  /** Popisek tlačítka „chybné" — výchozí: „Zapojení je chybné". */
+  wrongLabel?: string;
+  /** Zpráva po vyřešení všech situací. */
+  successMessage?: string;
+  scenarios: {
+    id: string;
+    text: string;
+    correct: 'correct' | 'wrong';
+    explanation: string;
+  }[];
+}
+
+export interface ScenarioChoiceActivity {
+  type: 'scenario-choice';
+  instruction: string;
+  /** Společné možnosti pro všechny situace (2–4 tlačítka). */
+  options: { id: string; label: string }[];
+  scenarios: {
+    id: string;
+    text: string;
+    correctOptionId: string;
+    explanation: string;
+    /** Volitelné vlastní možnosti jen pro tuto situaci (přepíší společné). */
+    options?: { id: string; label: string }[];
+  }[];
+  successMessage: string;
+}
+
 export type LessonActivity =
   | CircuitOrderActivity
   | TermMatchingActivity
   | FormulaSelectActivity
   | ConnectionTypeActivity
-  | SymbolMatchingActivity;
+  | SymbolMatchingActivity
+  | MeterConnectionActivity
+  | MeasurementJudgmentActivity
+  | ScenarioChoiceActivity;
 
 export interface Activity {
   circuitOrder?: CircuitOrderActivity;
@@ -76,6 +207,9 @@ export interface Activity {
   formulaSelect?: FormulaSelectActivity;
   connectionType?: ConnectionTypeActivity;
   symbolMatching?: SymbolMatchingActivity;
+  meterConnection?: MeterConnectionActivity;
+  measurementJudgment?: MeasurementJudgmentActivity;
+  scenarioChoice?: ScenarioChoiceActivity;
 }
 
 export interface QuizQuestion {
@@ -100,6 +234,9 @@ export interface MicroLesson {
   safetyNote: string;
   memorySentence: string;
   typicalMistake?: string;
+  /** Doporučení pro učitele, kdy lekci použít ve výuce. */
+  teacherTip?: string;
+  interactiveDemo?: InteractiveDemo;
   activity: Activity;
   quiz: QuizQuestion[];
   activityXp: number;
@@ -132,9 +269,10 @@ export type Route =
   | { page: 'home' }
   | { page: 'subject'; subjectId: string }
   | { page: 'topic'; subjectId: string; topicId: string }
-  | { page: 'lesson'; lessonId: string };
+  | { page: 'lesson'; lessonId: string }
+  | { page: 'teacher' };
 
-export type LessonStep = 'intro' | 'activity' | 'quiz' | 'complete';
+export type LessonStep = 'intro' | 'demo' | 'activity' | 'quiz' | 'complete';
 
 export function getLessonActivity(lesson: MicroLesson): LessonActivity | null {
   const { activity } = lesson;
@@ -143,5 +281,12 @@ export function getLessonActivity(lesson: MicroLesson): LessonActivity | null {
   if (activity.formulaSelect) return activity.formulaSelect;
   if (activity.connectionType) return activity.connectionType;
   if (activity.symbolMatching) return activity.symbolMatching;
+  if (activity.meterConnection) return activity.meterConnection;
+  if (activity.measurementJudgment) return activity.measurementJudgment;
+  if (activity.scenarioChoice) return activity.scenarioChoice;
   return null;
+}
+
+export function getNextStepAfterIntro(lesson: MicroLesson): LessonStep {
+  return lesson.interactiveDemo ? 'demo' : 'activity';
 }

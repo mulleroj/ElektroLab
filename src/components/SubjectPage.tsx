@@ -15,7 +15,8 @@ export function SubjectPage({ subject, progress }: SubjectPageProps) {
   const [selectedYear, setSelectedYear] = useState(subject.years[0]);
   const topics = getTopicsBySubject(subject.id, selectedYear);
 
-  const mvpLessons = getMvpLessonsBySubject(subject.id, selectedYear);
+  // Pokrok předmětu počítáme přes všechny ročníky, aby se filtrem neměnil.
+  const mvpLessons = getMvpLessonsBySubject(subject.id);
   const allLessonIds = mvpLessons.map((l) => l.id);
   const { completed, total } = getSubjectProgress(progress, allLessonIds);
   const progressPercent = total > 0 ? Math.round((completed / total) * 100) : 0;

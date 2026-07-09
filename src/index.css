@@ -173,10 +173,6 @@ input:focus-visible {
   color: var(--color-success);
 }
 
-.lesson-steps__done::before {
-  content: '✔ ';
-}
-
 /* Progress summary */
 
 .progress-summary {
@@ -1016,6 +1012,292 @@ input:focus-visible {
   margin-bottom: 0.5rem;
 }
 
+/* Interactive demos */
+
+.interactive-demo {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.interactive-demo h3 {
+  margin: 0 0 0.5rem;
+  color: var(--color-primary);
+}
+
+.circuit-diagram {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 1.5rem 1rem;
+  background: #f8fafc;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  margin: 1rem 0;
+}
+
+.circuit-diagram__part {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 3.5rem;
+}
+
+.circuit-diagram__icon {
+  font-size: 1.5rem;
+}
+
+.circuit-diagram__wire {
+  width: 2rem;
+  height: 4px;
+  background: var(--color-primary);
+  border-radius: 2px;
+}
+
+.circuit-diagram__wire--broken {
+  background: repeating-linear-gradient(
+    90deg,
+    #94a3b8,
+    #94a3b8 4px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+
+.circuit-diagram__bulb--on .circuit-diagram__icon {
+  filter: drop-shadow(0 0 8px #fbbf24);
+}
+
+.circuit-diagram__controls,
+.meter-circuit__controls {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+
+.demo-schemas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.demo-schema {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  background: #f8fafc;
+}
+
+.demo-schema--done {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.demo-schema h4 {
+  margin: 0 0 0.75rem;
+}
+
+.demo-schema__buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.schema-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  min-height: 4rem;
+  padding: 0.75rem;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+}
+
+.schema-visual--parallel {
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.schema-branch {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.schema-node {
+  font-size: 1.25rem;
+  padding: 0.25rem 0.5rem;
+  background: #eef2f7;
+  border-radius: 4px;
+}
+
+.schema-line {
+  width: 1.5rem;
+  height: 3px;
+  background: var(--color-primary);
+}
+
+.symbols-demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.symbols-demo-card {
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  cursor: pointer;
+  min-height: 5rem;
+}
+
+.symbols-demo-card--revealed {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.symbols-demo-card__symbol {
+  font-size: 1.75rem;
+  font-family: monospace;
+}
+
+.symbols-demo-card__name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.meter-circuit {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem 1rem;
+  background: #f8fafc;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  margin: 1rem 0;
+  min-height: 5rem;
+}
+
+.meter-circuit__source,
+.meter-circuit__load,
+.meter-circuit__return {
+  padding: 0.5rem 0.75rem;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.meter-circuit__line {
+  width: 2rem;
+  height: 4px;
+  background: var(--color-primary);
+}
+
+.meter-circuit__meter {
+  position: absolute;
+  padding: 0.35rem 0.6rem;
+  background: #fff8e6;
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 0.8125rem;
+}
+
+.meter-circuit--serial .meter-circuit__meter--serial,
+.meter-circuit--volt.meter-circuit--parallel .meter-circuit__meter--parallel {
+  top: 0.5rem;
+  right: 1rem;
+}
+
+.meter-circuit--amp.meter-circuit--serial .meter-circuit__meter--inline {
+  position: static;
+}
+
+.meter-circuit--parallel .meter-circuit__meter--parallel {
+  bottom: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.measurement-scenarios,
+.judgment-activity__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.measurement-scenario-card,
+.judgment-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.judgment-card--done {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.measurement-scenario-card__buttons,
+.judgment-card__buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.measurement-scenario-card__ok {
+  color: var(--color-success);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.measurement-scenario-card__bad {
+  color: var(--color-error);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.judgment-activity__actions,
+.meter-activity__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.meter-activity__meter-label {
+  margin-bottom: 1rem;
+}
+
 /* Responsive */
 
 @media (max-width: 600px) {
@@ -1034,4 +1316,648 @@ input:focus-visible {
   .matching-activity__columns {
     grid-template-columns: 1fr;
   }
+
+  .demo-schemas {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== MVP-3: kroky lekce (viditelné vždy) ===== */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.lesson-steps__number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.lesson-steps__active .lesson-steps__number {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.lesson-steps__done .lesson-steps__number {
+  background: var(--color-success-bg);
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.lesson-steps__check {
+  color: var(--color-success);
+}
+
+/* ===== MVP-3: učitelský režim ===== */
+
+.teacher-link {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  white-space: nowrap;
+}
+
+.teacher-link:hover,
+.teacher-link:focus-visible {
+  border-color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.teacher-subject {
+  margin-bottom: 2rem;
+}
+
+.teacher-lesson-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.teacher-lesson-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.25rem;
+}
+
+.teacher-lesson-card h3 {
+  margin: 0 0 0.25rem;
+}
+
+.teacher-lesson-card__meta {
+  margin: 0 0 0.75rem;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.teacher-lesson-card__details {
+  margin: 0 0 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.teacher-lesson-card__details dt {
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted);
+}
+
+.teacher-lesson-card__details dd {
+  margin: 0;
+}
+
+.teacher-lesson-card__safety {
+  background: var(--color-safety-bg);
+  border-left: 4px solid var(--color-safety-border);
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+}
+
+.teacher-lesson-card__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* ===== MVP-3: režim na projektor ===== */
+
+.projector-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 1.5rem;
+  background: var(--color-primary);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.projector-banner .btn {
+  margin: 0;
+}
+
+.btn--small {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.projector-mode .app-main {
+  font-size: 1.35rem;
+  max-width: 1200px;
+}
+
+.projector-mode .app-main h1 {
+  font-size: 2.5rem;
+}
+
+.projector-mode .app-main h2 {
+  font-size: 1.9rem;
+}
+
+.projector-mode .app-main .btn {
+  font-size: 1.25rem;
+  padding: 0.8rem 1.5rem;
+}
+
+.projector-mode .app-header__tagline,
+.projector-mode .progress-summary,
+.projector-mode .app-footer {
+  display: none;
+}
+
+.projector-mode .lesson-steps li {
+  font-size: 1.1rem;
+}
+
+.lesson-intro__projector-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ===== MVP-3: přehled „Co už umím" ===== */
+
+.progress-overview {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.progress-overview h2 {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+}
+
+.progress-overview__stats {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin: 0 0 1rem;
+}
+
+.progress-overview__stats dt {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted);
+}
+
+.progress-overview__stats dd {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.progress-overview__badges h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.progress-overview__badges ul {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: flex;
+  gap: 0.5rem 1rem;
+  flex-wrap: wrap;
+}
+
+.progress-overview__badges li {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.progress-overview__done {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-success);
+}
+
+@media (max-width: 640px) {
+  .progress-overview__stats {
+    gap: 1rem;
+  }
+
+  .teacher-lesson-card__actions .btn {
+    width: 100%;
+  }
+}
+
+/* ===== MVP-4: jistič demo ===== */
+
+.protection-breaker {
+  border: 2px solid var(--color-success);
+  border-radius: var(--radius);
+}
+
+.protection-breaker--tripped {
+  border-color: var(--color-error);
+  background: var(--color-error-bg);
+}
+
+/* ===== MVP-4: proudový chránič demo ===== */
+
+.rcd-diagram {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.rcd-diagram__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-weight: 600;
+}
+
+.rcd-diagram__value {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-primary);
+}
+
+.rcd-diagram__device {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius);
+  background: #e8f0f8;
+  font-size: 0.9375rem;
+}
+
+.rcd-diagram__device--tripped {
+  border-color: var(--color-error);
+  background: var(--color-error-bg);
+  font-weight: 700;
+}
+
+.rcd-diagram__leak {
+  margin: 0;
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+/* ===== MVP-4: karty situací (demo) ===== */
+
+.scenario-cards {
+  list-style: none;
+  margin: 1rem 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.scenario-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+}
+
+.scenario-card__situation {
+  margin: 0 0 0.75rem;
+  font-weight: 600;
+}
+
+.scenario-card__answer {
+  background: var(--color-success-bg);
+  border-left: 4px solid var(--color-success);
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+}
+
+.scenario-card__answer p {
+  margin: 0.25rem 0 0;
+}
+
+/* ===== MVP-4: rozhodovací aktivita (scenario-choice) ===== */
+
+.scenario-choice__instruction {
+  font-weight: 600;
+}
+
+.scenario-choice__list {
+  list-style: none;
+  margin: 1rem 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.scenario-choice__buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+
+.scenario-choice__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+/* ===== MVP-5: dioda demo ===== */
+
+.diode-symbol {
+  border: 2px solid var(--color-success);
+  border-radius: var(--radius);
+}
+
+.diode-symbol--blocking {
+  border-color: var(--color-error);
+  background: var(--color-error-bg);
+}
+
+/* ===== MVP-5: tranzistor demo ===== */
+
+.transistor-diagram {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+  display: grid;
+  gap: 0.4rem;
+  justify-items: start;
+}
+
+.transistor-diagram__control,
+.transistor-diagram__device {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+}
+
+.transistor-diagram__control--on {
+  border-color: var(--color-accent);
+  background: #fff8e6;
+}
+
+.transistor-diagram__device--on {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.transistor-diagram__arrow {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  padding-left: 0.75rem;
+}
+
+/* ===== MVP-5: logická hradla demo ===== */
+
+.logic-gate {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1rem 0 0.75rem;
+}
+
+.logic-gate__panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.logic-gate__inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.logic-gate__symbol {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--color-primary);
+}
+
+.logic-io {
+  font-family: inherit;
+  font-size: 0.9375rem;
+  padding: 0.5rem 0.9rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  cursor: pointer;
+  text-align: left;
+}
+
+.logic-io--output {
+  cursor: default;
+}
+
+.logic-io--one {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+  font-weight: 700;
+}
+
+.logic-gate__explain {
+  background: #eef2f7;
+  border-left: 4px solid var(--color-primary);
+  border-radius: 4px;
+  padding: 0.6rem 0.85rem;
+  margin: 0 0 1rem;
+}
+
+/* ===== MVP-6: onboarding ===== */
+
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 35, 50, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 100;
+}
+
+.onboarding {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(26, 35, 50, 0.3);
+  max-width: 560px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 1.5rem 1.75rem;
+}
+
+.onboarding h2 {
+  margin: 0 0 1rem;
+}
+
+.onboarding__points {
+  list-style: none;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.onboarding__points li {
+  padding-left: 1rem;
+  border-left: 3px solid var(--color-primary);
+}
+
+/* ===== MVP-6: pokračovací box ===== */
+
+.continue-box {
+  background: var(--color-surface);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.continue-box h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.15rem;
+}
+
+.continue-box p {
+  margin: 0 0 0.75rem;
+}
+
+/* ===== MVP-6: štítky lekcí ===== */
+
+.lesson-card__tags {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin: 0 0 0.5rem;
+}
+
+.tag--demo {
+  background: #e8f0f8;
+  color: var(--color-primary);
+}
+
+.tag--safety {
+  background: var(--color-safety-bg);
+  color: var(--color-safety-border);
+}
+
+/* ===== MVP-6: učitelské sekce ===== */
+
+.teacher-quick__list {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.teacher-quick__card {
+  background: var(--color-surface);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.teacher-quick__card h3 {
+  margin: 0;
+}
+
+.teacher-quick__meta {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.teacher-quick__tries {
+  margin: 0;
+  flex: 1;
+}
+
+.teacher-checklist {
+  margin-bottom: 1.5rem;
+}
+
+.teacher-checklist__list {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  margin: 0;
+  padding: 1rem 1rem 1rem 2.25rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.teacher-export {
+  margin-bottom: 2rem;
+}
+
+.teacher-export__status {
+  margin: 0.5rem 0;
+  font-weight: 600;
+  min-height: 1.2em;
+}
+
+.teacher-export__textarea {
+  width: 100%;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.8125rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.75rem;
 }

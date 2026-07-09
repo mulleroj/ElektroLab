@@ -17,6 +17,8 @@ export function parseHash(): Route {
     case 'lesson':
       if (parts[1]) return { page: 'lesson', lessonId: parts[1] };
       break;
+    case 'teacher':
+      return { page: 'teacher' };
   }
 
   return { page: 'home' };
@@ -37,6 +39,9 @@ export function navigate(route: Route): void {
       break;
     case 'lesson':
       hash = `#/lesson/${route.lessonId}`;
+      break;
+    case 'teacher':
+      hash = '#/teacher';
       break;
   }
 

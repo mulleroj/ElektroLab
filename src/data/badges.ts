@@ -31,6 +31,84 @@ export const badges: Badge[] = [
     description: 'Poznáš základní elektrotechnické značky.',
     icon: '📋',
   },
+  {
+    id: 'merici-elev',
+    title: 'Měřicí elév',
+    description: 'Dokončil jsi všechny dostupné mikrolekce o měření.',
+    icon: '🎖️',
+  },
+  {
+    id: 'voltmetr-zvladnut',
+    title: 'Voltmetr zvládnut',
+    description: 'Víš, že voltmetr patří paralelně.',
+    icon: '📏',
+  },
+  {
+    id: 'ampermetr-zvladnut',
+    title: 'Ampérmetr zvládnut',
+    description: 'Víš, že ampérmetr patří sériově.',
+    icon: '🔋',
+  },
+  {
+    id: 'merak-nespalen',
+    title: 'Měřák nespálen',
+    description: 'Rozpoznáš správné i chybné zapojení měřáků.',
+    icon: '🛡️',
+  },
+  {
+    id: 'spravny-rozsah',
+    title: 'Správný rozsah',
+    description: 'Umíš zvolit měřicí rozsah — od většího k menšímu.',
+    icon: '🎚️',
+  },
+  {
+    id: 'hlidac-jistice',
+    title: 'Hlídač jističe',
+    description: 'Víš, kdy jistič vypne a co vlastně chrání.',
+    icon: '🛑',
+  },
+  {
+    id: 'chranic-pochopen',
+    title: 'Chránič pochopen',
+    description: 'Rozumíš tomu, že proudový chránič porovnává proud tam a zpět.',
+    icon: '💠',
+  },
+  {
+    id: 'rozvodovy-detektiv',
+    title: 'Rozvodový detektiv',
+    description: 'Rozlišíš, kdy pomáhá jistič, kdy chránič a kdy je čas zavolat odborníka.',
+    icon: '🕵️',
+  },
+  {
+    id: 'bezpecny-rozvodar',
+    title: 'Bezpečný rozvodář',
+    description: 'Dokončil jsi všechny dostupné mikrolekce o rozvodných zařízeních.',
+    icon: '🏅',
+  },
+  {
+    id: 'dioda-pochopena',
+    title: 'Dioda pochopena',
+    description: 'Víš, že dioda propouští proud hlavně jedním směrem.',
+    icon: '🔺',
+  },
+  {
+    id: 'spinac-z-tranzistoru',
+    title: 'Spínač z tranzistoru',
+    description: 'Rozumíš tomu, jak malý signál spíná větší proud.',
+    icon: '🎛️',
+  },
+  {
+    id: 'logicky-elektrikar',
+    title: 'Logický elektrikář',
+    description: 'Zvládáš hradla AND, OR a NOT se vstupy 0 a 1.',
+    icon: '🧮',
+  },
+  {
+    id: 'elektronicky-elev',
+    title: 'Elektronický elév',
+    description: 'Dokončil jsi všechny dostupné mikrolekce z elektroniky.',
+    icon: '🎖️',
+  },
 ];
 
 export function getBadgeById(id: string): Badge | undefined {
