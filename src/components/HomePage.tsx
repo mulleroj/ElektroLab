@@ -10,9 +10,24 @@ interface HomePageProps {
   progress: ProgressState;
 }
 
+const RECOMMENDED_FIRST_LESSON_ID = 'co-je-obvod';
+
+function getLastOpenedLesson() {
+  try {
+    const id = localStorage.getItem('elektrolab-last-lesson');
+    if (!id) return undefined;
+    const lesson = getLessonById(id);
+    return lesson?.mvpAvailable ? lesson : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export function HomePage({ progress }: HomePageProps) {
   const mvpLessons = lessons.filter((l) => l.mvpAvailable);
   const completedLessons = mvpLessons.filter((l) => isLessonComplete(progress, l.id));
+  const lastOpened = getLastOpenedLesson();
+  const recommended = getLessonById(RECOMMENDED_FIRST_LESSON_ID);
 
   const lastCompleted = Object.entries(progress.lessons)
     .filter(([, lp]) => lp.completedAt)
@@ -38,6 +53,44 @@ export function HomePage({ progress }: HomePageProps) {
           Vše běží lokálně — bez přihlášení, bez internetu po načtení.
         </p>
       </div>
+
+      <section className="continue-box" aria-labelledby="continue-title">
+        {lastOpened ? (
+          <>
+            <h2 id="continue-title">Pokračuj tam, kde jsi skončil</h2>
+            <p>
+              Naposledy otevřená lekce: <strong>{lastOpened.title}</strong> (
+              {lastOpened.durationMinutes} min)
+            </p>
+            <button
+              type="button"
+              className="btn btn--primary"
+              onClick={() => navigate({ page: 'lesson', lessonId: lastOpened.id })}
+            >
+              Pokračovat v lekci
+            </button>
+          </>
+        ) : (
+          recommended && (
+            <>
+              <h2 id="continue-title">Začni první lekcí</h2>
+              <p>
+                Doporučujeme: <strong>{recommended.title}</strong> (
+                {recommended.durationMinutes} min)
+              </p>
+              <button
+                type="button"
+                className="btn btn--primary"
+                onClick={() =>
+                  navigate({ page: 'lesson', lessonId: recommended.id })
+                }
+              >
+                Začít lekci
+              </button>
+            </>
+          )
+        )}
+      </section>
 
       {completedLessons.length > 0 && (
         <section className="progress-overview" aria-labelledby="progress-overview-title">
@@ -73,13 +126,9 @@ export function HomePage({ progress }: HomePageProps) {
             </div>
           )}
           {nextLesson ? (
-            <button
-              type="button"
-              className="btn btn--primary"
-              onClick={() => navigate({ page: 'lesson', lessonId: nextLesson.id })}
-            >
-              Pokračovat tam, kde jsem skončil: {nextLesson.title}
-            </button>
+            <p className="progress-overview__next">
+              Další doporučená lekce: <strong>{nextLesson.title}</strong>
+            </p>
           ) : (
             <p className="progress-overview__done">
               🎉 Všechny dostupné lekce máš hotové. Můžeš je kdykoli opakovat.

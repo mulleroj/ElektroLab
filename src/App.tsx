@@ -19,8 +19,19 @@ import { SubjectPage } from './components/SubjectPage';
 import { TopicPage } from './components/TopicPage';
 import { LessonPage } from './components/LessonPage';
 import { TeacherPage } from './components/TeacherPage';
+import { Onboarding } from './components/Onboarding';
 
 const PROJECTOR_KEY = 'elektrolab-projector';
+const ONBOARDING_KEY = 'elektrolab-onboarding-seen';
+const LAST_LESSON_KEY = 'elektrolab-last-lesson';
+
+function loadOnboardingSeen(): boolean {
+  try {
+    return localStorage.getItem(ONBOARDING_KEY) === '1';
+  } catch {
+    return true;
+  }
+}
 
 /** Předmětové odznaky: udělí se po dokončení všech MVP lekcí předmětu (a ročníku). */
 const SUBJECT_BADGES: { subjectId: string; year?: number; badgeId: string }[] = [
@@ -41,6 +52,9 @@ function App() {
   const [route, setRoute] = useState<Route>(parseHash);
   const [progress, setProgress] = useState<ProgressState>(loadProgress);
   const [projectorMode, setProjectorMode] = useState<boolean>(loadProjectorMode);
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(
+    () => !loadOnboardingSeen(),
+  );
 
   useEffect(() => {
     const onHashChange = () => setRoute(parseHash());
@@ -55,6 +69,26 @@ function App() {
       // sessionStorage nemusí být dostupná — režim pak platí jen do obnovení stránky
     }
   }, [projectorMode]);
+
+  // Zapamatuj poslední otevřenou lekci (mimo projektorový režim).
+  useEffect(() => {
+    if (route.page === 'lesson' && !projectorMode) {
+      try {
+        localStorage.setItem(LAST_LESSON_KEY, route.lessonId);
+      } catch {
+        // bez localStorage se poslední lekce jen nezapamatuje
+      }
+    }
+  }, [route, projectorMode]);
+
+  const handleOnboardingClose = useCallback(() => {
+    setShowOnboarding(false);
+    try {
+      localStorage.setItem(ONBOARDING_KEY, '1');
+    } catch {
+      // bez localStorage se úvod zobrazí znovu při příštím spuštění
+    }
+  }, []);
 
   const handleCalmModeToggle = useCallback(() => {
     setProgress((prev) => toggleCalmMode(prev));
@@ -178,7 +212,9 @@ function App() {
       onCalmModeToggle={handleCalmModeToggle}
       projectorMode={projectorMode}
       onProjectorModeToggle={() => setProjectorMode((prev) => !prev)}
+      onOpenOnboarding={() => setShowOnboarding(true)}
     >
+      {showOnboarding && <Onboarding onClose={handleOnboardingClose} />}
       {renderPage()}
     </AppShell>
   );

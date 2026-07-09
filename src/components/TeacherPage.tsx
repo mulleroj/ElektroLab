@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import type { MicroLesson } from '../types';
-import { subjects } from '../data/subjects';
+import { subjects, getSubjectById } from '../data/subjects';
 import { getTopicById } from '../data/topics';
-import { getMvpLessonsBySubject } from '../data/lessons';
+import { getMvpLessonsBySubject, getLessonById } from '../data/lessons';
 import { filterValidLessons } from '../lib/validation';
 
 interface TeacherPageProps {
@@ -46,8 +47,72 @@ function getDefaultTeacherTip(lesson: MicroLesson): string {
   return `Krátká aktivita (~${lesson.durationMinutes} min) pro ${lesson.year}. ročník — vhodná jako opakování nebo rychlá aktivita do hodiny.`;
 }
 
+/** Doporučené rychlé lekce do hodiny (~10 minut). */
+const QUICK_LESSONS: { id: string; studentTries: string }[] = [
+  {
+    id: 'co-je-obvod',
+    studentTries: 'Sepne a rozpojí obvod a seřadí prvky tak, jak jimi teče proud.',
+  },
+  {
+    id: 'voltmetr-zapojeni',
+    studentTries: 'V simulaci vyzkouší, proč voltmetr patří paralelně.',
+  },
+  {
+    id: 'co-dela-jistic',
+    studentTries: 'Projde scénáře přetížení a zkratu a rozhodne, kdy jistič vypne.',
+  },
+  {
+    id: 'logicka-hradla',
+    studentTries: 'Přepíná vstupy 0/1 a sleduje výstup hradel AND, OR a NOT.',
+  },
+];
+
+const PILOT_CHECKLIST = [
+  'Spustit na projektoru',
+  'Vybrat lekci',
+  'Žáci projdou ukázku',
+  'Žáci splní úkol',
+  'Společně projít mini test',
+  'Zapsat, co bylo nejasné',
+];
+
+function buildLessonsOverview(): string {
+  const lines: string[] = ['ElektroLab — přehled dostupných lekcí', ''];
+  for (const subject of subjects.filter((s) => s.mvpAvailable)) {
+    const lessons = filterValidLessons(getMvpLessonsBySubject(subject.id));
+    if (lessons.length === 0) continue;
+    lines.push(`=== ${subject.title} ===`);
+    for (const lesson of lessons) {
+      const demo = lesson.interactiveDemo
+        ? (demoLabels[lesson.interactiveDemo.type] ?? lesson.interactiveDemo.title)
+        : 'bez ukázky';
+      lines.push(
+        `- ${lesson.title} (${lesson.year}. ročník, ${lesson.durationMinutes} min)`,
+      );
+      lines.push(`  Interaktivita: ${demo}; úkol: ${getActivityLabel(lesson)}`);
+      lines.push(`  Bezpečnost: ${lesson.safetyNote}`);
+    }
+    lines.push('');
+  }
+  return lines.join('\n');
+}
+
 export function TeacherPage({ onOpenLesson, onOpenLessonOnProjector }: TeacherPageProps) {
   const activeSubjects = subjects.filter((s) => s.mvpAvailable);
+  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'fallback'>('idle');
+  const [overviewText, setOverviewText] = useState('');
+
+  const handleCopyOverview = async () => {
+    const text = buildLessonsOverview();
+    setOverviewText(text);
+    try {
+      if (!navigator.clipboard) throw new Error('clipboard unavailable');
+      await navigator.clipboard.writeText(text);
+      setCopyState('copied');
+    } catch {
+      setCopyState('fallback');
+    }
+  };
 
   return (
     <section className="teacher-page">
@@ -63,6 +128,87 @@ export function TeacherPage({ onOpenLesson, onOpenLessonOnProjector }: TeacherPa
           ani XP</strong> — hodí se pro společnou práci celé třídy.
         </p>
       </header>
+
+      <section className="teacher-quick" aria-labelledby="quick-title">
+        <h2 id="quick-title" className="section-title">
+          ⏱️ Dnes do hodiny — rychlé lekce na ~10 minut
+        </h2>
+        <ul className="teacher-quick__list">
+          {QUICK_LESSONS.map(({ id, studentTries }) => {
+            const lesson = getLessonById(id);
+            if (!lesson) return null;
+            const subject = getSubjectById(lesson.subjectId);
+            return (
+              <li key={id}>
+                <article className="teacher-quick__card">
+                  <h3>{lesson.title}</h3>
+                  <p className="teacher-quick__meta">
+                    {subject?.title} · {lesson.durationMinutes} min
+                  </p>
+                  <p className="teacher-quick__tries">
+                    <strong>Žák si vyzkouší:</strong> {studentTries}
+                  </p>
+                  <div className="teacher-lesson-card__actions">
+                    <button
+                      type="button"
+                      className="btn btn--primary"
+                      onClick={() => onOpenLessonOnProjector(id)}
+                    >
+                      Projektor
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn--secondary"
+                      onClick={() => onOpenLesson(id)}
+                    >
+                      Otevřít
+                    </button>
+                  </div>
+                </article>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      <section className="teacher-checklist" aria-labelledby="checklist-title">
+        <h2 id="checklist-title" className="section-title">
+          📋 Checklist pro pilotní hodinu
+        </h2>
+        <ol className="teacher-checklist__list">
+          {PILOT_CHECKLIST.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="teacher-export" aria-labelledby="export-title">
+        <h2 id="export-title" className="section-title">
+          📄 Přehled lekcí pro přípravu
+        </h2>
+        <button
+          type="button"
+          className="btn btn--secondary"
+          onClick={handleCopyOverview}
+        >
+          Zkopírovat přehled lekcí
+        </button>
+        <p role="status" className="teacher-export__status">
+          {copyState === 'copied' && '✔ Přehled je zkopírovaný ve schránce.'}
+          {copyState === 'fallback' &&
+            'Schránka není dostupná — text si zkopíruj ručně z pole níže.'}
+        </p>
+        {copyState === 'fallback' && (
+          <textarea
+            className="teacher-export__textarea"
+            readOnly
+            rows={12}
+            value={overviewText}
+            aria-label="Přehled lekcí k ručnímu zkopírování"
+            onFocus={(e) => e.currentTarget.select()}
+          />
+        )}
+      </section>
 
       {activeSubjects.map((subject) => {
         const lessons = filterValidLessons(getMvpLessonsBySubject(subject.id));
