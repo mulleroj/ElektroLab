@@ -54,7 +54,7 @@ export const subjects: Subject[] = [
     description: 'Automatizace a řídicí systémy.',
     icon: '🤖',
     years: [3],
-    mvpAvailable: false,
+    mvpAvailable: true,
   },
   {
     id: 'bezpecnost',

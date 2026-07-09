@@ -1961,3 +1961,42 @@ input:focus-visible {
   border-radius: var(--radius);
   padding: 0.75rem;
 }
+
+/* ===== MVP-7: automatizační diagramy ===== */
+
+.automation-diagram {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+  display: grid;
+  gap: 0.4rem;
+  justify-items: start;
+}
+
+.automation-diagram__box {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+}
+
+.automation-diagram__box--active {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.automation-diagram__box--alert {
+  border-color: var(--color-safety-border);
+  background: var(--color-safety-bg);
+}
+
+.automation-diagram__arrow {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  padding-left: 0.75rem;
+}

@@ -42,7 +42,9 @@ export function CircuitOrderActivity({
       setCompleted(true);
       setFeedback({
         type: 'success',
-        message: 'Výborně! Sestavil jsi správný uzavřený obvod. Proud může téct od zdroje přes vypínač a spotřebič zpět.',
+        message:
+          activity.successMessage ??
+          'Výborně! Sestavil jsi správný uzavřený obvod. Proud může téct od zdroje přes vypínač a spotřebič zpět.',
       });
     }
   };

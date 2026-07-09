@@ -23,6 +23,10 @@ const demoLabels: Record<string, string> = {
   'diode-direction': 'Dioda: propustný a závěrný směr',
   'transistor-switch': 'Tranzistor jako spínač',
   'logic-gates': 'Hradla AND / OR / NOT',
+  'sensor-demo': 'Snímač pohybu a světlo',
+  'regulation-loop': 'Regulační smyčka s teplotou',
+  'feedback-loop': 'Zpětná vazba na nádrži',
+  'automation-logic': 'Dopravník s podmínkou AND',
 };
 
 const activityLabels: Record<string, string> = {

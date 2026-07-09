@@ -11,6 +11,10 @@ import { ProtectionScenarioDemoView } from './demos/ProtectionScenarioDemo';
 import { DiodeDirectionDemoView } from './demos/DiodeDirectionDemo';
 import { TransistorSwitchDemoView } from './demos/TransistorSwitchDemo';
 import { LogicGateDemoView } from './demos/LogicGateDemo';
+import { SensorDemoView } from './demos/SensorDemo';
+import { RegulationLoopDemoView } from './demos/RegulationLoopDemo';
+import { FeedbackDemoView } from './demos/FeedbackDemo';
+import { AutomationLogicDemoView } from './demos/AutomationLogicDemo';
 
 interface InteractiveDemoRendererProps {
   demo: InteractiveDemo;
@@ -68,6 +72,18 @@ export function InteractiveDemoRenderer({
       );
     case 'logic-gates':
       return <LogicGateDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />;
+    case 'sensor-demo':
+      return <SensorDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />;
+    case 'regulation-loop':
+      return (
+        <RegulationLoopDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />
+      );
+    case 'feedback-loop':
+      return <FeedbackDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />;
+    case 'automation-logic':
+      return (
+        <AutomationLogicDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />
+      );
     default:
       return null;
   }

@@ -109,6 +109,36 @@ export const badges: Badge[] = [
     description: 'Dokončil jsi všechny dostupné mikrolekce z elektroniky.',
     icon: '🎖️',
   },
+  {
+    id: 'lovec-signalu',
+    title: 'Lovec signálu',
+    description: 'Víš, že snímač zjišťuje stav a předává informaci dál.',
+    icon: '📡',
+  },
+  {
+    id: 'regulator-junior',
+    title: 'Regulátor junior',
+    description: 'Znáš části regulačního obvodu a jejich pořadí.',
+    icon: '🌡️',
+  },
+  {
+    id: 'zpetna-vazba-zvladnuta',
+    title: 'Zpětná vazba zvládnuta',
+    description: 'Rozumíš tomu, že systém sleduje výsledek a upravuje činnost.',
+    icon: '🔁',
+  },
+  {
+    id: 'automatizacni-logik',
+    title: 'Automatizační logik',
+    description: 'Chápeš řízení podmínkou A ZÁROVEŇ B — a proč se kryt neobchází.',
+    icon: '🦾',
+  },
+  {
+    id: 'automatizacni-elev',
+    title: 'Automatizační elév',
+    description: 'Dokončil jsi všechny dostupné mikrolekce o automatických zařízeních.',
+    icon: '🤖',
+  },
 ];
 
 export function getBadgeById(id: string): Badge | undefined {

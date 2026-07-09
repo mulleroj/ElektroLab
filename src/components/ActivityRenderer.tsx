@@ -36,8 +36,8 @@ export function ActivityRenderer({
         leftItems={a.terms}
         rightItems={a.definitions}
         correctPairs={a.correctPairs}
-        leftTitle="Veličiny"
-        rightTitle="Význam"
+        leftTitle={a.leftTitle ?? 'Veličiny'}
+        rightTitle={a.rightTitle ?? 'Význam'}
         calmMode={calmMode}
         onComplete={onComplete}
       />
