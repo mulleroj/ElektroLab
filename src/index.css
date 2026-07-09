@@ -1697,3 +1697,117 @@ input:focus-visible {
   flex-wrap: wrap;
   margin-top: 1rem;
 }
+
+/* ===== MVP-5: dioda demo ===== */
+
+.diode-symbol {
+  border: 2px solid var(--color-success);
+  border-radius: var(--radius);
+}
+
+.diode-symbol--blocking {
+  border-color: var(--color-error);
+  background: var(--color-error-bg);
+}
+
+/* ===== MVP-5: tranzistor demo ===== */
+
+.transistor-diagram {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+  display: grid;
+  gap: 0.4rem;
+  justify-items: start;
+}
+
+.transistor-diagram__control,
+.transistor-diagram__device {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+}
+
+.transistor-diagram__control--on {
+  border-color: var(--color-accent);
+  background: #fff8e6;
+}
+
+.transistor-diagram__device--on {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.transistor-diagram__arrow {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  padding-left: 0.75rem;
+}
+
+/* ===== MVP-5: logická hradla demo ===== */
+
+.logic-gate {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1rem 0 0.75rem;
+}
+
+.logic-gate__panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.logic-gate__inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.logic-gate__symbol {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--color-primary);
+}
+
+.logic-io {
+  font-family: inherit;
+  font-size: 0.9375rem;
+  padding: 0.5rem 0.9rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  cursor: pointer;
+  text-align: left;
+}
+
+.logic-io--output {
+  cursor: default;
+}
+
+.logic-io--one {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+  font-weight: 700;
+}
+
+.logic-gate__explain {
+  background: #eef2f7;
+  border-left: 4px solid var(--color-primary);
+  border-radius: 4px;
+  padding: 0.6rem 0.85rem;
+  margin: 0 0 1rem;
+}

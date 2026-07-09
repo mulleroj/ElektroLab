@@ -74,6 +74,24 @@ export interface ProtectionScenarioDemoConfig {
   description: string;
 }
 
+export interface DiodeDirectionDemoConfig {
+  type: 'diode-direction';
+  title: string;
+  description: string;
+}
+
+export interface TransistorSwitchDemoConfig {
+  type: 'transistor-switch';
+  title: string;
+  description: string;
+}
+
+export interface LogicGateDemoConfig {
+  type: 'logic-gates';
+  title: string;
+  description: string;
+}
+
 export type InteractiveDemo =
   | CircuitSwitchDemo
   | SeriesParallelDemoConfig
@@ -83,7 +101,10 @@ export type InteractiveDemo =
   | MeasurementScenariosDemo
   | ProtectionDeviceDemoConfig
   | ResidualCurrentDemoConfig
-  | ProtectionScenarioDemoConfig;
+  | ProtectionScenarioDemoConfig
+  | DiodeDirectionDemoConfig
+  | TransistorSwitchDemoConfig
+  | LogicGateDemoConfig;
 
 export interface CircuitOrderActivity {
   type: 'circuit-order';
@@ -164,6 +185,8 @@ export interface ScenarioChoiceActivity {
     text: string;
     correctOptionId: string;
     explanation: string;
+    /** Volitelné vlastní možnosti jen pro tuto situaci (přepíší společné). */
+    options?: { id: string; label: string }[];
   }[];
   successMessage: string;
 }

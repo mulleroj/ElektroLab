@@ -8,6 +8,9 @@ import { MeasurementScenariosDemoView } from './demos/MeasurementScenariosDemo';
 import { ProtectionDeviceDemoView } from './demos/ProtectionDeviceDemo';
 import { ResidualCurrentDemoView } from './demos/ResidualCurrentDemo';
 import { ProtectionScenarioDemoView } from './demos/ProtectionScenarioDemo';
+import { DiodeDirectionDemoView } from './demos/DiodeDirectionDemo';
+import { TransistorSwitchDemoView } from './demos/TransistorSwitchDemo';
+import { LogicGateDemoView } from './demos/LogicGateDemo';
 
 interface InteractiveDemoRendererProps {
   demo: InteractiveDemo;
@@ -55,6 +58,16 @@ export function InteractiveDemoRenderer({
       return (
         <ProtectionScenarioDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />
       );
+    case 'diode-direction':
+      return (
+        <DiodeDirectionDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />
+      );
+    case 'transistor-switch':
+      return (
+        <TransistorSwitchDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />
+      );
+    case 'logic-gates':
+      return <LogicGateDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />;
     default:
       return null;
   }

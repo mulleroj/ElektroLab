@@ -45,7 +45,7 @@ export const subjects: Subject[] = [
     description: 'Polovodiče a elektronické obvody.',
     icon: '🔺',
     years: [2, 3],
-    mvpAvailable: false,
+    mvpAvailable: true,
   },
   {
     id: 'automatizace',

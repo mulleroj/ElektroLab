@@ -1,6 +1,7 @@
 import type { MicroLesson } from '../types';
 import { mereniLessons } from './lessons-mereni';
 import { rozvodyLessons } from './lessons-rozvody';
+import { elektronikaLessons } from './lessons-elektronika';
 
 const SAFETY_NOTE =
   'Tato lekce je školní simulace. Ve skutečné elektrické instalaci se nesmí pracovat pod napětím bez odborného dohledu a dodržení bezpečnostních pravidel.';
@@ -448,6 +449,7 @@ export const lessons: MicroLesson[] = [
   },
   ...mereniLessons,
   ...rozvodyLessons,
+  ...elektronikaLessons,
 ];
 
 export function getLessonById(id: string): MicroLesson | undefined {

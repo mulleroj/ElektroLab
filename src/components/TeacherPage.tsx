@@ -19,6 +19,9 @@ const demoLabels: Record<string, string> = {
   'protection-device': 'Jistič ve třech scénářích',
   'residual-current': 'Proud tam a zpět (chránič)',
   'protection-scenario': 'Karty situací s ochranami',
+  'diode-direction': 'Dioda: propustný a závěrný směr',
+  'transistor-switch': 'Tranzistor jako spínač',
+  'logic-gates': 'Hradla AND / OR / NOT',
 };
 
 const activityLabels: Record<string, string> = {

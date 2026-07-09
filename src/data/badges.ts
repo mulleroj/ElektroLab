@@ -85,6 +85,30 @@ export const badges: Badge[] = [
     description: 'Dokončil jsi všechny dostupné mikrolekce o rozvodných zařízeních.',
     icon: '🏅',
   },
+  {
+    id: 'dioda-pochopena',
+    title: 'Dioda pochopena',
+    description: 'Víš, že dioda propouští proud hlavně jedním směrem.',
+    icon: '🔺',
+  },
+  {
+    id: 'spinac-z-tranzistoru',
+    title: 'Spínač z tranzistoru',
+    description: 'Rozumíš tomu, jak malý signál spíná větší proud.',
+    icon: '🎛️',
+  },
+  {
+    id: 'logicky-elektrikar',
+    title: 'Logický elektrikář',
+    description: 'Zvládáš hradla AND, OR a NOT se vstupy 0 a 1.',
+    icon: '🧮',
+  },
+  {
+    id: 'elektronicky-elev',
+    title: 'Elektronický elév',
+    description: 'Dokončil jsi všechny dostupné mikrolekce z elektroniky.',
+    icon: '🎖️',
+  },
 ];
 
 export function getBadgeById(id: string): Badge | undefined {

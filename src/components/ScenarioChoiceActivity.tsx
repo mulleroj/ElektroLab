@@ -69,7 +69,7 @@ export function ScenarioChoiceActivity({
                   role="group"
                   aria-label={`Možnosti pro situaci ${index + 1}`}
                 >
-                  {activity.options.map((option) => (
+                  {(scenario.options ?? activity.options).map((option) => (
                     <button
                       key={option.id}
                       type="button"
