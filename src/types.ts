@@ -56,13 +56,34 @@ export interface MeasurementScenariosDemo {
   description: string;
 }
 
+export interface ProtectionDeviceDemoConfig {
+  type: 'protection-device';
+  title: string;
+  description: string;
+}
+
+export interface ResidualCurrentDemoConfig {
+  type: 'residual-current';
+  title: string;
+  description: string;
+}
+
+export interface ProtectionScenarioDemoConfig {
+  type: 'protection-scenario';
+  title: string;
+  description: string;
+}
+
 export type InteractiveDemo =
   | CircuitSwitchDemo
   | SeriesParallelDemoConfig
   | SymbolsDemoConfig
   | VoltmeterConnectionDemo
   | AmmeterConnectionDemo
-  | MeasurementScenariosDemo;
+  | MeasurementScenariosDemo
+  | ProtectionDeviceDemoConfig
+  | ResidualCurrentDemoConfig
+  | ProtectionScenarioDemoConfig;
 
 export interface CircuitOrderActivity {
   type: 'circuit-order';
@@ -133,6 +154,20 @@ export interface MeasurementJudgmentActivity {
   }[];
 }
 
+export interface ScenarioChoiceActivity {
+  type: 'scenario-choice';
+  instruction: string;
+  /** Společné možnosti pro všechny situace (2–4 tlačítka). */
+  options: { id: string; label: string }[];
+  scenarios: {
+    id: string;
+    text: string;
+    correctOptionId: string;
+    explanation: string;
+  }[];
+  successMessage: string;
+}
+
 export type LessonActivity =
   | CircuitOrderActivity
   | TermMatchingActivity
@@ -140,7 +175,8 @@ export type LessonActivity =
   | ConnectionTypeActivity
   | SymbolMatchingActivity
   | MeterConnectionActivity
-  | MeasurementJudgmentActivity;
+  | MeasurementJudgmentActivity
+  | ScenarioChoiceActivity;
 
 export interface Activity {
   circuitOrder?: CircuitOrderActivity;
@@ -150,6 +186,7 @@ export interface Activity {
   symbolMatching?: SymbolMatchingActivity;
   meterConnection?: MeterConnectionActivity;
   measurementJudgment?: MeasurementJudgmentActivity;
+  scenarioChoice?: ScenarioChoiceActivity;
 }
 
 export interface QuizQuestion {
@@ -223,6 +260,7 @@ export function getLessonActivity(lesson: MicroLesson): LessonActivity | null {
   if (activity.symbolMatching) return activity.symbolMatching;
   if (activity.meterConnection) return activity.meterConnection;
   if (activity.measurementJudgment) return activity.measurementJudgment;
+  if (activity.scenarioChoice) return activity.scenarioChoice;
   return null;
 }
 

@@ -5,6 +5,9 @@ import { SymbolsDemoView } from './demos/SymbolsDemo';
 import { VoltmeterDemoView } from './demos/VoltmeterDemo';
 import { AmmeterDemoView } from './demos/AmmeterDemo';
 import { MeasurementScenariosDemoView } from './demos/MeasurementScenariosDemo';
+import { ProtectionDeviceDemoView } from './demos/ProtectionDeviceDemo';
+import { ResidualCurrentDemoView } from './demos/ResidualCurrentDemo';
+import { ProtectionScenarioDemoView } from './demos/ProtectionScenarioDemo';
 
 interface InteractiveDemoRendererProps {
   demo: InteractiveDemo;
@@ -39,6 +42,18 @@ export function InteractiveDemoRenderer({
           calmMode={calmMode}
           onContinue={onContinue}
         />
+      );
+    case 'protection-device':
+      return (
+        <ProtectionDeviceDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />
+      );
+    case 'residual-current':
+      return (
+        <ResidualCurrentDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />
+      );
+    case 'protection-scenario':
+      return (
+        <ProtectionScenarioDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />
       );
     default:
       return null;

@@ -61,6 +61,30 @@ export const badges: Badge[] = [
     description: 'Umíš zvolit měřicí rozsah — od většího k menšímu.',
     icon: '🎚️',
   },
+  {
+    id: 'hlidac-jistice',
+    title: 'Hlídač jističe',
+    description: 'Víš, kdy jistič vypne a co vlastně chrání.',
+    icon: '🛑',
+  },
+  {
+    id: 'chranic-pochopen',
+    title: 'Chránič pochopen',
+    description: 'Rozumíš tomu, že proudový chránič porovnává proud tam a zpět.',
+    icon: '💠',
+  },
+  {
+    id: 'rozvodovy-detektiv',
+    title: 'Rozvodový detektiv',
+    description: 'Rozlišíš, kdy pomáhá jistič, kdy chránič a kdy je čas zavolat odborníka.',
+    icon: '🕵️',
+  },
+  {
+    id: 'bezpecny-rozvodar',
+    title: 'Bezpečný rozvodář',
+    description: 'Dokončil jsi všechny dostupné mikrolekce o rozvodných zařízeních.',
+    icon: '🏅',
+  },
 ];
 
 export function getBadgeById(id: string): Badge | undefined {

@@ -27,7 +27,7 @@ export const subjects: Subject[] = [
     description: 'Silnoproudé a slaboproudé rozvody v bytech i průmyslu.',
     icon: '🏠',
     years: [2, 3],
-    mvpAvailable: false,
+    mvpAvailable: true,
   },
   {
     id: 'stroje',

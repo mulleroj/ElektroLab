@@ -16,6 +16,9 @@ const demoLabels: Record<string, string> = {
   'voltmeter-connection': 'Zapojení voltmetru',
   'ammeter-connection': 'Zapojení ampérmetru',
   'measurement-scenarios': 'Měřicí scénáře',
+  'protection-device': 'Jistič ve třech scénářích',
+  'residual-current': 'Proud tam a zpět (chránič)',
+  'protection-scenario': 'Karty situací s ochranami',
 };
 
 const activityLabels: Record<string, string> = {
@@ -26,6 +29,7 @@ const activityLabels: Record<string, string> = {
   symbolMatching: 'Párování značek',
   meterConnection: 'Výběr zapojení měřáku',
   measurementJudgment: 'Posuzování správně/chybně',
+  scenarioChoice: 'Rozhodovací scénáře s možnostmi',
 };
 
 function getActivityLabel(lesson: MicroLesson): string {

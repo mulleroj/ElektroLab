@@ -1577,3 +1577,123 @@ input:focus-visible {
     width: 100%;
   }
 }
+
+/* ===== MVP-4: jistič demo ===== */
+
+.protection-breaker {
+  border: 2px solid var(--color-success);
+  border-radius: var(--radius);
+}
+
+.protection-breaker--tripped {
+  border-color: var(--color-error);
+  background: var(--color-error-bg);
+}
+
+/* ===== MVP-4: proudový chránič demo ===== */
+
+.rcd-diagram {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.rcd-diagram__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-weight: 600;
+}
+
+.rcd-diagram__value {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-primary);
+}
+
+.rcd-diagram__device {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius);
+  background: #e8f0f8;
+  font-size: 0.9375rem;
+}
+
+.rcd-diagram__device--tripped {
+  border-color: var(--color-error);
+  background: var(--color-error-bg);
+  font-weight: 700;
+}
+
+.rcd-diagram__leak {
+  margin: 0;
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+/* ===== MVP-4: karty situací (demo) ===== */
+
+.scenario-cards {
+  list-style: none;
+  margin: 1rem 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.scenario-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+}
+
+.scenario-card__situation {
+  margin: 0 0 0.75rem;
+  font-weight: 600;
+}
+
+.scenario-card__answer {
+  background: var(--color-success-bg);
+  border-left: 4px solid var(--color-success);
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+}
+
+.scenario-card__answer p {
+  margin: 0.25rem 0 0;
+}
+
+/* ===== MVP-4: rozhodovací aktivita (scenario-choice) ===== */
+
+.scenario-choice__instruction {
+  font-weight: 600;
+}
+
+.scenario-choice__list {
+  list-style: none;
+  margin: 1rem 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.scenario-choice__buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+
+.scenario-choice__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}

@@ -22,6 +22,12 @@ import { TeacherPage } from './components/TeacherPage';
 
 const PROJECTOR_KEY = 'elektrolab-projector';
 
+/** Předmětové odznaky: udělí se po dokončení všech MVP lekcí předmětu (a ročníku). */
+const SUBJECT_BADGES: { subjectId: string; year?: number; badgeId: string }[] = [
+  { subjectId: 'mereni', year: 1, badgeId: 'merici-elev' },
+  { subjectId: 'rozvody', badgeId: 'bezpecny-rozvodar' },
+];
+
 function loadProjectorMode(): boolean {
   try {
     return sessionStorage.getItem(PROJECTOR_KEY) === '1';
@@ -67,14 +73,16 @@ function App() {
       if (projectorMode) return;
       setProgress((prev) => {
         let next = completeQuiz(prev, lessonId, xp, badgeId);
-        const mereniIds = getMvpLessonsBySubject('mereni', 1).map((l) => l.id);
-        const allMereniDone = mereniIds.every((id) => isLessonComplete(next, id));
-        if (allMereniDone && !next.earnedBadges.includes('merici-elev')) {
-          next = {
-            ...next,
-            earnedBadges: [...next.earnedBadges, 'merici-elev'],
-          };
-          saveProgress(next);
+        for (const sb of SUBJECT_BADGES) {
+          if (next.earnedBadges.includes(sb.badgeId)) continue;
+          const ids = getMvpLessonsBySubject(sb.subjectId, sb.year).map((l) => l.id);
+          if (ids.length > 0 && ids.every((id) => isLessonComplete(next, id))) {
+            next = {
+              ...next,
+              earnedBadges: [...next.earnedBadges, sb.badgeId],
+            };
+            saveProgress(next);
+          }
         }
         return next;
       });

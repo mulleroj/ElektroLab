@@ -101,6 +101,25 @@ export const topics: Topic[] = [
     mvpAvailable: true,
   },
   {
+    id: 'rozvod-obytne-budovy',
+    subjectId: 'rozvody',
+    title: 'Elektrický silnoproudý rozvod v obytných budovách',
+    description:
+      'Co v domovním rozvodu chrání vedení a co chrání člověka — jistič a proudový chránič.',
+    year: 2,
+    estimatedMinutes: 25,
+    mvpAvailable: true,
+  },
+  {
+    id: 'hromosvody',
+    subjectId: 'rozvody',
+    title: 'Hromosvody',
+    description: 'Ochrana budov před bleskem.',
+    year: 3,
+    estimatedMinutes: 30,
+    mvpAvailable: false,
+  },
+  {
     id: 'merici-pristroje',
     subjectId: 'mereni',
     title: 'Rozdělení a princip činnosti měřicích přístrojů',
