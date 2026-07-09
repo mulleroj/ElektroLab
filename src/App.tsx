@@ -6,11 +6,13 @@ import {
   completeActivity,
   completeQuiz,
   toggleCalmMode,
+  isLessonComplete,
+  saveProgress,
 } from './lib/progress';
 import { getValidatedLesson } from './lib/validation';
 import { getSubjectById } from './data/subjects';
 import { getTopicById } from './data/topics';
-import { getLessonById } from './data/lessons';
+import { getLessonById, getMvpLessonsBySubject } from './data/lessons';
 import { AppShell } from './components/AppShell';
 import { HomePage } from './components/HomePage';
 import { SubjectPage } from './components/SubjectPage';
@@ -37,7 +39,19 @@ function App() {
 
   const handleQuizComplete = useCallback(
     (lessonId: string, xp: number, badgeId?: string) => {
-      setProgress((prev) => completeQuiz(prev, lessonId, xp, badgeId));
+      setProgress((prev) => {
+        let next = completeQuiz(prev, lessonId, xp, badgeId);
+        const mereniIds = getMvpLessonsBySubject('mereni', 1).map((l) => l.id);
+        const allMereniDone = mereniIds.every((id) => isLessonComplete(next, id));
+        if (allMereniDone && !next.earnedBadges.includes('merici-elev')) {
+          next = {
+            ...next,
+            earnedBadges: [...next.earnedBadges, 'merici-elev'],
+          };
+          saveProgress(next);
+        }
+        return next;
+      });
     },
     [],
   );

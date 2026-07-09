@@ -91,6 +91,15 @@ export const topics: Topic[] = [
     estimatedMinutes: 40,
     mvpAvailable: false,
   },
+  {
+    id: 'metody-mereni',
+    subjectId: 'mereni',
+    title: 'Způsoby a metody měření elektrických veličin',
+    description: 'Jak správně měřit napětí a proud — voltmetr, ampérmetr a bezpečné postupy.',
+    year: 1,
+    estimatedMinutes: 30,
+    mvpAvailable: true,
+  },
 ];
 
 export function getTopicsBySubject(subjectId: string, year?: number): Topic[] {

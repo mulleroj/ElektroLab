@@ -1,9 +1,11 @@
 import type { MicroLesson } from '../types';
+import { mereniLessons } from './lessons-mereni';
 
 const SAFETY_NOTE =
   'Tato lekce je školní simulace. Ve skutečné elektrické instalaci se nesmí pracovat pod napětím bez odborného dohledu a dodržení bezpečnostních pravidel.';
 
 export const lessons: MicroLesson[] = [
+  // Základy elektrotechniky — MVP-1
   {
     id: 'co-je-obvod',
     subjectId: 'zaklady',
@@ -21,6 +23,12 @@ export const lessons: MicroLesson[] = [
     memorySentence: 'Elektrický proud teče jen tehdy, když má uzavřenou cestu.',
     typicalMistake:
       'Žáci často zapomínají, že obvod musí být uzavřený — stačí jedno přerušení a proud neteče.',
+    interactiveDemo: {
+      type: 'circuit-switch',
+      title: 'Sepni a rozpoj obvod',
+      description:
+        'Vyzkoušej, co se stane se žárovkou, když je obvod uzavřený nebo přerušený.',
+    },
     activity: {
       circuitOrder: {
         type: 'circuit-order',
@@ -258,6 +266,12 @@ export const lessons: MicroLesson[] = [
     memorySentence: 'Sériově za sebou, paralelně ve větvích.',
     typicalMistake:
       'Žáci si pletou, kde proud „teče stejně“ — sériově je stejný proud všude, paralelně stejné napětí na větvích.',
+    interactiveDemo: {
+      type: 'series-parallel',
+      title: 'Sériové nebo paralelní?',
+      description:
+        'Podívej se na dvě schémata a rozhodni, které je sériové a které paralelní.',
+    },
     activity: {
       connectionType: {
         type: 'connection-type',
@@ -344,6 +358,12 @@ export const lessons: MicroLesson[] = [
     memorySentence: 'Schéma čteš po značkách — každý prvek má svůj symbol.',
     typicalMistake:
       'Žáci zaměňují značku zdroje a spotřebiče — zdroj dodává energii, spotřebič ji spotřebovává.',
+    interactiveDemo: {
+      type: 'symbols-demo',
+      title: 'Poznej značky ve schématu',
+      description:
+        'Klikni na každou značku a zobraz její název — tak se učíš číst schéma.',
+    },
     activity: {
       symbolMatching: {
         type: 'symbol-matching',
@@ -415,6 +435,7 @@ export const lessons: MicroLesson[] = [
     badgeId: 'ctenar-znaciek',
     mvpAvailable: true,
   },
+  ...mereniLessons,
 ];
 
 export function getLessonById(id: string): MicroLesson | undefined {

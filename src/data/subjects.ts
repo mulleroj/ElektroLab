@@ -18,7 +18,7 @@ export const subjects: Subject[] = [
     description: 'Měření elektrických veličin a pohony v praxi.',
     icon: '📏',
     years: [1, 2, 3],
-    mvpAvailable: false,
+    mvpAvailable: true,
   },
   {
     id: 'rozvody',

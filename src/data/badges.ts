@@ -31,6 +31,30 @@ export const badges: Badge[] = [
     description: 'Poznáš základní elektrotechnické značky.',
     icon: '📋',
   },
+  {
+    id: 'merici-elev',
+    title: 'Měřicí elév',
+    description: 'Dokončil jsi všechny mikrolekce o měření v MVP-2.',
+    icon: '🎖️',
+  },
+  {
+    id: 'voltmetr-zvladnut',
+    title: 'Voltmetr zvládnut',
+    description: 'Víš, že voltmetr patří paralelně.',
+    icon: '📏',
+  },
+  {
+    id: 'ampermetr-zvladnut',
+    title: 'Ampérmetr zvládnut',
+    description: 'Víš, že ampérmetr patří sériově.',
+    icon: '🔋',
+  },
+  {
+    id: 'merak-nespalen',
+    title: 'Měřák nespálen',
+    description: 'Rozpoznáš správné i chybné zapojení měřáků.',
+    icon: '🛡️',
+  },
 ];
 
 export function getBadgeById(id: string): Badge | undefined {

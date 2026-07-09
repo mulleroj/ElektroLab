@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import type { MicroLesson, ProgressState, LessonStep } from '../types';
+import { getNextStepAfterIntro } from '../types';
 import { SafetyNote } from './SafetyNote';
+import { InteractiveDemoRenderer } from './InteractiveDemoRenderer';
 import { ActivityRenderer } from './ActivityRenderer';
 import { Quiz } from './Quiz';
 import { getLessonProgress } from '../lib/progress';
@@ -16,6 +18,13 @@ interface LessonPageProps {
   onQuizComplete: () => void;
 }
 
+function getInitialStep(lessonProgress: ReturnType<typeof getLessonProgress>): LessonStep {
+  if (lessonProgress.activityCompleted) {
+    return lessonProgress.quizCompleted ? 'intro' : 'quiz';
+  }
+  return 'intro';
+}
+
 export function LessonPage({
   lesson,
   progress,
@@ -27,13 +36,7 @@ export function LessonPage({
   const subject = getSubjectById(lesson.subjectId);
   const topic = getTopicById(lesson.topicId);
 
-  const initialStep: LessonStep = lessonProgress.activityCompleted
-    ? lessonProgress.quizCompleted
-      ? 'intro'
-      : 'quiz'
-    : 'intro';
-
-  const [step, setStep] = useState<LessonStep>(initialStep);
+  const [step, setStep] = useState<LessonStep>(() => getInitialStep(lessonProgress));
 
   const handleActivityComplete = () => {
     onActivityComplete();
@@ -49,6 +52,13 @@ export function LessonPage({
   const earnedBadge = lesson.badgeId
     ? progress.earnedBadges.includes(lesson.badgeId)
     : false;
+
+  const hasDemo = Boolean(lesson.interactiveDemo);
+  const stepOrder: LessonStep[] = hasDemo
+    ? ['intro', 'demo', 'activity', 'quiz']
+    : ['intro', 'activity', 'quiz'];
+
+  const stepIndex = stepOrder.indexOf(step);
 
   return (
     <section className="lesson-page">
@@ -72,36 +82,26 @@ export function LessonPage({
 
       <SafetyNote text={lesson.safetyNote} />
 
-      {calmMode && step !== 'complete' && (
+      {calmMode && step !== 'complete' && stepIndex >= 0 && (
         <nav className="lesson-steps" aria-label="Kroky lekce">
           <ol>
-            <li
-              className={
-                step === 'intro'
-                  ? 'lesson-steps__active'
-                  : ['activity', 'quiz', 'complete'].includes(step)
-                    ? 'lesson-steps__done'
-                    : ''
-              }
-            >
-              Úvod
-            </li>
-            <li
-              className={
-                step === 'activity'
-                  ? 'lesson-steps__active'
-                  : ['quiz', 'complete'].includes(step)
-                    ? 'lesson-steps__done'
-                    : ''
-              }
-            >
-              Aktivita
-            </li>
-            <li
-              className={step === 'quiz' ? 'lesson-steps__active' : ''}
-            >
-              Mini test
-            </li>
+            {stepOrder.map((s, i) => {
+              const labels: Record<LessonStep, string> = {
+                intro: 'Úvod',
+                demo: 'Ukázka',
+                activity: 'Úkol',
+                quiz: 'Mini test',
+                complete: 'Hotovo',
+              };
+              let cls = '';
+              if (step === s) cls = 'lesson-steps__active';
+              else if (stepIndex > i) cls = 'lesson-steps__done';
+              return (
+                <li key={s} className={cls}>
+                  {labels[s]}
+                </li>
+              );
+            })}
           </ol>
         </nav>
       )}
@@ -132,11 +132,19 @@ export function LessonPage({
           <button
             type="button"
             className="btn btn--primary btn--large"
-            onClick={() => setStep('activity')}
+            onClick={() => setStep(getNextStepAfterIntro(lesson))}
           >
-            Pokračovat na aktivitu
+            {hasDemo ? 'Pokračovat na ukázku' : 'Pokračovat na úkol'}
           </button>
         </article>
+      )}
+
+      {step === 'demo' && lesson.interactiveDemo && (
+        <InteractiveDemoRenderer
+          demo={lesson.interactiveDemo}
+          calmMode={calmMode}
+          onContinue={() => setStep('activity')}
+        />
       )}
 
       {step === 'activity' && (

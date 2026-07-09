@@ -20,6 +20,50 @@ export interface Topic {
   mvpAvailable: boolean;
 }
 
+export interface CircuitSwitchDemo {
+  type: 'circuit-switch';
+  title: string;
+  description: string;
+}
+
+export interface SeriesParallelDemoConfig {
+  type: 'series-parallel';
+  title: string;
+  description: string;
+}
+
+export interface SymbolsDemoConfig {
+  type: 'symbols-demo';
+  title: string;
+  description: string;
+}
+
+export interface VoltmeterConnectionDemo {
+  type: 'voltmeter-connection';
+  title: string;
+  description: string;
+}
+
+export interface AmmeterConnectionDemo {
+  type: 'ammeter-connection';
+  title: string;
+  description: string;
+}
+
+export interface MeasurementScenariosDemo {
+  type: 'measurement-scenarios';
+  title: string;
+  description: string;
+}
+
+export type InteractiveDemo =
+  | CircuitSwitchDemo
+  | SeriesParallelDemoConfig
+  | SymbolsDemoConfig
+  | VoltmeterConnectionDemo
+  | AmmeterConnectionDemo
+  | MeasurementScenariosDemo;
+
 export interface CircuitOrderActivity {
   type: 'circuit-order';
   instruction: string;
@@ -63,12 +107,34 @@ export interface SymbolMatchingActivity {
   correctPairs: Record<string, string>;
 }
 
+export interface MeterConnectionActivity {
+  type: 'meter-connection';
+  instruction: string;
+  meterLabel: string;
+  options: { id: string; text: string }[];
+  correctOptionId: string;
+  successExplanation: string;
+}
+
+export interface MeasurementJudgmentActivity {
+  type: 'measurement-judgment';
+  instruction: string;
+  scenarios: {
+    id: string;
+    text: string;
+    correct: 'correct' | 'wrong';
+    explanation: string;
+  }[];
+}
+
 export type LessonActivity =
   | CircuitOrderActivity
   | TermMatchingActivity
   | FormulaSelectActivity
   | ConnectionTypeActivity
-  | SymbolMatchingActivity;
+  | SymbolMatchingActivity
+  | MeterConnectionActivity
+  | MeasurementJudgmentActivity;
 
 export interface Activity {
   circuitOrder?: CircuitOrderActivity;
@@ -76,6 +142,8 @@ export interface Activity {
   formulaSelect?: FormulaSelectActivity;
   connectionType?: ConnectionTypeActivity;
   symbolMatching?: SymbolMatchingActivity;
+  meterConnection?: MeterConnectionActivity;
+  measurementJudgment?: MeasurementJudgmentActivity;
 }
 
 export interface QuizQuestion {
@@ -100,6 +168,7 @@ export interface MicroLesson {
   safetyNote: string;
   memorySentence: string;
   typicalMistake?: string;
+  interactiveDemo?: InteractiveDemo;
   activity: Activity;
   quiz: QuizQuestion[];
   activityXp: number;
@@ -134,7 +203,7 @@ export type Route =
   | { page: 'topic'; subjectId: string; topicId: string }
   | { page: 'lesson'; lessonId: string };
 
-export type LessonStep = 'intro' | 'activity' | 'quiz' | 'complete';
+export type LessonStep = 'intro' | 'demo' | 'activity' | 'quiz' | 'complete';
 
 export function getLessonActivity(lesson: MicroLesson): LessonActivity | null {
   const { activity } = lesson;
@@ -143,5 +212,11 @@ export function getLessonActivity(lesson: MicroLesson): LessonActivity | null {
   if (activity.formulaSelect) return activity.formulaSelect;
   if (activity.connectionType) return activity.connectionType;
   if (activity.symbolMatching) return activity.symbolMatching;
+  if (activity.meterConnection) return activity.meterConnection;
+  if (activity.measurementJudgment) return activity.measurementJudgment;
   return null;
+}
+
+export function getNextStepAfterIntro(lesson: MicroLesson): LessonStep {
+  return lesson.interactiveDemo ? 'demo' : 'activity';
 }
