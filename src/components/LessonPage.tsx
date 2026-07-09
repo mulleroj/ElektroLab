@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { MicroLesson, ProgressState, LessonStep } from '../types';
 import { SafetyNote } from './SafetyNote';
-import { CircuitOrderActivity } from './CircuitOrderActivity';
+import { ActivityRenderer } from './ActivityRenderer';
 import { Quiz } from './Quiz';
 import { getLessonProgress } from '../lib/progress';
 import { getBadgeById } from '../data/badges';
@@ -34,8 +34,6 @@ export function LessonPage({
     : 'intro';
 
   const [step, setStep] = useState<LessonStep>(initialStep);
-
-  const circuitActivity = lesson.activity.circuitOrder;
 
   const handleActivityComplete = () => {
     onActivityComplete();
@@ -141,9 +139,9 @@ export function LessonPage({
         </article>
       )}
 
-      {step === 'activity' && circuitActivity && (
-        <CircuitOrderActivity
-          activity={circuitActivity}
+      {step === 'activity' && (
+        <ActivityRenderer
+          activity={lesson.activity}
           calmMode={calmMode}
           onComplete={handleActivityComplete}
         />

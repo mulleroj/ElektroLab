@@ -1,7 +1,5 @@
 export type Difficulty = 'základní' | 'střední' | 'pokročilá';
 
-export type ActivityType = 'circuit-order' | 'matching' | 'quiz' | 'scenario';
-
 export interface Subject {
   id: string;
   title: string;
@@ -27,7 +25,57 @@ export interface CircuitOrderActivity {
   instruction: string;
   elements: { id: string; label: string }[];
   correctOrder: string[];
-  xpReward: number;
+}
+
+export interface TermMatchingActivity {
+  type: 'term-matching';
+  instruction: string;
+  terms: { id: string; label: string }[];
+  definitions: { id: string; label: string }[];
+  correctPairs: Record<string, string>;
+}
+
+export interface FormulaSelectActivity {
+  type: 'formula-select';
+  instruction: string;
+  example: string;
+  question: string;
+  options: { id: string; text: string }[];
+  correctOptionId: string;
+  successExplanation: string;
+}
+
+export interface ConnectionTypeActivity {
+  type: 'connection-type';
+  instruction: string;
+  scenarios: {
+    id: string;
+    description: string;
+    correctType: 'serial' | 'parallel';
+  }[];
+}
+
+export interface SymbolMatchingActivity {
+  type: 'symbol-matching';
+  instruction: string;
+  symbols: { id: string; symbol: string; ariaLabel: string }[];
+  names: { id: string; label: string }[];
+  correctPairs: Record<string, string>;
+}
+
+export type LessonActivity =
+  | CircuitOrderActivity
+  | TermMatchingActivity
+  | FormulaSelectActivity
+  | ConnectionTypeActivity
+  | SymbolMatchingActivity;
+
+export interface Activity {
+  circuitOrder?: CircuitOrderActivity;
+  termMatching?: TermMatchingActivity;
+  formulaSelect?: FormulaSelectActivity;
+  connectionType?: ConnectionTypeActivity;
+  symbolMatching?: SymbolMatchingActivity;
 }
 
 export interface QuizQuestion {
@@ -36,10 +84,6 @@ export interface QuizQuestion {
   options: { id: string; text: string }[];
   correctOptionId: string;
   explanation: string;
-}
-
-export interface Activity {
-  circuitOrder?: CircuitOrderActivity;
 }
 
 export interface MicroLesson {
@@ -91,3 +135,13 @@ export type Route =
   | { page: 'lesson'; lessonId: string };
 
 export type LessonStep = 'intro' | 'activity' | 'quiz' | 'complete';
+
+export function getLessonActivity(lesson: MicroLesson): LessonActivity | null {
+  const { activity } = lesson;
+  if (activity.circuitOrder) return activity.circuitOrder;
+  if (activity.termMatching) return activity.termMatching;
+  if (activity.formulaSelect) return activity.formulaSelect;
+  if (activity.connectionType) return activity.connectionType;
+  if (activity.symbolMatching) return activity.symbolMatching;
+  return null;
+}

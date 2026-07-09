@@ -12,7 +12,10 @@ interface TopicPageProps {
 }
 
 export function TopicPage({ topic, subject, progress }: TopicPageProps) {
-  const lessons = filterValidLessons(getLessonsByTopic(topic.id));
+  const lessons = filterValidLessons(
+    getLessonsByTopic(topic.id).filter((l) => l.mvpAvailable),
+  );
+  const completedCount = lessons.filter((l) => isLessonComplete(progress, l.id)).length;
 
   return (
     <section className="topic-page">
@@ -25,6 +28,11 @@ export function TopicPage({ topic, subject, progress }: TopicPageProps) {
         <h1>{topic.title}</h1>
         <p>{topic.description}</p>
         <p className="topic-page__time">Doporučený čas: ~{topic.estimatedMinutes} minut</p>
+        {lessons.length > 0 && (
+          <p className="topic-page__progress">
+            {completedCount} / {lessons.length} mikrolekcí dokončeno
+          </p>
+        )}
       </header>
 
       <h2 className="section-title">Mikrolekce</h2>

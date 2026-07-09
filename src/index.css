@@ -416,6 +416,30 @@ input:focus-visible {
   color: var(--color-primary);
 }
 
+.subject-progress {
+  margin-top: 0.75rem;
+}
+
+.subject-progress__bar {
+  height: 10px;
+  background: #eef2f7;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.subject-progress__fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 999px;
+  transition: width var(--transition);
+}
+
+.topic-page__progress {
+  font-weight: 600;
+  color: var(--color-success);
+}
+
 /* Year filter */
 
 .year-filter {
@@ -648,6 +672,204 @@ input:focus-visible {
   flex-wrap: wrap;
 }
 
+/* Matching activity */
+
+.matching-activity__instruction,
+.formula-activity__instruction,
+.connection-activity__instruction {
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.matching-activity__columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.matching-activity__col-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin: 0 0 0.5rem;
+}
+
+.matching-activity__items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.match-item {
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.match-item:hover:not(:disabled) {
+  border-color: var(--color-primary);
+}
+
+.match-item--selected {
+  border-color: var(--color-primary);
+  background: #e8f0f8;
+}
+
+.match-item--matched {
+  background: var(--color-success-bg);
+  border-color: var(--color-success);
+  color: var(--color-success);
+  cursor: default;
+}
+
+.match-item--symbol {
+  font-size: 1.5rem;
+  font-family: monospace;
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+.match-item--idle:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.matching-activity__hint {
+  font-size: 0.875rem;
+  color: var(--color-primary);
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.matching-activity__actions,
+.formula-activity__actions,
+.connection-activity__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+/* Formula activity */
+
+.formula-activity__example {
+  background: #f0f7ff;
+  border-left: 4px solid var(--color-primary);
+  padding: 0.75rem 1rem;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  margin-bottom: 1rem;
+}
+
+.formula-activity__example h3 {
+  margin: 0 0 0.25rem;
+  font-size: 0.875rem;
+  color: var(--color-primary);
+}
+
+.formula-activity__example p {
+  margin: 0;
+}
+
+.formula-activity__question {
+  border: none;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.formula-activity__question legend {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.formula-activity__options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formula-option {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 1rem;
+}
+
+.formula-option--selected {
+  border-color: var(--color-primary);
+  background: #e8f0f8;
+}
+
+.formula-option--correct {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.formula-option--wrong {
+  border-color: var(--color-error);
+  background: var(--color-error-bg);
+}
+
+/* Connection activity */
+
+.connection-activity__scenarios {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.connection-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+}
+
+.connection-card--done {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.connection-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.connection-card__done {
+  color: var(--color-success);
+}
+
+.connection-card__buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.btn--active {
+  border-color: var(--color-primary);
+  background: #e8f0f8;
+  color: var(--color-primary);
+}
+
 /* Feedback */
 
 .feedback {
@@ -806,6 +1028,10 @@ input:focus-visible {
   }
 
   .subject-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .matching-activity__columns {
     grid-template-columns: 1fr;
   }
 }

@@ -89,6 +89,7 @@ function App() {
         }
         return (
           <LessonPage
+            key={lesson.id}
             lesson={lesson}
             progress={progress}
             calmMode={progress.calmMode}

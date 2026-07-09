@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { Subject } from '../types';
 import type { ProgressState } from '../types';
 import { getTopicsBySubject } from '../data/topics';
-import { getLessonsByTopic } from '../data/lessons';
+import { getMvpLessonsBySubject, getLessonsByTopic } from '../data/lessons';
 import { getSubjectProgress } from '../lib/progress';
 import { navigate } from '../lib/routing';
 
@@ -15,10 +15,10 @@ export function SubjectPage({ subject, progress }: SubjectPageProps) {
   const [selectedYear, setSelectedYear] = useState(subject.years[0]);
   const topics = getTopicsBySubject(subject.id, selectedYear);
 
-  const allLessonIds = topics.flatMap((t) =>
-    getLessonsByTopic(t.id).map((l) => l.id),
-  );
+  const mvpLessons = getMvpLessonsBySubject(subject.id, selectedYear);
+  const allLessonIds = mvpLessons.map((l) => l.id);
   const { completed, total } = getSubjectProgress(progress, allLessonIds);
+  const progressPercent = total > 0 ? Math.round((completed / total) * 100) : 0;
 
   return (
     <section className="subject-page">
@@ -33,9 +33,24 @@ export function SubjectPage({ subject, progress }: SubjectPageProps) {
         <h1>{subject.title}</h1>
         <p>{subject.description}</p>
         {total > 0 && (
-          <p className="page-header__progress">
-            Pokrok: {completed} / {total} mikrolekcí
-          </p>
+          <div className="subject-progress">
+            <p className="page-header__progress">
+              Pokrok: {completed} / {total} mikrolekcí ({progressPercent} %)
+            </p>
+            <div
+              className="subject-progress__bar"
+              role="progressbar"
+              aria-valuenow={progressPercent}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`Dokončeno ${completed} z ${total} mikrolekcí`}
+            >
+              <div
+                className="subject-progress__fill"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+          </div>
         )}
       </header>
 
@@ -55,7 +70,7 @@ export function SubjectPage({ subject, progress }: SubjectPageProps) {
 
       <ul className="topic-list">
         {topics.map((topic) => {
-          const lessons = getLessonsByTopic(topic.id);
+          const lessons = getLessonsByTopic(topic.id).filter((l) => l.mvpAvailable);
           const topicProgress = getSubjectProgress(
             progress,
             lessons.map((l) => l.id),
