@@ -10,6 +10,7 @@ interface AppShellProps {
   calmMode: boolean;
   projectorMode: boolean;
   onProjectorModeToggle: () => void;
+  onOpenOnboarding: () => void;
 }
 
 export function AppShell({
@@ -19,6 +20,7 @@ export function AppShell({
   calmMode,
   projectorMode,
   onProjectorModeToggle,
+  onOpenOnboarding,
 }: AppShellProps) {
   return (
     <div
@@ -50,6 +52,13 @@ export function AppShell({
         <div className="app-header__controls">
           <ProgressSummary progress={progress} />
           <CalmModeToggle enabled={calmMode} onToggle={onCalmModeToggle} />
+          <button
+            type="button"
+            className="teacher-link"
+            onClick={onOpenOnboarding}
+          >
+            ℹ️ Úvod
+          </button>
           <a href="#/teacher" className="teacher-link">
             👩‍🏫 Učitelský režim
           </a>

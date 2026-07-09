@@ -53,6 +53,14 @@ export function TopicPage({ topic, subject, progress }: TopicPageProps) {
                 <p className="lesson-card__meta">
                   {lesson.durationMinutes} min · {lesson.difficulty}
                 </p>
+                <p className="lesson-card__tags">
+                  {lesson.interactiveDemo && (
+                    <span className="tag tag--demo">🔬 Interaktivní ukázka</span>
+                  )}
+                  <span className="tag">🧩 Úkol</span>
+                  <span className="tag">❓ Mini test</span>
+                  <span className="tag tag--safety">🛡️ Bezpečnost</span>
+                </p>
                 <p className="lesson-card__goal">{lesson.goal}</p>
                 {lesson.mvpAvailable ? (
                   <button
