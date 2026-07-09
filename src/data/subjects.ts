@@ -18,7 +18,7 @@ export const subjects: Subject[] = [
     description: 'Měření elektrických veličin a pohony v praxi.',
     icon: '📏',
     years: [1, 2, 3],
-    mvpAvailable: false,
+    mvpAvailable: true,
   },
   {
     id: 'rozvody',
@@ -27,7 +27,7 @@ export const subjects: Subject[] = [
     description: 'Silnoproudé a slaboproudé rozvody v bytech i průmyslu.',
     icon: '🏠',
     years: [2, 3],
-    mvpAvailable: false,
+    mvpAvailable: true,
   },
   {
     id: 'stroje',
@@ -45,7 +45,7 @@ export const subjects: Subject[] = [
     description: 'Polovodiče a elektronické obvody.',
     icon: '🔺',
     years: [2, 3],
-    mvpAvailable: false,
+    mvpAvailable: true,
   },
   {
     id: 'automatizace',

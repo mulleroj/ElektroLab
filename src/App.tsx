@@ -1,25 +1,46 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Route, ProgressState } from './types';
-import { parseHash } from './lib/routing';
+import { parseHash, navigate } from './lib/routing';
 import {
   loadProgress,
   completeActivity,
   completeQuiz,
   toggleCalmMode,
+  isLessonComplete,
+  saveProgress,
 } from './lib/progress';
 import { getValidatedLesson } from './lib/validation';
 import { getSubjectById } from './data/subjects';
 import { getTopicById } from './data/topics';
-import { getLessonById } from './data/lessons';
+import { getLessonById, getMvpLessonsBySubject } from './data/lessons';
 import { AppShell } from './components/AppShell';
 import { HomePage } from './components/HomePage';
 import { SubjectPage } from './components/SubjectPage';
 import { TopicPage } from './components/TopicPage';
 import { LessonPage } from './components/LessonPage';
+import { TeacherPage } from './components/TeacherPage';
+
+const PROJECTOR_KEY = 'elektrolab-projector';
+
+/** Předmětové odznaky: udělí se po dokončení všech MVP lekcí předmětu (a ročníku). */
+const SUBJECT_BADGES: { subjectId: string; year?: number; badgeId: string }[] = [
+  { subjectId: 'mereni', year: 1, badgeId: 'merici-elev' },
+  { subjectId: 'rozvody', badgeId: 'bezpecny-rozvodar' },
+  { subjectId: 'elektronika', badgeId: 'elektronicky-elev' },
+];
+
+function loadProjectorMode(): boolean {
+  try {
+    return sessionStorage.getItem(PROJECTOR_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
 
 function App() {
   const [route, setRoute] = useState<Route>(parseHash);
   const [progress, setProgress] = useState<ProgressState>(loadProgress);
+  const [projectorMode, setProjectorMode] = useState<boolean>(loadProjectorMode);
 
   useEffect(() => {
     const onHashChange = () => setRoute(parseHash());
@@ -27,25 +48,69 @@ function App() {
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(PROJECTOR_KEY, projectorMode ? '1' : '0');
+    } catch {
+      // sessionStorage nemusí být dostupná — režim pak platí jen do obnovení stránky
+    }
+  }, [projectorMode]);
+
   const handleCalmModeToggle = useCallback(() => {
     setProgress((prev) => toggleCalmMode(prev));
   }, []);
 
-  const handleActivityComplete = useCallback((lessonId: string, xp: number) => {
-    setProgress((prev) => completeActivity(prev, lessonId, xp));
-  }, []);
+  const handleActivityComplete = useCallback(
+    (lessonId: string, xp: number) => {
+      // V projektorovém režimu učitel promítá — pokrok a XP se neukládají.
+      if (projectorMode) return;
+      setProgress((prev) => completeActivity(prev, lessonId, xp));
+    },
+    [projectorMode],
+  );
 
   const handleQuizComplete = useCallback(
     (lessonId: string, xp: number, badgeId?: string) => {
-      setProgress((prev) => completeQuiz(prev, lessonId, xp, badgeId));
+      if (projectorMode) return;
+      setProgress((prev) => {
+        let next = completeQuiz(prev, lessonId, xp, badgeId);
+        for (const sb of SUBJECT_BADGES) {
+          if (next.earnedBadges.includes(sb.badgeId)) continue;
+          const ids = getMvpLessonsBySubject(sb.subjectId, sb.year).map((l) => l.id);
+          if (ids.length > 0 && ids.every((id) => isLessonComplete(next, id))) {
+            next = {
+              ...next,
+              earnedBadges: [...next.earnedBadges, sb.badgeId],
+            };
+            saveProgress(next);
+          }
+        }
+        return next;
+      });
     },
-    [],
+    [projectorMode],
   );
+
+  const openLessonOnProjector = useCallback((lessonId: string) => {
+    setProjectorMode(true);
+    navigate({ page: 'lesson', lessonId });
+  }, []);
 
   const renderPage = () => {
     switch (route.page) {
       case 'home':
-        return <HomePage />;
+        return <HomePage progress={progress} />;
+
+      case 'teacher':
+        return (
+          <TeacherPage
+            onOpenLesson={(lessonId) => {
+              setProjectorMode(false);
+              navigate({ page: 'lesson', lessonId });
+            }}
+            onOpenLessonOnProjector={openLessonOnProjector}
+          />
+        );
 
       case 'subject': {
         const subject = getSubjectById(route.subjectId);
@@ -93,6 +158,7 @@ function App() {
             lesson={lesson}
             progress={progress}
             calmMode={progress.calmMode}
+            projectorMode={projectorMode}
             onActivityComplete={() =>
               handleActivityComplete(lesson.id, lesson.activityXp)
             }
@@ -110,6 +176,8 @@ function App() {
       progress={progress}
       calmMode={progress.calmMode}
       onCalmModeToggle={handleCalmModeToggle}
+      projectorMode={projectorMode}
+      onProjectorModeToggle={() => setProjectorMode((prev) => !prev)}
     >
       {renderPage()}
     </AppShell>

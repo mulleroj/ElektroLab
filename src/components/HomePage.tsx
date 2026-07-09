@@ -1,8 +1,31 @@
+import type { ProgressState } from '../types';
 import { subjects } from '../data/subjects';
+import { lessons, getLessonById } from '../data/lessons';
+import { getBadgeById } from '../data/badges';
+import { isLessonComplete } from '../lib/progress';
 import { SubjectCard } from './SubjectCard';
 import { navigate } from '../lib/routing';
 
-export function HomePage() {
+interface HomePageProps {
+  progress: ProgressState;
+}
+
+export function HomePage({ progress }: HomePageProps) {
+  const mvpLessons = lessons.filter((l) => l.mvpAvailable);
+  const completedLessons = mvpLessons.filter((l) => isLessonComplete(progress, l.id));
+
+  const lastCompleted = Object.entries(progress.lessons)
+    .filter(([, lp]) => lp.completedAt)
+    .sort(([, a], [, b]) => (a.completedAt! < b.completedAt! ? 1 : -1))
+    .map(([id]) => getLessonById(id))
+    .find((l) => l !== undefined);
+
+  const nextLesson = mvpLessons.find((l) => !isLessonComplete(progress, l.id));
+
+  const earnedBadges = progress.earnedBadges
+    .map((id) => getBadgeById(id))
+    .filter((b) => b !== undefined);
+
   return (
     <section className="home-page">
       <div className="page-intro">
@@ -15,6 +38,55 @@ export function HomePage() {
           Vše běží lokálně — bez přihlášení, bez internetu po načtení.
         </p>
       </div>
+
+      {completedLessons.length > 0 && (
+        <section className="progress-overview" aria-labelledby="progress-overview-title">
+          <h2 id="progress-overview-title">Co už umím</h2>
+          <dl className="progress-overview__stats">
+            <div>
+              <dt>Dokončené lekce</dt>
+              <dd>
+                {completedLessons.length} / {mvpLessons.length}
+              </dd>
+            </div>
+            <div>
+              <dt>Celkem XP</dt>
+              <dd>{progress.totalXp}</dd>
+            </div>
+            {lastCompleted && (
+              <div>
+                <dt>Poslední dokončená lekce</dt>
+                <dd>{lastCompleted.title}</dd>
+              </div>
+            )}
+          </dl>
+          {earnedBadges.length > 0 && (
+            <div className="progress-overview__badges">
+              <h3>Odznaky ({earnedBadges.length})</h3>
+              <ul>
+                {earnedBadges.map((badge) => (
+                  <li key={badge.id} title={badge.description}>
+                    <span aria-hidden="true">{badge.icon}</span> {badge.title}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {nextLesson ? (
+            <button
+              type="button"
+              className="btn btn--primary"
+              onClick={() => navigate({ page: 'lesson', lessonId: nextLesson.id })}
+            >
+              Pokračovat tam, kde jsem skončil: {nextLesson.title}
+            </button>
+          ) : (
+            <p className="progress-overview__done">
+              🎉 Všechny dostupné lekce máš hotové. Můžeš je kdykoli opakovat.
+            </p>
+          )}
+        </section>
+      )}
 
       <div className="subject-grid" role="list">
         {subjects.map((subject) => (

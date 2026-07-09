@@ -3,6 +3,9 @@ import { CircuitOrderActivity } from './CircuitOrderActivity';
 import { ClickMatchingActivity } from './ClickMatchingActivity';
 import { FormulaSelectActivity } from './FormulaSelectActivity';
 import { ConnectionTypeActivity } from './ConnectionTypeActivity';
+import { MeterConnectionActivity } from './MeterConnectionActivity';
+import { MeasurementJudgmentActivity } from './MeasurementJudgmentActivity';
+import { ScenarioChoiceActivity } from './ScenarioChoiceActivity';
 
 interface ActivityRendererProps {
   activity: Activity;
@@ -76,6 +79,36 @@ export function ActivityRenderer({
         correctPairs={a.correctPairs}
         leftTitle="Značky"
         rightTitle="Názvy prvků"
+        calmMode={calmMode}
+        onComplete={onComplete}
+      />
+    );
+  }
+
+  if (activity.meterConnection) {
+    return (
+      <MeterConnectionActivity
+        activity={activity.meterConnection}
+        calmMode={calmMode}
+        onComplete={onComplete}
+      />
+    );
+  }
+
+  if (activity.measurementJudgment) {
+    return (
+      <MeasurementJudgmentActivity
+        activity={activity.measurementJudgment}
+        calmMode={calmMode}
+        onComplete={onComplete}
+      />
+    );
+  }
+
+  if (activity.scenarioChoice) {
+    return (
+      <ScenarioChoiceActivity
+        activity={activity.scenarioChoice}
         calmMode={calmMode}
         onComplete={onComplete}
       />
