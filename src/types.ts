@@ -92,6 +92,54 @@ export interface LogicGateDemoConfig {
   description: string;
 }
 
+export interface SensorDemoConfig {
+  type: 'sensor-demo';
+  title: string;
+  description: string;
+}
+
+export interface RegulationLoopDemoConfig {
+  type: 'regulation-loop';
+  title: string;
+  description: string;
+}
+
+export interface FeedbackDemoConfig {
+  type: 'feedback-loop';
+  title: string;
+  description: string;
+}
+
+export interface AutomationLogicDemoConfig {
+  type: 'automation-logic';
+  title: string;
+  description: string;
+}
+
+export interface TransformerDemoConfig {
+  type: 'transformer-demo';
+  title: string;
+  description: string;
+}
+
+export interface InductionMotorDemoConfig {
+  type: 'induction-motor';
+  title: string;
+  description: string;
+}
+
+export interface ContactorRelayDemoConfig {
+  type: 'contactor-relay';
+  title: string;
+  description: string;
+}
+
+export interface VoltageLevelSafetyDemoConfig {
+  type: 'voltage-level-safety';
+  title: string;
+  description: string;
+}
+
 export type InteractiveDemo =
   | CircuitSwitchDemo
   | SeriesParallelDemoConfig
@@ -104,13 +152,23 @@ export type InteractiveDemo =
   | ProtectionScenarioDemoConfig
   | DiodeDirectionDemoConfig
   | TransistorSwitchDemoConfig
-  | LogicGateDemoConfig;
+  | LogicGateDemoConfig
+  | SensorDemoConfig
+  | RegulationLoopDemoConfig
+  | FeedbackDemoConfig
+  | AutomationLogicDemoConfig
+  | TransformerDemoConfig
+  | InductionMotorDemoConfig
+  | ContactorRelayDemoConfig
+  | VoltageLevelSafetyDemoConfig;
 
 export interface CircuitOrderActivity {
   type: 'circuit-order';
   instruction: string;
   elements: { id: string; label: string }[];
   correctOrder: string[];
+  /** Zpráva po úspěšném seřazení — výchozí text je o elektrickém obvodu. */
+  successMessage?: string;
 }
 
 export interface TermMatchingActivity {
@@ -119,6 +177,10 @@ export interface TermMatchingActivity {
   terms: { id: string; label: string }[];
   definitions: { id: string; label: string }[];
   correctPairs: Record<string, string>;
+  /** Titulek levého sloupce — výchozí „Veličiny". */
+  leftTitle?: string;
+  /** Titulek pravého sloupce — výchozí „Význam". */
+  rightTitle?: string;
 }
 
 export interface FormulaSelectActivity {

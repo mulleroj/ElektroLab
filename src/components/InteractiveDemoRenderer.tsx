@@ -11,6 +11,14 @@ import { ProtectionScenarioDemoView } from './demos/ProtectionScenarioDemo';
 import { DiodeDirectionDemoView } from './demos/DiodeDirectionDemo';
 import { TransistorSwitchDemoView } from './demos/TransistorSwitchDemo';
 import { LogicGateDemoView } from './demos/LogicGateDemo';
+import { SensorDemoView } from './demos/SensorDemo';
+import { RegulationLoopDemoView } from './demos/RegulationLoopDemo';
+import { FeedbackDemoView } from './demos/FeedbackDemo';
+import { AutomationLogicDemoView } from './demos/AutomationLogicDemo';
+import { TransformerDemoView } from './demos/TransformerDemo';
+import { InductionMotorDemoView } from './demos/InductionMotorDemo';
+import { ContactorRelayDemoView } from './demos/ContactorRelayDemo';
+import { VoltageLevelSafetyDemoView } from './demos/VoltageLevelSafetyDemo';
 
 interface InteractiveDemoRendererProps {
   demo: InteractiveDemo;
@@ -68,6 +76,34 @@ export function InteractiveDemoRenderer({
       );
     case 'logic-gates':
       return <LogicGateDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />;
+    case 'sensor-demo':
+      return <SensorDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />;
+    case 'regulation-loop':
+      return (
+        <RegulationLoopDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />
+      );
+    case 'feedback-loop':
+      return <FeedbackDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />;
+    case 'automation-logic':
+      return (
+        <AutomationLogicDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />
+      );
+    case 'transformer-demo':
+      return (
+        <TransformerDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />
+      );
+    case 'induction-motor':
+      return (
+        <InductionMotorDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />
+      );
+    case 'contactor-relay':
+      return (
+        <ContactorRelayDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />
+      );
+    case 'voltage-level-safety':
+      return (
+        <VoltageLevelSafetyDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />
+      );
     default:
       return null;
   }

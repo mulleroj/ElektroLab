@@ -38,6 +38,8 @@ const SUBJECT_BADGES: { subjectId: string; year?: number; badgeId: string }[] = 
   { subjectId: 'mereni', year: 1, badgeId: 'merici-elev' },
   { subjectId: 'rozvody', badgeId: 'bezpecny-rozvodar' },
   { subjectId: 'elektronika', badgeId: 'elektronicky-elev' },
+  { subjectId: 'automatizace', badgeId: 'automatizacni-elev' },
+  { subjectId: 'stroje', badgeId: 'strojarsky-elev' },
 ];
 
 function loadProjectorMode(): boolean {

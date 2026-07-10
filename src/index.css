@@ -1961,3 +1961,82 @@ input:focus-visible {
   border-radius: var(--radius);
   padding: 0.75rem;
 }
+
+/* ===== MVP-7: automatizační diagramy ===== */
+
+.automation-diagram {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+  display: grid;
+  gap: 0.4rem;
+  justify-items: start;
+}
+
+.automation-diagram__box {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+}
+
+.automation-diagram__box--active {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.automation-diagram__box--alert {
+  border-color: var(--color-safety-border);
+  background: var(--color-safety-bg);
+}
+
+.automation-diagram__arrow {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  padding-left: 0.75rem;
+}
+
+/* ===== MVP-8: karty napěťových hladin ===== */
+
+.voltage-card {
+  background: var(--color-surface);
+  border: 2px solid var(--color-safety-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin: 0 0 1rem;
+}
+
+.voltage-card h4 {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+}
+
+.voltage-card__rows {
+  margin: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.voltage-card__rows dt {
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted);
+}
+
+.voltage-card__rows dd {
+  margin: 0;
+}
+
+.voltage-card__behavior {
+  background: var(--color-safety-bg);
+  border-left: 4px solid var(--color-safety-border);
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+}

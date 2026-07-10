@@ -36,7 +36,7 @@ export const subjects: Subject[] = [
     description: 'Transformátory, motory a ochranná zařízení.',
     icon: '⚙️',
     years: [2],
-    mvpAvailable: false,
+    mvpAvailable: true,
   },
   {
     id: 'elektronika',
@@ -54,7 +54,7 @@ export const subjects: Subject[] = [
     description: 'Automatizace a řídicí systémy.',
     icon: '🤖',
     years: [3],
-    mvpAvailable: false,
+    mvpAvailable: true,
   },
   {
     id: 'bezpecnost',
