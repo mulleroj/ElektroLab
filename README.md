@@ -116,6 +116,15 @@ src/
 5. **Učitelský režim** — projekce aktivity bez ukládání pokroku
 6. **Přístupnost** — rozšířené ARIA, testování čtečkou obrazovky
 
+## Příprava na závěrečnou zkoušku (připraveno, vypnuto)
+
+Závěrečkový režim je **připravený architektonicky, ale vypnutý** — oficiální
+zkušební okruhy zatím nebyly dodány a aplikace nesmí nabízet vymyšlené otázky.
+Datový kontrakt, prázdný registr, validace a feature flag jsou
+v `src/features/finalExam/`. Postup budoucího doplnění obsahu popisuje
+skill `skills/electrolab-final-exam-content/SKILL.md`; stav a další kroky
+shrnuje `docs/FINAL_EXAM_EXTENSION_STATUS.md`.
+
 ## Licence
 
 Školní projekt — ElektroLab MVP-0.

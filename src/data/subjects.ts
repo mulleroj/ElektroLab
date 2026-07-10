@@ -69,7 +69,8 @@ export const subjects: Subject[] = [
     id: 'zkouska',
     title: 'Příprava na závěrečnou zkoušku',
     subtitle: 'Trénink na zkoušku bez stresu.',
-    description: 'Opakování a trénink pro závěrečnou zkoušku.',
+    description:
+      'Připraveno pro budoucí doplnění oficiálních okruhů. Závěrečkový režim bude zpřístupněn po vložení a ověření skutečných zkušebních okruhů.',
     icon: '🎓',
     years: [1, 2, 3],
     mvpAvailable: false,
