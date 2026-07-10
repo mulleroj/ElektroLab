@@ -1,4 +1,5 @@
 import type { InteractiveDemo } from '../types';
+import { assertNever } from '../lib/assertNever';
 import { CircuitSwitchDemoView } from './demos/CircuitSwitchDemo';
 import { SeriesParallelDemoView } from './demos/SeriesParallelDemo';
 import { SymbolsDemoView } from './demos/SymbolsDemo';
@@ -105,6 +106,6 @@ export function InteractiveDemoRenderer({
         <VoltageLevelSafetyDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />
       );
     default:
-      return null;
+      return assertNever(demo);
   }
 }

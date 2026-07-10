@@ -115,15 +115,15 @@ Obsah piš tak, aby fungoval ve stávajících komponentách (viz UI kontrakt):
 
 ## 10. Povinné validace
 
-- `validateFinalExamTopics(finalExamTopics)` z
-  `src/features/finalExam/finalExamValidation.ts` musí vrátit `valid: true`
+- **`npm run validate:content` je POVINNÉ před každým commitem a před
+  publikací každého batche** — spouští validaci celého obsahu včetně
+  final-exam registru (pravidla z
+  `src/features/finalExam/finalExamValidation.ts`) a musí skončit `PASS`
   (varování posuď a zdůvodni v PR).
-- Jak spustit (bez nové závislosti): dočasně zavolej
-  `reportFinalExamValidation(finalExamTopics)` v `src/main.tsx` za
-  `validateAllLessons()` a zkontroluj konzoli dev serveru, poté volání
-  odstraň — NEBO validaci spusť v konzoli prohlížeče přes
-  `import('/src/features/finalExam/finalExamValidation.ts')`.
-- Vždy: `npm run typecheck && npm run lint && npm run build`.
+- Totéž hlídá CI při každém PR (`.github/workflows/ci.yml`) — nevalidní
+  data neprojdou do main.
+- Vždy také: `npm run typecheck && npm run lint && npm run build`
+  (nebo souhrnně `npm run check`).
 
 ## 11. QA checklist
 
@@ -144,8 +144,7 @@ Po každé dávce ověř minimálně:
 - Commit zprávy: `content: add final exam batch N (draft)`,
   `content: review final exam batch N`, `content: publish final exam batch N`.
 - Žádný commit bez proběhlé validace a kontrol.
-- Merge do hlavní větve (`feat/electrolab-mvp-1-zaklady-five-lessons` —
-  pozor, větev `main` je v tomto repu zastaralá) přes PR.
+- Merge do hlavní větve `main` přes PR.
 - NIKDY force-push, NIKDY přepis historie publikovaného obsahu.
 
 ## 13. Handoff pro dalšího agenta

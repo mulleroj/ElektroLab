@@ -16,11 +16,18 @@ Aplikace poběží na `http://localhost:5173`.
 ### Další příkazy
 
 ```bash
-npm run build      # produkční build do dist/
-npm run preview    # náhled produkčního buildu
-npm run typecheck  # kontrola TypeScript typů
-npm run lint       # ESLint
+npm run build             # produkční build do dist/
+npm run preview           # náhled produkčního buildu
+npm run typecheck         # kontrola TypeScript typů
+npm run lint              # ESLint
+npm run validate:content  # validace datové konzistence obsahu
+npm run check             # validace + typecheck + lint + build
 ```
+
+Každý pull request a push do main prochází CI quality gate
+(`.github/workflows/ci.yml`): instalace, validace obsahu, typecheck, lint
+a build. Nevalidní data blokují merge. Podrobnosti:
+[docs/CONTENT_VALIDATION.md](docs/CONTENT_VALIDATION.md).
 
 ## Co obsahuje MVP-0
 
