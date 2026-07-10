@@ -1,4 +1,5 @@
 import type { ProgressState, LessonProgress } from '../types';
+import { migrateProgressLessonReferences } from './lessonIdMigration';
 
 const STORAGE_KEY = 'elektrolab-progress';
 
@@ -14,12 +15,16 @@ export function loadProgress(): ProgressState {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return { ...defaultProgress };
     const parsed = JSON.parse(raw) as Partial<ProgressState>;
-    return {
+    const loaded: ProgressState = {
       totalXp: parsed.totalXp ?? 0,
       earnedBadges: parsed.earnedBadges ?? [],
       lessons: parsed.lessons ?? {},
       calmMode: parsed.calmMode ?? false,
     };
+    // Jednorázová migrace historických lesson ID; ukládá se jen při změně.
+    const { state, changed } = migrateProgressLessonReferences(loaded);
+    if (changed) saveProgress(state);
+    return state;
   } catch {
     return { ...defaultProgress };
   }

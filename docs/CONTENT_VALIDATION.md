@@ -72,6 +72,26 @@ Před commitem a před publikací každé dávky závěrečkového obsahu je
 `docs/FINAL_EXAM_CONTENT_BATCH_CHECKLIST.md` a
 `skills/electrolab-final-exam-content/SKILL.md`.
 
+## Migrace historických lesson ID
+
+Historické ID `zakladni-znacKy` (vybočovalo z kebab-case) bylo v MVP-10B
+přejmenováno na `zakladni-znacky` pomocí bezpečné legacy alias migrace —
+modul `src/lib/lessonIdMigration.ts`:
+
+- **Proč existuje:** přejmenování lesson ID by jinak rozbilo staré hash
+  odkazy a uložený pokrok žáků (`elektrolab-progress`,
+  `elektrolab-last-lesson`).
+- **Co dělá:** `loadProgress()` při načtení jednorázově převede legacy
+  klíče pokroku na canonical (sloučí bez duplicit, XP/odznaky nemění,
+  uloží jen při skutečné změně — idempotentní); pokračovací box migruje
+  uložené poslední ID; hash routing rozpozná
+  `#/lesson/zakladni-znacKy`, otevře novou lekci a adresu tiše nahradí
+  canonical tvarem bez přidání historie.
+- **Aliasy se NESMÍ odstranit** bez vědomého rozhodnutí o ukončení zpětné
+  kompatibility (staré odkazy v sešitech žáků, záložky, uložený pokrok).
+- Validátor mapu aliasů kontroluje (canonical existuje, legacy už není
+  produkční ID, žádné řetězení).
+
 ## Zásady
 
 - CI (`.github/workflows/ci.yml`) blokuje nevalidní data při každém PR

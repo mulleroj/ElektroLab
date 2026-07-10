@@ -10,6 +10,7 @@ import { lessons } from '../src/data/lessons';
 import { badges } from '../src/data/badges';
 import { SUBJECT_BADGES } from '../src/data/subjectBadges';
 import { finalExamTopics } from '../src/features/finalExam/finalExamRegistry';
+import { LEGACY_LESSON_ID_ALIASES } from '../src/lib/lessonIdMigration';
 import { finalExamConfig } from '../src/features/finalExam/finalExamConfig';
 import { validateContentData } from '../src/validation/contentValidation';
 import type { ContentValidationIssue } from '../src/validation/contentValidationTypes';
@@ -30,6 +31,7 @@ const result = validateContentData({
   badges,
   subjectBadges: SUBJECT_BADGES,
   finalExamTopics,
+  lessonIdAliases: LEGACY_LESSON_ID_ALIASES,
 });
 
 console.log('ElektroLab content validation');

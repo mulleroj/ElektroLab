@@ -34,6 +34,8 @@ export interface ContentInput {
   badges: Badge[];
   subjectBadges: SubjectBadgeRule[];
   finalExamTopics: FinalExamTopic[];
+  /** Migrační aliasy legacy lesson ID → canonical (volitelné). */
+  lessonIdAliases?: Record<string, string>;
 }
 
 /** Přísný kebab-case (doporučená konvence). */
@@ -497,6 +499,24 @@ export function validateContentData(input: ContentInput): ContentValidationResul
       c.error('SUBJECT_BADGE_DUPLICATE', 'subject-badge', `Předmět "${rule.subjectId}" má více předmětových odznaků pro stejný rozsah.`, rid);
     }
     seenSubjectBadgeSubjects.add(key);
+  }
+
+  // Migrační aliasy lesson ID
+  const lessonIdSet = new Set(lessons.map((l) => l.id));
+  for (const [legacy, canonical] of Object.entries(input.lessonIdAliases ?? {})) {
+    const aid = `${legacy}→${canonical}`;
+    if (legacy === canonical) {
+      c.error('ALIAS_SELF_REFERENCE', 'lesson-id-alias', 'Legacy ID je stejné jako canonical ID.', aid);
+    }
+    if (!lessonIdSet.has(canonical)) {
+      c.error('ALIAS_UNKNOWN_CANONICAL', 'lesson-id-alias', `Canonical ID "${canonical}" neexistuje mezi lekcemi.`, aid);
+    }
+    if (lessonIdSet.has(legacy)) {
+      c.error('ALIAS_LEGACY_STILL_EXISTS', 'lesson-id-alias', `Legacy ID "${legacy}" stále existuje jako produkční lesson.id.`, aid);
+    }
+    if ((input.lessonIdAliases ?? {})[canonical] !== undefined) {
+      c.error('ALIAS_CHAINED', 'lesson-id-alias', `Canonical ID "${canonical}" je zároveň legacy klíčem jiného aliasu (řetězení/cyklus).`, aid);
+    }
   }
 
   // Final exam (existující pravidla — bez duplikace logiky)

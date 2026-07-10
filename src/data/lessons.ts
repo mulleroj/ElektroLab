@@ -355,7 +355,7 @@ export const lessons: MicroLesson[] = [
     mvpAvailable: true,
   },
   {
-    id: 'zakladni-znacKy',
+    id: 'zakladni-znacky',
     subjectId: 'zaklady',
     topicId: 'el-kresleni',
     title: 'Základní elektrotechnické značky',
