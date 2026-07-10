@@ -36,7 +36,7 @@ export const subjects: Subject[] = [
     description: 'Transformátory, motory a ochranná zařízení.',
     icon: '⚙️',
     years: [2],
-    mvpAvailable: false,
+    mvpAvailable: true,
   },
   {
     id: 'elektronika',

@@ -139,6 +139,36 @@ export const badges: Badge[] = [
     description: 'Dokončil jsi všechny dostupné mikrolekce o automatických zařízeních.',
     icon: '🤖',
   },
+  {
+    id: 'mistr-transformatoru',
+    title: 'Mistr transformátoru',
+    description: 'Víš, kdy transformátor napětí zvyšuje, snižuje a kdy je převod 1:1.',
+    icon: '🧲',
+  },
+  {
+    id: 'motorovy-elev',
+    title: 'Motorový elév',
+    description: 'Chápeš točivé pole a proč se rotor za polem opožďuje.',
+    icon: '🌀',
+  },
+  {
+    id: 'vladce-kontaktu',
+    title: 'Vládce kontaktů',
+    description: 'Rozumíš tomu, jak cívka stykače spíná jiný obvod.',
+    icon: '🕹️',
+  },
+  {
+    id: 'bezpecny-u-vn',
+    title: 'Bezpečný u vysokého napětí',
+    description: 'Znáš napěťové hladiny a víš, že u VN/VVN rozhoduje odstup.',
+    icon: '🚧',
+  },
+  {
+    id: 'strojarsky-elev',
+    title: 'Strojařský elév',
+    description: 'Dokončil jsi všechny dostupné mikrolekce o strojích a přístrojích.',
+    icon: '⚙️',
+  },
 ];
 
 export function getBadgeById(id: string): Badge | undefined {

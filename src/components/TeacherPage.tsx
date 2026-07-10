@@ -27,6 +27,10 @@ const demoLabels: Record<string, string> = {
   'regulation-loop': 'Regulační smyčka s teplotou',
   'feedback-loop': 'Zpětná vazba na nádrži',
   'automation-logic': 'Dopravník s podmínkou AND',
+  'transformer-demo': 'Transformátor: závity a napětí',
+  'induction-motor': 'Asynchronní motor krok za krokem',
+  'contactor-relay': 'Stykač: cívka spíná kontakt',
+  'voltage-level-safety': 'Karty NN / VN / VVN a odstup',
 };
 
 const activityLabels: Record<string, string> = {

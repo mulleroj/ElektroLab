@@ -116,6 +116,30 @@ export interface AutomationLogicDemoConfig {
   description: string;
 }
 
+export interface TransformerDemoConfig {
+  type: 'transformer-demo';
+  title: string;
+  description: string;
+}
+
+export interface InductionMotorDemoConfig {
+  type: 'induction-motor';
+  title: string;
+  description: string;
+}
+
+export interface ContactorRelayDemoConfig {
+  type: 'contactor-relay';
+  title: string;
+  description: string;
+}
+
+export interface VoltageLevelSafetyDemoConfig {
+  type: 'voltage-level-safety';
+  title: string;
+  description: string;
+}
+
 export type InteractiveDemo =
   | CircuitSwitchDemo
   | SeriesParallelDemoConfig
@@ -132,7 +156,11 @@ export type InteractiveDemo =
   | SensorDemoConfig
   | RegulationLoopDemoConfig
   | FeedbackDemoConfig
-  | AutomationLogicDemoConfig;
+  | AutomationLogicDemoConfig
+  | TransformerDemoConfig
+  | InductionMotorDemoConfig
+  | ContactorRelayDemoConfig
+  | VoltageLevelSafetyDemoConfig;
 
 export interface CircuitOrderActivity {
   type: 'circuit-order';
