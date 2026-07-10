@@ -30,7 +30,8 @@ Používá se pro KAŽDOU dávku okruhů. Dávka = vlastní větev
 - [ ] Obsahová kontrola (znění beze změn proti zdroji, osnova odpovědi správná)
 - [ ] Bezpečnostní kontrola (safetyNote, žádné návody k práci na zařízení,
       rizikové scénáře končí bezpečnou volbou)
-- [ ] `validateFinalExamTopics` — 0 chyb, varování posouzena
+- [ ] `npm run validate:content` — PASS, 0 chyb, varování posouzena
+      (zahrnuje pravidla `validateFinalExamTopics`)
 - [ ] Kontrola odkazů (subjectIds, relatedLessonIds, practiceItems)
 - [ ] Přístupnost (texty čitelné, žádný význam jen barvou, žádné časovače)
 - [ ] Mobilní zobrazení zkontrolováno
@@ -43,6 +44,7 @@ Používá se pro KAŽDOU dávku okruhů. Dávka = vlastní větev
 
 ## Po publikaci
 
+- [ ] Před commitem znovu `npm run validate:content` — PASS
 - [ ] Commit (`content: publish final exam batch N`)
 - [ ] Technická kontrola JINÝM agentem (typy, validace, diff registru)
 - [ ] Push větve

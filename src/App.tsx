@@ -21,6 +21,8 @@ import { LessonPage } from './components/LessonPage';
 import { TeacherPage } from './components/TeacherPage';
 import { Onboarding } from './components/Onboarding';
 
+import { SUBJECT_BADGES } from './data/subjectBadges';
+
 const PROJECTOR_KEY = 'elektrolab-projector';
 const ONBOARDING_KEY = 'elektrolab-onboarding-seen';
 const LAST_LESSON_KEY = 'elektrolab-last-lesson';
@@ -33,14 +35,6 @@ function loadOnboardingSeen(): boolean {
   }
 }
 
-/** Předmětové odznaky: udělí se po dokončení všech MVP lekcí předmětu (a ročníku). */
-const SUBJECT_BADGES: { subjectId: string; year?: number; badgeId: string }[] = [
-  { subjectId: 'mereni', year: 1, badgeId: 'merici-elev' },
-  { subjectId: 'rozvody', badgeId: 'bezpecny-rozvodar' },
-  { subjectId: 'elektronika', badgeId: 'elektronicky-elev' },
-  { subjectId: 'automatizace', badgeId: 'automatizacni-elev' },
-  { subjectId: 'stroje', badgeId: 'strojarsky-elev' },
-];
 
 function loadProjectorMode(): boolean {
   try {
