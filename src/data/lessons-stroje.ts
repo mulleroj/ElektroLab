@@ -137,7 +137,7 @@ export const strojeLessons: MicroLesson[] = [
     typicalMistake:
       'Žáci zaměňují stator a rotor. Pomůcka: STÁtor STOJÍ, ROTor ROTUJE.',
     teacherTip:
-      'Navazuje na transformátor (obojí je o magnetickém poli). Demo se čtyřmi stavy se hodí projít společně a nechat třídu předvídat další krok.',
+      'Navazuje na transformátor (obojí je o magnetickém poli). Demo se šesti kroky se hodí projít společně a nechat třídu předvídat další krok.',
     interactiveDemo: {
       type: 'induction-motor',
       title: 'Od stojícího motoru k běhu',
