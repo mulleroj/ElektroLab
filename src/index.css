@@ -2464,3 +2464,220 @@ input:focus-visible {
     animation: none;
   }
 }
+
+/* Schéma asynchronního motoru (MVP-11C InductionMotorDemo) */
+
+.induction-motor-svg {
+  display: block;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.induction-motor-label {
+  fill: var(--color-text-muted);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.induction-motor-label--direction,
+.induction-motor-label--field,
+.induction-motor-label--rotor {
+  fill: var(--color-text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.induction-motor-stator {
+  fill: none;
+  stroke: var(--color-border);
+  stroke-width: 14;
+}
+
+.induction-motor-airgap {
+  fill: var(--color-bg);
+  stroke: #cbd5e1;
+  stroke-width: 2;
+  stroke-dasharray: 4 4;
+}
+
+.induction-motor-phase {
+  fill: #e8f0f8;
+  stroke: var(--color-border);
+  stroke-width: 1.5;
+  transition: fill 0.35s ease, stroke 0.35s ease;
+}
+
+.induction-motor-phase--on {
+  fill: #dbeafe;
+  stroke: var(--color-primary);
+  stroke-width: 2;
+}
+
+.induction-motor-phase--pulse {
+  animation: induction-motor-phase-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes induction-motor-phase-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.induction-motor-phase-label {
+  fill: var(--color-text);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+.induction-motor-field,
+.induction-motor-rotor {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.induction-motor-field {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.induction-motor-field--visible {
+  opacity: 1;
+}
+
+.induction-motor-field-arrow {
+  stroke: var(--color-primary);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.induction-motor-field-head {
+  fill: var(--color-primary);
+}
+
+.induction-motor-field-arc {
+  fill: none;
+  stroke: #94a3b8;
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+}
+
+/* Pole: kratší perioda = rychlejší otáčení než rotor */
+.induction-motor-field--spinning {
+  animation: induction-motor-field-spin 7s linear infinite;
+}
+
+.induction-motor-rotor--spinning {
+  animation: induction-motor-rotor-spin 9.5s linear infinite;
+}
+
+@keyframes induction-motor-field-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes induction-motor-rotor-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.induction-motor-field--static-start {
+  transform: rotate(20deg);
+}
+
+.induction-motor-field--static-mid {
+  transform: rotate(36deg);
+}
+
+.induction-motor-field--static-slip {
+  transform: rotate(42deg);
+}
+
+.induction-motor-rotor-disc {
+  fill: #f1f5f9;
+  stroke: var(--color-border);
+  stroke-width: 2;
+}
+
+.induction-motor-rotor-bar {
+  stroke: #94a3b8;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke 0.35s ease, stroke-width 0.35s ease;
+}
+
+.induction-motor-rotor-bar--on {
+  stroke: var(--color-primary);
+  stroke-width: 4;
+}
+
+.induction-motor-rotor-current {
+  fill: var(--color-primary);
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+.induction-motor-shaft {
+  fill: var(--color-border);
+  stroke: #64748b;
+  stroke-width: 1.5;
+}
+
+.induction-motor-rotor--static-start {
+  transform: rotate(14deg);
+}
+
+.induction-motor-rotor--static-slip {
+  transform: rotate(24deg);
+}
+
+.induction-motor-slip-marker {
+  stroke: var(--color-text);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.induction-motor-slip-marker--field {
+  stroke: var(--color-primary);
+}
+
+.induction-motor-slip-panel {
+  margin: 0.75rem 0 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: #f8fafc;
+  font-size: 0.95rem;
+}
+
+.induction-motor-slip-panel p {
+  margin: 0.35rem 0;
+}
+
+.induction-motor-anim--paused,
+.induction-motor-anim--paused * {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .induction-motor-phase,
+  .induction-motor-field,
+  .induction-motor-rotor-disc,
+  .induction-motor-rotor-bar {
+    transition: none;
+  }
+
+  .induction-motor-phase--pulse,
+  .induction-motor-field--spinning,
+  .induction-motor-rotor--spinning {
+    animation: none;
+  }
+}

@@ -142,7 +142,7 @@ export const strojeLessons: MicroLesson[] = [
       type: 'induction-motor',
       title: 'Od stojícího motoru k běhu',
       description:
-        'Projdi čtyři stavy motoru a sleduj, jak točivé pole roztáčí rotor — a proč ho nikdy úplně nedožene.',
+        'Projdi šest kroků ukázky a sleduj, jak točivé pole roztáčí rotor — a proč ho nikdy úplně nedožene.',
     },
     activity: {
       termMatching: {

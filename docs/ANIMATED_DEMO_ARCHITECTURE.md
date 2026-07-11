@@ -115,7 +115,11 @@ otevření lekce se povolení neodebírá (stejně jako u ostatních dem).
   souřadnic.
 - **CSS animation (@keyframes)** — opakovaný pohyb, dokud trvá stav (rotor
   motoru). Pauza = `animation-play-state: paused`, nikdy odstranění třídy
-  uprostřed (to by skokem vrátilo úhel).
+  uprostřed (to by skokem vrátilo úhel). U dem s **dvěma současně rotujícími
+  prvky** (např. asynchronní motor: točivé pole + rotor) použij **oddělené
+  skupiny** s vlastním `transform-origin` a **různé periody** animace — kratší
+  pro rychlejší prvek, delší pro pomalejší; skluz pak není jen text, ale i
+  vizuální rozdíl rychlostí.
 - **requestAnimationFrame** — až když je potřeba počítat hodnoty každý
   snímek; viz pravidla výše.
 
