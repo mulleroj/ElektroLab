@@ -332,7 +332,7 @@ export function TransformerDemoView({
           {/* Primární vinutí (levý sloupek jádra) */}
           {PRIMARY_TURNS_Y.map((y) => (
             <ellipse
-              key={y}
+              key={`primary-turn-${y}`}
               className={primaryTurnClass}
               cx={274}
               cy={y}
@@ -344,7 +344,7 @@ export function TransformerDemoView({
           {/* Sekundární vinutí (pravý sloupek) — počet závitů podle varianty */}
           {variant.turnsY.map((y) => (
             <ellipse
-              key={y}
+              key={`secondary-turn-${y}`}
               className={secondaryTurnClass}
               cx={376}
               cy={y}
