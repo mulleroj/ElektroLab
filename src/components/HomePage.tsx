@@ -5,6 +5,7 @@ import { getBadgeById } from '../data/badges';
 import { isLessonComplete } from '../lib/progress';
 import { SubjectCard } from './SubjectCard';
 import { navigate } from '../lib/routing';
+import { migrateLessonId } from '../lib/lessonIdMigration';
 
 interface HomePageProps {
   progress: ProgressState;
@@ -14,8 +15,12 @@ const RECOMMENDED_FIRST_LESSON_ID = 'co-je-obvod';
 
 function getLastOpenedLesson() {
   try {
-    const id = localStorage.getItem('elektrolab-last-lesson');
-    if (!id) return undefined;
+    const stored = localStorage.getItem('elektrolab-last-lesson');
+    if (!stored) return undefined;
+    const id = migrateLessonId(stored);
+    if (id !== stored) {
+      localStorage.setItem('elektrolab-last-lesson', id);
+    }
     const lesson = getLessonById(id);
     return lesson?.mvpAvailable ? lesson : undefined;
   } catch {

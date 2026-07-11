@@ -1,4 +1,5 @@
 import type { Route } from '../types';
+import { migrateLessonId } from './lessonIdMigration';
 
 export function parseHash(): Route {
   const hash = window.location.hash.replace(/^#\/?/, '');
@@ -15,7 +16,15 @@ export function parseHash(): Route {
         return { page: 'topic', subjectId: parts[1], topicId: parts[2] };
       break;
     case 'lesson':
-      if (parts[1]) return { page: 'lesson', lessonId: parts[1] };
+      if (parts[1]) {
+        // Zpětná kompatibilita: legacy lesson ID převedeme na canonical
+        // a adresu tiše nahradíme (bez přidání záznamu do historie).
+        const lessonId = migrateLessonId(parts[1]);
+        if (lessonId !== parts[1]) {
+          window.location.replace(`#/lesson/${lessonId}`);
+        }
+        return { page: 'lesson', lessonId };
+      }
       break;
     case 'teacher':
       return { page: 'teacher' };
