@@ -2040,3 +2040,208 @@ input:focus-visible {
   border-radius: 4px;
   padding: 0.5rem 0.75rem;
 }
+
+/* ===== MVP-11A: animovaná dema ===== */
+
+/* Jednotné ovládání animace (AnimatedDemoControls) */
+
+.animated-demo-controls {
+  margin: 1rem 0;
+}
+
+.animated-demo-controls__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Dostatečná dotyková plocha i na mobilu */
+.animated-demo-controls__buttons .btn {
+  min-height: 2.75rem;
+  min-width: 6rem;
+}
+
+.animated-demo-controls__status {
+  margin: 0.5rem 0 0;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* Plocha se schématem */
+
+.animated-demo__stage {
+  background: #f8fafc;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.5rem;
+  margin: 1rem 0;
+}
+
+.animated-demo__stage svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Textový výpis stavu — informace nikdy nenese jen barva nebo pohyb */
+
+.animated-demo__state {
+  list-style: none;
+  margin: 1rem 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.5rem;
+}
+
+.animated-demo__state li {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.4rem 0.6rem;
+  font-size: 0.875rem;
+}
+
+/* Schéma stykače (referenční demo ContactorRelayDemo) */
+
+.contactor-label {
+  font-size: 15px;
+  font-weight: 600;
+  fill: var(--color-text-muted);
+}
+
+.contactor-label--state {
+  fill: var(--color-text);
+}
+
+.contactor-wire {
+  stroke: #94a3b8;
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke 0.4s ease, stroke-width 0.4s ease;
+}
+
+/* Obvod pod proudem: silnější čára (změna není jen barvou) + stav v textu */
+.contactor-wire--on {
+  stroke: var(--color-primary);
+  stroke-width: 5;
+}
+
+.contactor-terminal {
+  fill: var(--color-text);
+}
+
+.contactor-battery {
+  stroke: var(--color-text);
+  stroke-width: 3;
+}
+
+.contactor-battery--short {
+  stroke-width: 6;
+}
+
+.contactor-switch-blade {
+  stroke: var(--color-text);
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: transform 0.4s ease;
+}
+
+.contactor-coil {
+  fill: var(--color-surface);
+  stroke: var(--color-text);
+  stroke-width: 2;
+  transition: fill 0.4s ease;
+}
+
+.contactor-coil--on {
+  fill: #e8f0f8;
+  stroke: var(--color-primary);
+}
+
+.contactor-winding {
+  stroke: #94a3b8;
+  stroke-width: 2;
+}
+
+/* Naznačení magnetického pole — objevuje se a mizí (opacity), popis v textu */
+.contactor-field {
+  stroke: var(--color-primary);
+  stroke-width: 2;
+  fill: none;
+  stroke-dasharray: 5 4;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.contactor-field--visible {
+  opacity: 1;
+}
+
+/* Pohyblivá sestava kotvy — poloha se mění CSS transformací s přechodem */
+.contactor-moving {
+  transition: transform 0.7s ease;
+}
+
+.contactor-armature,
+.contactor-rod,
+.contactor-bridge {
+  fill: #cbd5e1;
+  stroke: var(--color-text);
+  stroke-width: 2;
+}
+
+.contactor-pad {
+  fill: var(--color-text);
+}
+
+.contactor-motor {
+  fill: var(--color-surface);
+  stroke: var(--color-text);
+  stroke-width: 3;
+}
+
+.contactor-rotor line {
+  stroke: var(--color-primary);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.contactor-rotor {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.contactor-rotor--spinning {
+  animation: contactor-rotor-spin 1.4s linear infinite;
+}
+
+.contactor-rotor--paused {
+  animation-play-state: paused;
+}
+
+@keyframes contactor-rotor-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Reduced motion: žádná rotace ani plynulé přejezdy — stavy se mění skokem.
+   Klidný režim řeší globální pravidlo .calm-mode * výše. */
+@media (prefers-reduced-motion: reduce) {
+  .contactor-moving,
+  .contactor-switch-blade,
+  .contactor-coil,
+  .contactor-field,
+  .contactor-wire {
+    transition: none;
+  }
+
+  .contactor-rotor--spinning {
+    animation: none;
+  }
+}
