@@ -18,38 +18,49 @@ export function migrateLessonId(id: string): string {
   return LEGACY_LESSON_ID_ALIASES[id] ?? id;
 }
 
-/** Sloučí pokrok legacy a canonical záznamu bez ztráty dokončení. */
-function mergeLessonProgress(
-  canonical: LessonProgress | undefined,
-  legacy: LessonProgress,
-): LessonProgress {
-  if (!canonical) return legacy;
-  return {
-    activityCompleted: canonical.activityCompleted || legacy.activityCompleted,
-    quizCompleted: canonical.quizCompleted || legacy.quizCompleted,
-    completedAt: canonical.completedAt ?? legacy.completedAt,
-  };
-}
-
 /**
  * Čistá migrace referencí na lekce uvnitř pokroku.
  * XP a odznaky se nemění (nejsou indexované lesson ID).
  * Vrací `changed: false`, když nebylo co migrovat — volající pak neukládá.
  * Idempotentní: po první migraci už žádné legacy klíče neexistují.
+ *
+ * completedAt: canonical záznam má přednost; jinak legacy. Nezávislé na
+ * pořadí klíčů v načteném objektu.
  */
 export function migrateProgressLessonReferences(state: ProgressState): {
   state: ProgressState;
   changed: boolean;
 } {
   let changed = false;
-  const lessons: Record<string, LessonProgress> = {};
+  const lessons: Record<string, Pick<LessonProgress, 'activityCompleted' | 'quizCompleted'>> = {};
+  const canonicalCompletedAt: Record<string, string> = {};
+  const legacyCompletedAt: Record<string, string> = {};
 
   for (const [id, progress] of Object.entries(state.lessons)) {
     const canonicalId = migrateLessonId(id);
     if (canonicalId !== id) changed = true;
-    lessons[canonicalId] = mergeLessonProgress(lessons[canonicalId], progress);
+
+    const existing = lessons[canonicalId];
+    lessons[canonicalId] = {
+      activityCompleted: (existing?.activityCompleted ?? false) || progress.activityCompleted,
+      quizCompleted: (existing?.quizCompleted ?? false) || progress.quizCompleted,
+    };
+
+    if (progress.completedAt) {
+      if (id === canonicalId) {
+        canonicalCompletedAt[canonicalId] = progress.completedAt;
+      } else {
+        legacyCompletedAt[canonicalId] = progress.completedAt;
+      }
+    }
+  }
+
+  const mergedLessons: Record<string, LessonProgress> = {};
+  for (const [canonicalId, flags] of Object.entries(lessons)) {
+    const completedAt = canonicalCompletedAt[canonicalId] ?? legacyCompletedAt[canonicalId];
+    mergedLessons[canonicalId] = completedAt ? { ...flags, completedAt } : flags;
   }
 
   if (!changed) return { state, changed: false };
-  return { state: { ...state, lessons }, changed: true };
+  return { state: { ...state, lessons: mergedLessons }, changed: true };
 }
