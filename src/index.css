@@ -2245,3 +2245,222 @@ input:focus-visible {
     animation: none;
   }
 }
+
+/* Schéma transformátoru (MVP-11B TransformerDemo) */
+
+.transformer-label {
+  font-size: 15px;
+  font-weight: 600;
+  fill: var(--color-text-muted);
+}
+
+.transformer-label--state {
+  fill: var(--color-text);
+}
+
+.transformer-label--small {
+  font-size: 11px;
+}
+
+.transformer-core {
+  fill: #cbd5e1;
+  stroke: var(--color-text);
+  stroke-width: 2;
+}
+
+.transformer-core-window {
+  fill: #f8fafc;
+  stroke: var(--color-text);
+  stroke-width: 2;
+}
+
+.transformer-wire {
+  stroke: #94a3b8;
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke 0.4s ease, stroke-width 0.4s ease;
+}
+
+/* Vodič pod napětím: silnější čára (změna není jen barvou) + stav v textu */
+.transformer-wire--on {
+  stroke: var(--color-primary);
+  stroke-width: 5;
+}
+
+/* Střídavý proud: pomalé přelévání čárek tam a zpět (alternate = AC) */
+.transformer-wire--current {
+  stroke-dasharray: 7 5;
+  animation: transformer-current-slide 1.1s ease-in-out infinite alternate;
+}
+
+@keyframes transformer-current-slide {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: 24;
+  }
+}
+
+.transformer-terminal {
+  fill: var(--color-text);
+}
+
+.transformer-source {
+  fill: var(--color-surface);
+  stroke: var(--color-text);
+  stroke-width: 3;
+  transition: fill 0.4s ease, stroke 0.4s ease;
+}
+
+.transformer-source--on {
+  fill: #e8f0f8;
+  stroke: var(--color-primary);
+}
+
+.transformer-source-symbol {
+  font-size: 26px;
+  font-weight: 700;
+  fill: var(--color-text);
+}
+
+/* Střídání polarity zdroje: dvě dvojice +/− se pomalu prolínají (perioda
+   2,4 s — žádné blikání). Statická varianta ±/∓ pro režimy bez pohybu. */
+.transformer-polarity text,
+.transformer-polarity-static {
+  font-size: 18px;
+  font-weight: 700;
+  fill: var(--color-primary);
+}
+
+.transformer-polarity__a {
+  animation: transformer-polarity-a 2.4s ease-in-out infinite;
+}
+
+.transformer-polarity__b {
+  animation: transformer-polarity-b 2.4s ease-in-out infinite;
+}
+
+@keyframes transformer-polarity-a {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes transformer-polarity-b {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.transformer-turn {
+  fill: none;
+  stroke: #94a3b8;
+  stroke-width: 3;
+  transition: stroke 0.4s ease, stroke-width 0.4s ease;
+}
+
+.transformer-turn--on {
+  stroke: var(--color-primary);
+  stroke-width: 4;
+}
+
+/* Magnetický tok: čárkovaná smyčka jádrem; pohyb = posun dash offsetu
+   tam a zpět (tok se mění, nemá trvalý směr) */
+.transformer-flux {
+  stroke: var(--color-accent);
+  stroke-width: 4;
+  fill: none;
+  stroke-dasharray: 10 8;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.transformer-flux--visible {
+  opacity: 1;
+}
+
+.transformer-flux--moving {
+  animation: transformer-flux-slide 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes transformer-flux-slide {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: 36;
+  }
+}
+
+/* Indikátor výstupního napětí: sloupec roste CSS transformací od spodku */
+.transformer-meter {
+  fill: var(--color-surface);
+  stroke: var(--color-text);
+  stroke-width: 2;
+  transition: stroke 0.4s ease;
+}
+
+.transformer-meter--on {
+  stroke: var(--color-primary);
+  stroke-width: 3;
+}
+
+.transformer-meter-fill {
+  fill: var(--color-primary);
+  transform-box: fill-box;
+  transform-origin: bottom;
+  transition: transform 0.5s ease;
+}
+
+.transformer-ref-line {
+  stroke: var(--color-text-muted);
+  stroke-width: 2;
+  stroke-dasharray: 4 4;
+}
+
+/* Pauza zmrazí všechny běžící animace dema (proud, tok, polarita) */
+.transformer-anim--paused,
+.transformer-anim--paused * {
+  animation-play-state: paused;
+}
+
+.transformer-tried {
+  margin: 0.5rem 0 0;
+  font-weight: 600;
+}
+
+.transformer-variant-note {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+/* Reduced motion: stavy se mění skokem, žádný souvislý pohyb.
+   Klidný režim řeší globální pravidlo .calm-mode * výše. */
+@media (prefers-reduced-motion: reduce) {
+  .transformer-wire,
+  .transformer-turn,
+  .transformer-source,
+  .transformer-flux,
+  .transformer-meter,
+  .transformer-meter-fill {
+    transition: none;
+  }
+
+  .transformer-wire--current,
+  .transformer-flux--moving,
+  .transformer-polarity__a,
+  .transformer-polarity__b {
+    animation: none;
+  }
+}
