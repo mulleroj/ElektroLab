@@ -3503,6 +3503,9 @@ input:focus-visible {
 .sensor-demo-person {
   opacity: 0;
   transform: translateX(-24px);
+}
+
+.sensor-demo-stage--live .sensor-demo-person {
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 

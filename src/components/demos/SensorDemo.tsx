@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { SensorDemoConfig } from '../../types';
 import { AnimatedDemoControls } from '../animation/AnimatedDemoControls';
 import { useAnimatedDemo } from '../animation/useAnimatedDemo';
@@ -382,6 +382,7 @@ function SensorScenarioPlayer({
   });
   const { status, stepIndex, hasCompletedOnce } = playback;
   const step = steps[stepIndex];
+  const holdAutoplayMotionRef = useRef(false);
 
   useEffect(() => {
     if (hasCompletedOnce) {
@@ -389,20 +390,41 @@ function SensorScenarioPlayer({
     }
   }, [hasCompletedOnce, scenarioId, onScenarioCompleted]);
 
-  const continuousMotion =
+  useEffect(() => {
+    if (status === 'playing') {
+      holdAutoplayMotionRef.current = true;
+    } else if (status === 'idle' || status === 'completed') {
+      holdAutoplayMotionRef.current = false;
+    }
+  }, [status]);
+
+  const handleNextStep = useCallback(() => {
+    holdAutoplayMotionRef.current = false;
+    playback.nextStep();
+  }, [playback]);
+
+  const handleReset = useCallback(() => {
+    holdAutoplayMotionRef.current = false;
+    playback.reset();
+  }, [playback]);
+
+  const showMotion =
     motion.allowContinuousMotion &&
-    (status === 'playing' || status === 'paused');
+    (status === 'playing' ||
+      (status === 'paused' && holdAutoplayMotionRef.current));
   const visual = deriveVisual(scenarioId, stepIndex);
-  const pausedMod = status === 'paused' ? ' sensor-demo-anim--paused' : '';
+  const pausedMod =
+    status === 'paused' && showMotion ? ' sensor-demo-anim--paused' : '';
+  const liveMod = showMotion ? ' sensor-demo-stage--live' : '';
 
   const personClass = `sensor-demo-person${
     visual.personPresent ? ' sensor-demo-person--present' : ''
   }${
-    visual.personMotion === 'entering' && continuousMotion
+    visual.personMotion === 'entering' && showMotion
       ? ' sensor-demo-person--entering'
       : ''
   }${
-    visual.personMotion === 'leaving' && continuousMotion
+    visual.personMotion === 'leaving' && showMotion
       ? ' sensor-demo-person--leaving'
       : ''
   }`;
@@ -410,19 +432,19 @@ function SensorScenarioPlayer({
   const sensorClass = `sensor-demo-sensor${
     visual.highlightSensor ? ' sensor-demo-block--active' : ''
   }${
-    visual.sensorPulse && continuousMotion ? ' sensor-demo-sensor--pulse' : ''
+    visual.sensorPulse && showMotion ? ' sensor-demo-sensor--pulse' : ''
   }`;
 
   const signalClass = `sensor-demo-signal${
     visual.highlightSignal ? ' sensor-demo-block--active' : ''
   }${
-    visual.signalFlow && continuousMotion ? ' sensor-demo-signal--flow' : ''
+    visual.signalFlow && showMotion ? ' sensor-demo-signal--flow' : ''
   }`;
 
   const controllerClass = `sensor-demo-controller${
     visual.highlightController ? ' sensor-demo-block--active' : ''
   }${
-    visual.controllerPulse && continuousMotion
+    visual.controllerPulse && showMotion
       ? ' sensor-demo-controller--pulse'
       : ''
   }`;
@@ -452,12 +474,12 @@ function SensorScenarioPlayer({
         autoPlayAllowed={motion.allowAutoPlay}
         onPlay={playback.play}
         onPause={playback.pause}
-        onNextStep={playback.nextStep}
-        onReset={playback.reset}
+        onNextStep={handleNextStep}
+        onReset={handleReset}
       />
 
       <div
-        className={`animated-demo__stage sensor-demo-stage${pausedMod}`}
+        className={`animated-demo__stage sensor-demo-stage${pausedMod}${liveMod}`}
         aria-hidden="true"
       >
         <svg
@@ -515,7 +537,7 @@ function SensorScenarioPlayer({
             height={16}
             rx={3}
             className={`sensor-demo-signal-path${
-              visual.signalFlow && continuousMotion
+              visual.signalFlow && showMotion
                 ? ' sensor-demo-signal-path--flow'
                 : ''
             }`}
@@ -541,7 +563,7 @@ function SensorScenarioPlayer({
             height={16}
             rx={3}
             className={`sensor-demo-signal-path${
-              visual.signalFlow && continuousMotion
+              visual.signalFlow && showMotion
                 ? ' sensor-demo-signal-path--flow'
                 : ''
             }`}
