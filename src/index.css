@@ -2787,10 +2787,14 @@ input:focus-visible {
   fill: var(--color-primary);
   opacity: 0.85;
   transition: transform 0.28s ease;
+  transform-box: fill-box;
+  transform-origin: center bottom;
 }
 
 .regulation-loop-temp-fill--rising {
   animation: regulation-loop-temp-rise 2.2s ease-out forwards;
+  transform-box: fill-box;
+  transform-origin: center bottom;
 }
 
 @keyframes regulation-loop-temp-rise {
