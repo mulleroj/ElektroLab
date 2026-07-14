@@ -81,12 +81,45 @@ interface LoopVisual {
   loopClosed: boolean;
   sensorState: string;
   regulatorDecision: string;
+  regulatorSublabel: string;
+  regulatorCompare: string;
   loopState: string;
 }
 
 function tempBarPercent(temp: number): number {
   const clamped = Math.max(18, Math.min(22, temp));
   return ((clamped - 18) / (22 - 18)) * 100;
+}
+
+function formatRegulatorDiff(diff: number): string {
+  return diff === 0 ? '0 °C' : `${Math.abs(diff)} °C`;
+}
+
+function deriveRegulatorDisplay(
+  stepIndex: number,
+  displayTemp: number,
+  diff: number,
+): { sublabel: string; compare: string } {
+  if (stepIndex === 0) {
+    return {
+      sublabel: 'rovnováha',
+      compare: `${TARGET_TEMP} °C ↔ ${TARGET_TEMP} °C`,
+    };
+  }
+  if (stepIndex === 1) {
+    return { sublabel: 'čeká', compare: 'Čeká na nové měření' };
+  }
+  if (stepIndex === 2) {
+    return {
+      sublabel: 'přijímá',
+      compare: `Přijímá měření: ${displayTemp} °C`,
+    };
+  }
+  const diffLabel = formatRegulatorDiff(diff);
+  return {
+    sublabel: stepIndex >= 6 ? 'sleduje' : 'porovnává',
+    compare: `${displayTemp} °C ↔ ${TARGET_TEMP} °C (${diffLabel})`,
+  };
 }
 
 function deriveVisual(stepIndex: number): LoopVisual {
@@ -161,6 +194,9 @@ function deriveVisual(stepIndex: number): LoopVisual {
     loopState = 'Uzavřená smyčka — měření pokračuje';
   }
 
+  const { sublabel: regulatorSublabel, compare: regulatorCompare } =
+    deriveRegulatorDisplay(stepIndex, displayTemp, diff);
+
   return {
     displayTemp,
     heatingOn,
@@ -172,6 +208,8 @@ function deriveVisual(stepIndex: number): LoopVisual {
     loopClosed,
     sensorState,
     regulatorDecision,
+    regulatorSublabel,
+    regulatorCompare,
     loopState,
   };
 }
@@ -218,7 +256,6 @@ export function RegulationLoopDemoView({
     ? undefined
     : {
         transform: `scaleY(${tempBarPercent(visual.displayTemp) / 100})`,
-        transformOrigin: '400px 352px',
       };
   const heaterClass = `regulation-loop-heater-icon${
     visual.heatingOn ? ' regulation-loop-heater-icon--on' : ''
@@ -343,13 +380,11 @@ export function RegulationLoopDemoView({
               Regulátor
             </text>
             <text x={320} y={78} textAnchor="middle" className="regulation-loop-sublabel">
-              porovnává
+              {visual.regulatorSublabel}
             </text>
-            {stepIndex >= 3 && (
-              <text x={320} y={98} textAnchor="middle" className="regulation-loop-compare">
-                18 °C ↔ 22 °C
-              </text>
-            )}
+            <text x={320} y={98} textAnchor="middle" className="regulation-loop-compare">
+              {visual.regulatorCompare}
+            </text>
           </g>
 
           <g className={blockClass('heater', visual.activeBlocks)}>
