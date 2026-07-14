@@ -3137,3 +3137,229 @@ input:focus-visible {
     animation: none;
   }
 }
+
+/* MVP-11G: animované scénáře jističe */
+
+.protection-device-switch-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.protection-device-scenarios {
+  flex-wrap: wrap;
+}
+
+.protection-device-note {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.protection-device-label {
+  font-size: 14px;
+  font-weight: 600;
+  fill: var(--color-text);
+}
+
+.protection-device-sublabel,
+.protection-device-value,
+.protection-device-fault-label {
+  font-size: 12px;
+  fill: var(--color-text);
+}
+
+.protection-device-value {
+  font-size: 13px;
+  font-weight: 700;
+  fill: var(--color-primary);
+}
+
+.protection-device-overload {
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--color-warning, #b45309);
+}
+
+.protection-device-block rect {
+  fill: var(--color-surface);
+  stroke: var(--color-border);
+  stroke-width: 2;
+  transition: stroke 0.25s ease;
+}
+
+.protection-device-block--active rect {
+  stroke: var(--color-primary);
+  stroke-width: 3;
+}
+
+.protection-device-wire {
+  stroke: var(--color-border);
+  stroke-width: 3;
+}
+
+.protection-device-wire--broken {
+  stroke-dasharray: 6 8;
+  stroke: var(--color-text-muted);
+}
+
+.protection-device-current rect {
+  fill: var(--color-primary);
+  opacity: 0.35;
+}
+
+.protection-device-current--normal rect {
+  animation: protection-device-current-normal 2.4s ease-in-out infinite;
+}
+
+.protection-device-current--elevated rect {
+  animation: protection-device-current-elevated 1.4s ease-in-out infinite;
+  opacity: 0.55;
+}
+
+.protection-device-current--surge rect {
+  animation: protection-device-current-surge 0.9s ease-in-out infinite;
+  opacity: 0.7;
+}
+
+@keyframes protection-device-current-normal {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scaleX(0.92);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes protection-device-current-elevated {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scaleX(0.88);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scaleX(1.05);
+  }
+}
+
+@keyframes protection-device-current-surge {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scaleX(0.85);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scaleX(1.12);
+  }
+}
+
+.protection-device-thermal rect {
+  fill: #fef3c7;
+  stroke: var(--color-border);
+  stroke-width: 1.5;
+}
+
+.protection-device-thermal--active rect {
+  stroke: #d97706;
+}
+
+.protection-device-thermal--heating rect {
+  animation: protection-device-thermal-heating 1.6s ease-in-out infinite;
+}
+
+@keyframes protection-device-thermal-heating {
+  0%,
+  100% {
+    fill: #fef3c7;
+  }
+  50% {
+    fill: #fbbf24;
+  }
+}
+
+.protection-device-magnetic rect {
+  fill: #e0e7ff;
+  stroke: var(--color-border);
+  stroke-width: 1.5;
+}
+
+.protection-device-magnetic--active rect {
+  stroke: var(--color-primary);
+}
+
+.protection-device-magnetic--pulse rect {
+  animation: protection-device-magnetic-pulse 1s ease-in-out infinite;
+}
+
+@keyframes protection-device-magnetic-pulse {
+  0%,
+  100% {
+    fill: #e0e7ff;
+    stroke-width: 1.5;
+  }
+  50% {
+    fill: #c7d2fe;
+    stroke-width: 3;
+  }
+}
+
+.protection-device-contacts line {
+  stroke: var(--color-text-muted);
+  stroke-width: 3;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.protection-device-contacts--open line:first-child {
+  transform: translateY(-5px);
+  stroke: var(--color-error);
+}
+
+.protection-device-contacts--open line:last-child {
+  transform: translateY(5px);
+  stroke: var(--color-error);
+}
+
+.protection-device-contacts--opening line {
+  transition: transform 0.28s ease;
+}
+
+.protection-device-fault path {
+  fill: none;
+  stroke: var(--color-error);
+  stroke-width: 2.5;
+}
+
+.protection-device-fault-line {
+  stroke: var(--color-error);
+  stroke-width: 2;
+  stroke-dasharray: 4 4;
+}
+
+.protection-device-anim--paused,
+.protection-device-anim--paused * {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .protection-device-block rect,
+  .protection-device-contacts line,
+  .protection-device-current rect,
+  .protection-device-thermal rect,
+  .protection-device-magnetic rect {
+    transition: none;
+  }
+
+  .protection-device-current--normal rect,
+  .protection-device-current--elevated rect,
+  .protection-device-current--surge rect,
+  .protection-device-thermal--heating rect,
+  .protection-device-magnetic--pulse rect {
+    animation: none;
+  }
+}
