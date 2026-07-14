@@ -26,7 +26,7 @@ export const rozvodyLessons: MicroLesson[] = [
       type: 'protection-device',
       title: 'Kdy jistič vypne?',
       description:
-        'Vyzkoušej tři scénáře školního obvodu — normální provoz, přetížení a zkrat — a sleduj, kdy jistič vypne a proč.',
+        'Vyber scénář a projdi jeho kroky. Sleduj, jak jistič reaguje při běžném provozu, přetížení a zkratu.',
     },
     activity: {
       measurementJudgment: {
