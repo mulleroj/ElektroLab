@@ -209,7 +209,7 @@ export const automatizaceLessons: MicroLesson[] = [
     typicalMistake:
       'Žáci si myslí, že systém „ví“ stav sám od sebe. Neví — všechno, co ví, mu musí ohlásit snímač. Rozbitý snímač = slepý systém.',
     teacherTip:
-      'Dobrá lekce k diskusi ‚co se stane, když snímač lže‘. Aktivita ukazuje také bezpečné zastavení při vysoké hladině, takže ji propojte s BOZP.',
+      'Dobrá lekce k diskusi ‚co se stane, když snímač lže‘. Aktivitu a otázky o poruše snímače či riziku přetečení propojte s BOZP.',
     interactiveDemo: {
       type: 'feedback-loop',
       title: 'Nádrž, čerpadlo a snímač hladiny',
