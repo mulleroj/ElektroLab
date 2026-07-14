@@ -202,14 +202,18 @@ export function RegulationLoopDemoView({
   });
   const { status, stepIndex } = playback;
   const step = STEPS[stepIndex];
-  const moving = motion.allowContinuousMotion;
+  // Souvislý pohyb jen při přehrávání nebo pauze (zmrazení). V completed zůstane
+  // statický závěrečný snímek — aktivní bloky a cesty bez nekonečných animací.
+  const continuousMotion =
+    motion.allowContinuousMotion &&
+    (status === 'playing' || status === 'paused');
   const visual = deriveVisual(stepIndex);
   const pausedMod = status === 'paused' ? ' regulation-loop-anim--paused' : '';
 
   const tempFillClass = `regulation-loop-temp-fill${
-    visual.tempRising && moving ? ' regulation-loop-temp-fill--rising' : ''
+    visual.tempRising && continuousMotion ? ' regulation-loop-temp-fill--rising' : ''
   }`;
-  const useRisingAnimation = visual.tempRising && moving;
+  const useRisingAnimation = visual.tempRising && continuousMotion;
   const tempFillStyle = useRisingAnimation
     ? undefined
     : {
@@ -218,7 +222,7 @@ export function RegulationLoopDemoView({
       };
   const heaterClass = `regulation-loop-heater-icon${
     visual.heatingOn ? ' regulation-loop-heater-icon--on' : ''
-  }${visual.heatingOn && moving ? ' regulation-loop-heater-icon--glow' : ''}`;
+  }${visual.heatingOn && continuousMotion ? ' regulation-loop-heater-icon--glow' : ''}`;
 
   const diffLabel =
     visual.diff === 0
@@ -272,7 +276,7 @@ export function RegulationLoopDemoView({
 
           {/* Požadovaná hodnota → regulátor */}
           <line
-            className={signalClass('setpoint-reg', visual.activeSignals, moving)}
+            className={signalClass('setpoint-reg', visual.activeSignals, continuousMotion)}
             x1={168}
             y1={68}
             x2={248}
@@ -281,7 +285,7 @@ export function RegulationLoopDemoView({
           />
           {/* Snímač → regulátor */}
           <line
-            className={signalClass('sensor-reg', visual.activeSignals, moving)}
+            className={signalClass('sensor-reg', visual.activeSignals, continuousMotion)}
             x1={195}
             y1={228}
             x2={248}
@@ -290,7 +294,7 @@ export function RegulationLoopDemoView({
           />
           {/* Regulátor → topení */}
           <line
-            className={signalClass('reg-heater', visual.activeSignals, moving)}
+            className={signalClass('reg-heater', visual.activeSignals, continuousMotion)}
             x1={392}
             y1={78}
             x2={488}
@@ -299,7 +303,7 @@ export function RegulationLoopDemoView({
           />
           {/* Topení → místnost */}
           <line
-            className={signalClass('heater-room', visual.activeSignals, moving)}
+            className={signalClass('heater-room', visual.activeSignals, continuousMotion)}
             x1={528}
             y1={198}
             x2={470}
@@ -308,7 +312,7 @@ export function RegulationLoopDemoView({
           />
           {/* Místnost → snímač */}
           <line
-            className={signalClass('room-sensor', visual.activeSignals, moving)}
+            className={signalClass('room-sensor', visual.activeSignals, continuousMotion)}
             x1={360}
             y1={310}
             x2={195}
@@ -317,7 +321,7 @@ export function RegulationLoopDemoView({
           />
           {/* Zvýraznění uzavřené smyčky (krok 6) */}
           <path
-            className={signalClass('feedback-loop', visual.activeSignals, moving)}
+            className={signalClass('feedback-loop', visual.activeSignals, continuousMotion)}
             d="M 140 260 Q 80 200 140 120 Q 300 40 500 120 Q 560 220 470 300 Q 300 350 140 260"
             fill="none"
             markerEnd="url(#regulation-loop-arrow)"
