@@ -2829,3 +2829,151 @@ input:focus-visible {
     animation: none;
   }
 }
+
+/* Schéma zpětnovazební smyčky nádrže (MVP-11E FeedbackDemo) */
+
+.feedback-loop-label {
+  font-size: 14px;
+  font-weight: 600;
+  fill: var(--color-text-muted);
+  font-family: inherit;
+}
+
+.feedback-loop-sublabel,
+.feedback-loop-compare {
+  font-size: 12px;
+  fill: var(--color-text);
+  font-family: inherit;
+}
+
+.feedback-loop-value {
+  font-size: 15px;
+  font-weight: 700;
+  fill: var(--color-text);
+  font-family: inherit;
+}
+
+.feedback-loop-withdrawal-label {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--color-primary);
+  font-family: inherit;
+}
+
+.feedback-loop-marker {
+  fill: var(--color-primary);
+}
+
+.feedback-loop-block rect {
+  fill: var(--color-surface);
+  stroke: var(--color-border);
+  stroke-width: 2;
+  transition: stroke 0.25s ease, stroke-width 0.25s ease, fill 0.25s ease;
+}
+
+.feedback-loop-block--active rect {
+  stroke: var(--color-primary);
+  stroke-width: 3;
+  fill: #e8f0f8;
+}
+
+.feedback-loop-path {
+  stroke: #cbd5e1;
+  stroke-width: 2.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 8 6;
+}
+
+.feedback-loop-path--active {
+  stroke: var(--color-primary);
+  stroke-width: 3.5;
+}
+
+.feedback-loop-signal--flow {
+  animation: feedback-loop-signal-flow 2.4s linear infinite;
+}
+
+@keyframes feedback-loop-signal-flow {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+
+.feedback-loop-pump-icon {
+  font-size: 14px;
+  font-weight: 700;
+  fill: var(--color-text-muted);
+  font-family: inherit;
+}
+
+.feedback-loop-pump-icon--on {
+  fill: var(--color-primary);
+}
+
+.feedback-loop-pump-icon--glow {
+  animation: feedback-loop-pump-glow 1.6s ease-in-out infinite;
+}
+
+@keyframes feedback-loop-pump-glow {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.feedback-loop-level-track {
+  fill: #f1f5f9;
+  stroke: var(--color-border);
+  stroke-width: 1.5;
+}
+
+.feedback-loop-level-fill {
+  fill: var(--color-primary);
+  opacity: 0.85;
+  transition: transform 0.28s ease;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+.feedback-loop-level-fill--rising {
+  animation: feedback-loop-level-rise 2.2s ease-out forwards;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+@keyframes feedback-loop-level-rise {
+  from {
+    transform: scaleY(0.3);
+  }
+  to {
+    transform: scaleY(0.5);
+  }
+}
+
+.feedback-loop-note {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.feedback-loop-anim--paused,
+.feedback-loop-anim--paused * {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feedback-loop-block rect,
+  .feedback-loop-level-fill {
+    transition: none;
+  }
+
+  .feedback-loop-signal--flow,
+  .feedback-loop-pump-icon--glow,
+  .feedback-loop-level-fill--rising {
+    animation: none;
+  }
+}
