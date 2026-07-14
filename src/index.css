@@ -2681,3 +2681,147 @@ input:focus-visible {
     animation: none;
   }
 }
+
+/* Schéma regulační smyčky (MVP-11D RegulationLoopDemo) */
+
+.regulation-loop-label {
+  font-size: 14px;
+  font-weight: 600;
+  fill: var(--color-text-muted);
+  font-family: inherit;
+}
+
+.regulation-loop-sublabel,
+.regulation-loop-compare {
+  font-size: 12px;
+  fill: var(--color-text);
+  font-family: inherit;
+}
+
+.regulation-loop-value {
+  font-size: 15px;
+  font-weight: 700;
+  fill: var(--color-text);
+  font-family: inherit;
+}
+
+.regulation-loop-cold {
+  font-size: 12px;
+  fill: var(--color-primary);
+  font-weight: 600;
+  font-family: inherit;
+}
+
+.regulation-loop-marker {
+  fill: var(--color-primary);
+}
+
+.regulation-loop-block rect {
+  fill: var(--color-surface);
+  stroke: var(--color-border);
+  stroke-width: 2;
+  transition: stroke 0.25s ease, stroke-width 0.25s ease, fill 0.25s ease;
+}
+
+.regulation-loop-block--active rect {
+  stroke: var(--color-primary);
+  stroke-width: 3;
+  fill: #e8f0f8;
+}
+
+.regulation-loop-path {
+  stroke: #cbd5e1;
+  stroke-width: 2.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 8 6;
+}
+
+.regulation-loop-path--active {
+  stroke: var(--color-primary);
+  stroke-width: 3.5;
+}
+
+.regulation-loop-signal--flow {
+  animation: regulation-loop-signal-flow 2.4s linear infinite;
+}
+
+@keyframes regulation-loop-signal-flow {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+
+.regulation-loop-heater-icon {
+  font-size: 14px;
+  font-weight: 700;
+  fill: var(--color-text-muted);
+  font-family: inherit;
+}
+
+.regulation-loop-heater-icon--on {
+  fill: var(--color-primary);
+}
+
+.regulation-loop-heater-icon--glow {
+  animation: regulation-loop-heater-glow 1.6s ease-in-out infinite;
+}
+
+@keyframes regulation-loop-heater-glow {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.regulation-loop-temp-track {
+  fill: #f1f5f9;
+  stroke: var(--color-border);
+  stroke-width: 1.5;
+}
+
+.regulation-loop-temp-fill {
+  fill: var(--color-primary);
+  opacity: 0.85;
+  transition: transform 0.28s ease;
+}
+
+.regulation-loop-temp-fill--rising {
+  animation: regulation-loop-temp-rise 2.2s ease-out forwards;
+}
+
+@keyframes regulation-loop-temp-rise {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(0.5);
+  }
+}
+
+.regulation-loop-note {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.regulation-loop-anim--paused,
+.regulation-loop-anim--paused * {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .regulation-loop-block rect,
+  .regulation-loop-temp-fill {
+    transition: none;
+  }
+
+  .regulation-loop-signal--flow,
+  .regulation-loop-heater-icon--glow,
+  .regulation-loop-temp-fill--rising {
+    animation: none;
+  }
+}

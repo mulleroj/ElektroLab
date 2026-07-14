@@ -125,7 +125,7 @@ export const automatizaceLessons: MicroLesson[] = [
       type: 'regulation-loop',
       title: 'Regulace teploty v místnosti',
       description:
-        'Vyzkoušej tři situace a sleduj, jak regulátor porovnává naměřenou teplotu s požadovanými 22 °C.',
+        'Projdi sedm kroků ukázky a sleduj, jak snímač měří teplotu, regulátor ji porovnává s požadovanými 22 °C a topení reaguje.',
     },
     activity: {
       circuitOrder: {
