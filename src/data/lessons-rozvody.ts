@@ -136,7 +136,7 @@ export const rozvodyLessons: MicroLesson[] = [
       type: 'residual-current',
       title: 'Proud tam a proud zpět',
       description:
-        'Vyzkoušej scénáře a sleduj, jak chránič porovnává oba proudy — a kdy vypne.',
+        'Vyber scénář a projdi jeho kroky. Sleduj, jak proudový chránič porovnává proud tam a zpět — a kdy vypne.',
     },
     activity: {
       scenarioChoice: {

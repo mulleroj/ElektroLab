@@ -2977,3 +2977,163 @@ input:focus-visible {
     animation: none;
   }
 }
+
+/* Schéma proudového chrániče (MVP-11F ResidualCurrentDemo) */
+
+.residual-current-switch-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.residual-current-scenarios {
+  flex-wrap: wrap;
+}
+
+.residual-current-note {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.residual-current-label {
+  font-size: 14px;
+  font-weight: 600;
+  fill: var(--color-text-muted);
+  font-family: inherit;
+}
+
+.residual-current-sublabel,
+.residual-current-core-label {
+  font-size: 12px;
+  fill: var(--color-text);
+  font-family: inherit;
+}
+
+.residual-current-value {
+  font-size: 14px;
+  font-weight: 700;
+  fill: var(--color-text);
+  font-family: inherit;
+}
+
+.residual-current-overload {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--color-primary);
+  font-family: inherit;
+}
+
+.residual-current-marker {
+  fill: var(--color-primary);
+}
+
+.residual-current-block rect {
+  fill: var(--color-surface);
+  stroke: var(--color-border);
+  stroke-width: 2;
+  transition: stroke 0.25s ease, stroke-width 0.25s ease, fill 0.25s ease;
+}
+
+.residual-current-block--active rect {
+  stroke: var(--color-primary);
+  stroke-width: 3;
+  fill: #e8f0f8;
+}
+
+.residual-current-signal {
+  stroke: #cbd5e1;
+  stroke-width: 2.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 8 6;
+}
+
+.residual-current-signal--active {
+  stroke: var(--color-primary);
+  stroke-width: 3.5;
+}
+
+.residual-current-signal--flow {
+  animation: residual-current-signal-flow 2.4s linear infinite;
+}
+
+@keyframes residual-current-signal-flow {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+
+.residual-current-core ellipse {
+  fill: none;
+  stroke: var(--color-border);
+  stroke-width: 2.5;
+  transition: stroke 0.25s ease, stroke-width 0.25s ease;
+}
+
+.residual-current-core--active ellipse {
+  stroke: var(--color-primary);
+  stroke-width: 3;
+}
+
+.residual-current-core--pulse ellipse {
+  animation: residual-current-core-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes residual-current-core-pulse {
+  0%,
+  100% {
+    stroke-width: 2.5;
+    opacity: 0.85;
+  }
+  50% {
+    stroke-width: 3.5;
+    opacity: 1;
+  }
+}
+
+.residual-current-contacts line {
+  stroke: var(--color-text-muted);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: transform 0.28s ease, stroke 0.25s ease;
+}
+
+.residual-current-contacts--open line:nth-child(1),
+.residual-current-contacts--open line:nth-child(4) {
+  transform: translateY(-6px);
+  stroke: var(--color-error);
+}
+
+.residual-current-contacts--open line:nth-child(2),
+.residual-current-contacts--open line:nth-child(3) {
+  transform: translateY(6px);
+  stroke: var(--color-error);
+}
+
+.residual-current-contacts--opening line {
+  transition: transform 0.28s ease;
+}
+
+.residual-current-earth line {
+  stroke: var(--color-text-muted);
+  stroke-width: 2;
+}
+
+.residual-current-anim--paused,
+.residual-current-anim--paused * {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .residual-current-block rect,
+  .residual-current-contacts line,
+  .residual-current-core ellipse {
+    transition: none;
+  }
+
+  .residual-current-signal--flow,
+  .residual-current-core--pulse {
+    animation: none;
+  }
+}
