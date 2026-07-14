@@ -26,7 +26,7 @@ export const automatizaceLessons: MicroLesson[] = [
       type: 'sensor-demo',
       title: 'Snímač pohybu na chodbě',
       description:
-        'Vyzkoušej, co snímač hlásí a co s tím řídicí systém udělá, když někdo vejde a odejde.',
+        'Vyber situaci a projdi její kroky. Sleduj, co snímač hlásí a jak na to reaguje řídicí systém.',
     },
     activity: {
       termMatching: {
