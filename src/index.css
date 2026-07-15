@@ -3822,7 +3822,16 @@ input:focus-visible {
 .transistor-switch-demo-svg {
   width: 100%;
   height: auto;
-  max-height: min(70vh, 420px);
+  max-width: none;
+  max-height: min(70vh, 440px);
+  display: block;
+}
+
+.transistor-switch-demo-legend {
+  margin: 0.35rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  line-height: 1.35;
 }
 
 .transistor-switch-demo-label {
@@ -3978,12 +3987,40 @@ input:focus-visible {
   animation: transistor-switch-demo-load-flow 1.4s ease-in-out infinite;
 }
 
-.transistor-switch-demo-base--flow {
-  animation: transistor-switch-demo-base-flow 1.3s ease-in-out infinite;
-}
-
 .transistor-switch-demo-control--flow {
   animation: transistor-switch-demo-control-flow 1.3s ease-in-out infinite;
+}
+
+/* Modeled internal current paths (not metal wires) */
+.transistor-switch-demo-internal-current-path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 5 5;
+  opacity: 0.9;
+}
+
+.transistor-switch-demo-internal-current-path--base {
+  stroke: #7c3aed;
+  stroke-width: 2.5;
+}
+
+.transistor-switch-demo-internal-current-path--load {
+  stroke: #0d9488;
+  stroke-width: 2.75;
+}
+
+.transistor-switch-demo-internal-current-path--flow {
+  animation: transistor-switch-demo-internal-flow 1.25s linear infinite;
+}
+
+@keyframes transistor-switch-demo-internal-flow {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -20;
+  }
 }
 
 @keyframes transistor-switch-demo-load-flow {
@@ -3995,16 +4032,6 @@ input:focus-visible {
   50% {
     opacity: 0.9;
     stroke-width: 5.5;
-  }
-}
-
-@keyframes transistor-switch-demo-base-flow {
-  0%,
-  100% {
-    opacity: 0.35;
-  }
-  50% {
-    opacity: 0.95;
   }
 }
 
@@ -4074,16 +4101,25 @@ input:focus-visible {
 }
 
 @media (max-width: 480px) {
+  .transistor-switch-demo-stage {
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+
   .transistor-switch-demo-svg {
+    width: 100%;
+    max-width: none;
     max-height: none;
   }
 
   .transistor-switch-demo-label {
-    font-size: 17px;
+    font-size: 18px;
   }
 
   .transistor-switch-demo-sublabel {
-    font-size: 14px;
+    font-size: 16px;
   }
 
   .transistor-switch-demo-terminal {
@@ -4091,11 +4127,29 @@ input:focus-visible {
   }
 
   .transistor-switch-demo-common-label {
-    font-size: 14px;
+    font-size: 17px;
+  }
+
+  .transistor-switch-demo-source-title,
+  .transistor-switch-demo-rled-label,
+  .transistor-switch-demo-rb-label,
+  .transistor-switch-demo-led-state {
+    font-size: 17px;
+  }
+
+  .transistor-switch-demo-current-label {
+    font-size: 13px;
+  }
+
+  .transistor-switch-demo-legend {
+    font-size: 0.875rem;
   }
 
   .transistor-switch-demo-emitter-arrow {
-    /* larger hit area for mobile readability */
+    /* larger rendered footprint on narrow screens */
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(1.15);
   }
 }
 
@@ -4106,8 +4160,8 @@ input:focus-visible {
   }
 
   .transistor-switch-demo-load--flow,
-  .transistor-switch-demo-base--flow,
   .transistor-switch-demo-control--flow,
+  .transistor-switch-demo-internal-current-path--flow,
   .transistor-switch-demo-q--pulse .transistor-switch-demo-base-bar,
   .transistor-switch-demo-q--pulse .transistor-switch-demo-collector,
   .transistor-switch-demo-q--pulse .transistor-switch-demo-emitter,

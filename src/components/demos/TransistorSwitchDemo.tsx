@@ -58,12 +58,12 @@ const ON_STEPS: DemoStep[] = [
   {
     title: 'Malý proud báze',
     description:
-      'Malý řídicí proud báze teče cestou B–E ke společnému návratu. Tento proud LED nenapájí — jen řídí tranzistor.',
+      'Malý řídicí proud báze prochází modelovanou vnitřní cestou B→E uvnitř NPN. Tento proud LED nenapájí — jen řídí tranzistor.',
   },
   {
     title: 'Sepnutí a proud zátěže',
     description:
-      'Tranzistor přejde do sepnutého stavu. Hlavní zdroj dodá větší proud kolektorovou větví přes rezistor LED a LED.',
+      'Tranzistor přejde do sepnutého stavu. Hlavní zdroj dodá větší proud cestou +→Rled→LED→C a modelovaným průchodem C–E k návratu.',
   },
   {
     title: 'Statický závěr',
@@ -89,23 +89,30 @@ const CONVENTIONAL_NOTE =
 const SCOPE_NOTE =
   'Model neznázorňuje MOSFET ani přesnou saturační charakteristiku tranzistoru.';
 
+const INTERNAL_PATH_NOTE =
+  'Přerušovaná cesta uvnitř symbolu znázorňuje modelovaný průchod proudu tranzistorem, nikoliv samostatný kovový vodič.';
+
 /** Exact topology join points (SVG user units). */
 const TOPO = {
   sourcePlus: { x: 100, y: 52 },
-  sourceMinus: { x: 100, y: 112 },
-  rledLeft: { x: 118, y: 52 },
-  rledRight: { x: 188, y: 52 },
-  ledLeft: { x: 206, y: 52 },
-  ledRight: { x: 268, y: 52 },
-  cTip: { x: 448, y: 108 },
-  baseMid: { x: 400, y: 168 },
-  baseTop: { x: 400, y: 138 },
-  baseBot: { x: 400, y: 198 },
-  eTip: { x: 448, y: 248 },
-  controlOut: { x: 100, y: 288 },
-  rbLeft: { x: 118, y: 288 },
-  rbRight: { x: 198, y: 288 },
-  commonY: 310,
+  sourceMinus: { x: 100, y: 118 },
+  rledLeft: { x: 140, y: 52 },
+  rledRight: { x: 180, y: 52 },
+  /** Electrical anode terminal of the LED symbol (triangle left edge mid). */
+  ledAnode: { x: 210, y: 52 },
+  /** Electrical cathode terminal (cathode bar mid). Light rays are NOT terminals. */
+  ledCathode: { x: 250, y: 52 },
+  cTip: { x: 448, y: 112 },
+  baseMid: { x: 400, y: 172 },
+  baseTop: { x: 400, y: 142 },
+  baseBot: { x: 400, y: 202 },
+  cBranch: { x: 400, y: 150 },
+  eBranch: { x: 400, y: 194 },
+  eTip: { x: 448, y: 252 },
+  controlOut: { x: 100, y: 292 },
+  rbLeft: { x: 148, y: 292 },
+  rbRight: { x: 188, y: 292 },
+  commonY: 328,
 } as const;
 
 interface TransistorVisual {
@@ -297,7 +304,7 @@ function deriveVisual(scenarioId: ScenarioId, stepIndex: number): TransistorVisu
       emitterTerminalState: 'E — na společném návratu',
       transistorState: 'PŘIPRAVEN K SEPNUTÍ',
       collectorBranchState: 'C–E PŘIPRAVENÁ',
-      baseCurrent: 'MALÝ PROUD BÁZE (ŘÍZENÍ)',
+      baseCurrent: 'MALÝ PROUD BÁZE — modelovaná vnitřní cesta B→E',
       loadCurrent: 'NEAKTIVNÍ',
       ledState: 'ZHASNUTÁ',
       baseCurrentFlow: true,
@@ -314,9 +321,9 @@ function deriveVisual(scenarioId: ScenarioId, stepIndex: number): TransistorVisu
       collectorTerminalState: 'C — připojen k LED větvi',
       emitterTerminalState: 'E — na společném návratu',
       transistorState: 'SEPNUTÝ (VODÍ)',
-      collectorBranchState: 'C–E VODÍ',
+      collectorBranchState: 'C–E VODÍ — modelovaný vnitřní průchod',
       baseCurrent: 'MALÝ PROUD BÁZE (ŘÍZENÍ)',
-      loadCurrent: 'MŮŽE PROCHÁZET ZÁTĚŽÍ',
+      loadCurrent: 'MŮŽE PROCHÁZET ZÁTĚŽÍ (+→LED→C→E→−)',
       ledState: 'PŘIJÍMÁ PROUD',
       transistorPulse: true,
       loadCurrentFlow: true,
@@ -334,9 +341,9 @@ function deriveVisual(scenarioId: ScenarioId, stepIndex: number): TransistorVisu
     collectorTerminalState: 'C — připojen k LED větvi',
     emitterTerminalState: 'E — na společném návratu',
     transistorState: 'SEPNUTÝ (VODÍ)',
-    collectorBranchState: 'C–E VODÍ',
+    collectorBranchState: 'C–E VODÍ — modelovaný vnitřní průchod',
     baseCurrent: 'MALÝ PROUD BÁZE (ŘÍZENÍ)',
-    loadCurrent: 'PROCHÁZÍ V MODELU',
+    loadCurrent: 'PROCHÁZÍ V MODELU (+→LED→C→E→−)',
     ledState: 'SVÍTÍ',
     ledOn: true,
     highlightLed: true,
@@ -460,7 +467,8 @@ function TransistorScenarioPlayer({
       ? ' transistor-switch-demo-load--flow'
       : ''
   }${
-    visual.highlightLoadPath && !visual.loadCurrentFlow
+    (visual.highlightLoadPath || visual.loadCurrentFlow) &&
+    !(visual.loadCurrentFlow && showMotion)
       ? ' transistor-switch-demo-wire--emphasis'
       : ''
   }`;
@@ -470,16 +478,38 @@ function TransistorScenarioPlayer({
       ? ' transistor-switch-demo-control--flow'
       : ''
   }${
-    visual.highlightControl || visual.highlightBaseResistor
+    visual.highlightControl ||
+    visual.highlightBaseResistor ||
+    (visual.controlFlow && !showMotion)
       ? ' transistor-switch-demo-wire--emphasis'
       : ''
   }`;
 
-  const baseWire = `transistor-switch-demo-wire${
-    visual.baseCurrentFlow && showMotion
-      ? ' transistor-switch-demo-base--flow'
+  const showInternalBase = visual.baseCurrentFlow;
+  const showInternalLoad =
+    visual.loadCurrentFlow ||
+    (visual.ledOn && visual.transistorState.includes('SEPNUTÝ'));
+
+  const internalBaseClass = `transistor-switch-demo-internal-current-path transistor-switch-demo-internal-current-path--base${
+    showInternalBase && showMotion
+      ? ' transistor-switch-demo-internal-current-path--flow'
       : ''
   }`;
+
+  const internalLoadClass = `transistor-switch-demo-internal-current-path transistor-switch-demo-internal-current-path--load${
+    visual.loadCurrentFlow && showMotion
+      ? ' transistor-switch-demo-internal-current-path--flow'
+      : ''
+  }`;
+
+  const loadPathPlusToRled = `M ${TOPO.sourcePlus.x} ${TOPO.sourcePlus.y} L ${TOPO.rledLeft.x} ${TOPO.rledLeft.y}`;
+  const loadPathThroughRled = `M ${TOPO.rledLeft.x} ${TOPO.rledLeft.y} L ${TOPO.rledRight.x} ${TOPO.rledRight.y}`;
+  const loadPathRledToAnode = `M ${TOPO.rledRight.x} ${TOPO.rledRight.y} L ${TOPO.ledAnode.x} ${TOPO.ledAnode.y}`;
+  const loadPathThroughLed = `M ${TOPO.ledAnode.x} ${TOPO.ledAnode.y} L ${TOPO.ledCathode.x} ${TOPO.ledCathode.y}`;
+  const loadPathCathodeToC = `M ${TOPO.ledCathode.x} ${TOPO.ledCathode.y} L ${TOPO.cTip.x} ${TOPO.ledCathode.y} L ${TOPO.cTip.x} ${TOPO.cTip.y}`;
+  const loadPathInternalCE = `M ${TOPO.cTip.x} ${TOPO.cTip.y} L ${TOPO.cBranch.x} ${TOPO.cBranch.y} L ${TOPO.eBranch.x} ${TOPO.eBranch.y} L ${TOPO.eTip.x} ${TOPO.eTip.y}`;
+  const loadPathReturn = `M ${TOPO.eTip.x} ${TOPO.eTip.y} L ${TOPO.eTip.x} ${TOPO.commonY} L ${TOPO.sourceMinus.x} ${TOPO.commonY} L ${TOPO.sourceMinus.x} ${TOPO.sourceMinus.y}`;
+  const internalBasePath = `M ${TOPO.baseMid.x} ${TOPO.baseMid.y} L ${TOPO.eBranch.x} ${TOPO.eBranch.y} L ${TOPO.eTip.x} ${TOPO.eTip.y}`;
 
   return (
     <>
@@ -508,39 +538,44 @@ function TransistorScenarioPlayer({
       >
         <svg
           className="transistor-switch-demo-svg"
-          viewBox="0 0 560 360"
+          viewBox="0 0 490 360"
           focusable="false"
         >
-          {/* HLAVNÍ ZDROJ */}
+          {/* HLAVNÍ ZDROJ — split title; poles beside terminals */}
           <g className={sourceClass}>
-            <rect x={16} y={28} width={84} height={100} rx={8} />
+            <rect x={12} y={20} width={78} height={112} rx={8} />
             <text
-              x={58}
-              y={50}
+              x={51}
+              y={42}
               textAnchor="middle"
-              className="transistor-switch-demo-label"
+              className="transistor-switch-demo-label transistor-switch-demo-source-title"
             >
-              HLAVNÍ ZDROJ
+              <tspan x={51} dy={0}>
+                HLAVNÍ
+              </tspan>
+              <tspan x={51} dy={16}>
+                ZDROJ
+              </tspan>
             </text>
             <text
-              x={78}
-              y={72}
+              x={102}
+              y={TOPO.sourcePlus.y + 5}
               textAnchor="middle"
               className="transistor-switch-demo-pole transistor-switch-demo-pole--plus"
             >
               +
             </text>
             <text
-              x={78}
-              y={112}
+              x={102}
+              y={TOPO.sourceMinus.y + 5}
               textAnchor="middle"
               className="transistor-switch-demo-pole transistor-switch-demo-pole--minus"
             >
               −
             </text>
             <text
-              x={58}
-              y={132}
+              x={51}
+              y={120}
               textAnchor="middle"
               className="transistor-switch-demo-sublabel"
             >
@@ -548,84 +583,75 @@ function TransistorScenarioPlayer({
             </text>
           </g>
 
-          {/* + → Rled */}
-          <line
-            x1={TOPO.sourcePlus.x}
-            y1={TOPO.sourcePlus.y}
-            x2={TOPO.rledLeft.x}
-            y2={TOPO.rledLeft.y}
-            className={loadWire}
-          />
+          {/* Structural load path: + → Rled → LED anode → cathode → C */}
+          <path d={loadPathPlusToRled} fill="none" className={loadWire} />
+          <path d={loadPathThroughRled} fill="none" className={loadWire} />
 
           <g className={rledClass}>
-            <rect x={118} y={28} width={70} height={48} rx={6} />
-            <text
-              x={153}
-              y={46}
-              textAnchor="middle"
-              className="transistor-switch-demo-label"
-            >
-              REZISTOR LED
-            </text>
             <rect
-              x={137}
-              y={52}
-              width={32}
-              height={10}
+              x={140}
+              y={44}
+              width={40}
+              height={16}
               rx={2}
               className="transistor-switch-demo-resistor-symbol"
             />
             <text
-              x={153}
-              y={72}
+              x={160}
+              y={28}
               textAnchor="middle"
-              className="transistor-switch-demo-sublabel"
+              className="transistor-switch-demo-label transistor-switch-demo-rled-label"
             >
-              bez hodnoty
+              <tspan x={160} dy={0}>
+                REZISTOR
+              </tspan>
+              <tspan x={160} dy={14}>
+                LED
+              </tspan>
             </text>
           </g>
 
-          {/* Rled → LED */}
-          <line
-            x1={TOPO.rledRight.x}
-            y1={TOPO.rledRight.y}
-            x2={TOPO.ledLeft.x}
-            y2={TOPO.ledLeft.y}
-            className={loadWire}
-          />
+          <path d={loadPathRledToAnode} fill="none" className={loadWire} />
 
-          {/* Standard LED symbol (anode left → cathode right) */}
+          {/* Standard LED symbol; light rays are NOT electrical terminals */}
           <g className={ledClass}>
             <polygon
-              points="210,36 210,68 250,52"
+              points="210,32 210,72 250,52"
               className="transistor-switch-demo-led-body"
             />
             <line
               x1={250}
-              y1={36}
+              y1={32}
               x2={250}
-              y2={68}
+              y2={72}
               className="transistor-switch-demo-led-cathode"
             />
+            {/* Decorative light rays — must not be join points */}
             <line
-              x1={256}
+              x1={258}
               y1={40}
-              x2={268}
-              y2={32}
+              x2={272}
+              y2={30}
               className="transistor-switch-demo-led-ray"
             />
             <line
-              x1={256}
-              y1={48}
-              x2={268}
+              x1={258}
+              y1={50}
+              x2={272}
               y2={40}
               className="transistor-switch-demo-led-ray"
             />
-            <polygon points="266,30 270,34 262,36" className="transistor-switch-demo-led-ray-head" />
-            <polygon points="266,38 270,42 262,44" className="transistor-switch-demo-led-ray-head" />
+            <polygon
+              points="270,28 274,32 266,34"
+              className="transistor-switch-demo-led-ray-head"
+            />
+            <polygon
+              points="270,38 274,42 266,44"
+              className="transistor-switch-demo-led-ray-head"
+            />
             <text
               x={230}
-              y={86}
+              y={88}
               textAnchor="middle"
               className="transistor-switch-demo-label"
             >
@@ -633,26 +659,23 @@ function TransistorScenarioPlayer({
             </text>
             <text
               x={230}
-              y={100}
+              y={112}
               textAnchor="middle"
-              className="transistor-switch-demo-sublabel"
+              className="transistor-switch-demo-sublabel transistor-switch-demo-led-state"
             >
               {visual.ledState}
             </text>
           </g>
 
-          {/* LED → C tip (continuous) */}
-          <path
-            d={`M ${TOPO.ledRight.x} ${TOPO.ledRight.y} L ${TOPO.cTip.x} ${TOPO.ledRight.y} L ${TOPO.cTip.x} ${TOPO.cTip.y}`}
-            fill="none"
-            className={loadWire}
-          />
+          {/* Through LED electrical body anode → cathode */}
+          <path d={loadPathThroughLed} fill="none" className={loadWire} />
+          <path d={loadPathCathodeToC} fill="none" className={loadWire} />
 
           {/* ŘÍZENÍ */}
           <g className={controlClass}>
-            <rect x={16} y={248} width={84} height={80} rx={8} />
+            <rect x={12} y={248} width={78} height={80} rx={8} />
             <text
-              x={58}
+              x={51}
               y={272}
               textAnchor="middle"
               className="transistor-switch-demo-label"
@@ -660,7 +683,7 @@ function TransistorScenarioPlayer({
               ŘÍZENÍ
             </text>
             <text
-              x={58}
+              x={51}
               y={294}
               textAnchor="middle"
               className="transistor-switch-demo-sublabel"
@@ -668,7 +691,7 @@ function TransistorScenarioPlayer({
               {visual.controlSignal}
             </text>
             <text
-              x={58}
+              x={51}
               y={314}
               textAnchor="middle"
               className="transistor-switch-demo-sublabel"
@@ -677,44 +700,42 @@ function TransistorScenarioPlayer({
             </text>
           </g>
 
-          {/* ŘÍZENÍ → Rb */}
-          <line
-            x1={TOPO.controlOut.x}
-            y1={TOPO.controlOut.y}
-            x2={TOPO.rbLeft.x}
-            y2={TOPO.rbLeft.y}
+          <path
+            d={`M ${TOPO.controlOut.x} ${TOPO.controlOut.y} L ${TOPO.rbLeft.x} ${TOPO.rbLeft.y}`}
+            fill="none"
+            className={controlWire}
+          />
+          <path
+            d={`M ${TOPO.rbLeft.x} ${TOPO.rbLeft.y} L ${TOPO.rbRight.x} ${TOPO.rbRight.y}`}
+            fill="none"
             className={controlWire}
           />
 
           <g className={rbClass}>
-            <rect x={118} y={258} width={80} height={60} rx={6} />
-            <text
-              x={158}
-              y={278}
-              textAnchor="middle"
-              className="transistor-switch-demo-label"
-            >
-              REZISTOR BÁZE
-            </text>
             <rect
-              x={142}
-              y={286}
-              width={32}
-              height={10}
+              x={148}
+              y={284}
+              width={40}
+              height={16}
               rx={2}
               className="transistor-switch-demo-resistor-symbol"
             />
             <text
-              x={158}
-              y={310}
+              x={100}
+              y={262}
               textAnchor="middle"
-              className="transistor-switch-demo-sublabel"
+              className="transistor-switch-demo-label transistor-switch-demo-rb-label"
             >
-              bez hodnoty
+              <tspan x={100} dy={0}>
+                REZISTOR
+              </tspan>
+              <tspan x={100} dy={14}>
+                BÁZE
+              </tspan>
             </text>
           </g>
 
-          {/* Rb → B (ends exactly at base mid) */}
+          {/* External control ends exactly at B */}
           <path
             d={`M ${TOPO.rbRight.x} ${TOPO.rbRight.y} L 320 ${TOPO.rbRight.y} L 320 ${TOPO.baseMid.y} L ${TOPO.baseMid.x} ${TOPO.baseMid.y}`}
             fill="none"
@@ -723,7 +744,6 @@ function TransistorScenarioPlayer({
 
           {/* Standard NPN BJT symbol */}
           <g className={transistorClass}>
-            {/* Vertical base bar */}
             <line
               x1={TOPO.baseTop.x}
               y1={TOPO.baseTop.y}
@@ -731,47 +751,36 @@ function TransistorScenarioPlayer({
               y2={TOPO.baseBot.y}
               className="transistor-switch-demo-base-bar"
             />
-            {/* Collector branch up-right */}
             <line
-              x1={TOPO.baseTop.x}
-              y1={TOPO.baseTop.y + 8}
+              x1={TOPO.cBranch.x}
+              y1={TOPO.cBranch.y}
               x2={TOPO.cTip.x}
               y2={TOPO.cTip.y}
               className="transistor-switch-demo-collector"
             />
-            {/* Emitter branch down-right */}
             <line
-              x1={TOPO.baseBot.x}
-              y1={TOPO.baseBot.y - 8}
+              x1={TOPO.eBranch.x}
+              y1={TOPO.eBranch.y}
               x2={TOPO.eTip.x}
               y2={TOPO.eTip.y}
               className="transistor-switch-demo-emitter"
             />
-            {/* NPN arrow on emitter, pointing away from base */}
             <polygon
               points="442,240 422,226 432,214"
               className="transistor-switch-demo-emitter-arrow"
             />
             <text
               x={378}
-              y={172}
+              y={176}
               textAnchor="middle"
               className="transistor-switch-demo-terminal"
             >
               B
             </text>
-            <text
-              x={462}
-              y={106}
-              className="transistor-switch-demo-terminal"
-            >
+            <text x={462} y={106} className="transistor-switch-demo-terminal">
               C
             </text>
-            <text
-              x={462}
-              y={252}
-              className="transistor-switch-demo-terminal"
-            >
+            <text x={462} y={256} className="transistor-switch-demo-terminal">
               E
             </text>
             <text
@@ -783,8 +792,8 @@ function TransistorScenarioPlayer({
               NPN BJT
             </text>
             <text
-              x={400}
-              y={220}
+              x={392}
+              y={224}
               textAnchor="end"
               className="transistor-switch-demo-sublabel"
             >
@@ -792,23 +801,37 @@ function TransistorScenarioPlayer({
             </text>
           </g>
 
-          {/* E → common return → source − */}
-          <path
-            d={`M ${TOPO.eTip.x} ${TOPO.eTip.y} L ${TOPO.eTip.x} ${TOPO.commonY} L ${TOPO.sourceMinus.x} ${TOPO.commonY} L ${TOPO.sourceMinus.x} ${TOPO.sourceMinus.y}`}
-            fill="none"
-            className={loadWire}
-          />
-
-          {/* Modeled B–E path overlay only when base current is active */}
-          {visual.baseCurrentFlow && (
+          {/* Modeled internal C–E (dashed) — not a metal wire */}
+          {showInternalLoad && (
             <path
-              d={`M ${TOPO.baseMid.x} ${TOPO.baseMid.y} L ${TOPO.baseBot.x} ${TOPO.baseBot.y - 8} L ${TOPO.eTip.x} ${TOPO.eTip.y} L ${TOPO.eTip.x} ${TOPO.commonY}`}
+              d={loadPathInternalCE}
               fill="none"
-              className={baseWire}
+              className={internalLoadClass}
             />
           )}
 
-          {/* Common return marker */}
+          {/* Return E → common → source − */}
+          <path d={loadPathReturn} fill="none" className={loadWire} />
+
+          {/* Modeled internal B–E (dashed), stays inside transistor symbol */}
+          {showInternalBase && (
+            <>
+              <path
+                d={internalBasePath}
+                fill="none"
+                className={internalBaseClass}
+              />
+              <text
+                x={360}
+                y={300}
+                textAnchor="middle"
+                className="transistor-switch-demo-current-label"
+              >
+                Modelovaný řídicí proud uvnitř NPN: B → E
+              </text>
+            </>
+          )}
+
           <circle
             cx={TOPO.eTip.x}
             cy={TOPO.commonY}
@@ -816,8 +839,8 @@ function TransistorScenarioPlayer({
             className="transistor-switch-demo-common-node"
           />
           <text
-            x={340}
-            y={TOPO.commonY + 18}
+            x={280}
+            y={TOPO.commonY + 28}
             textAnchor="middle"
             className="transistor-switch-demo-common-label"
           >
@@ -826,7 +849,7 @@ function TransistorScenarioPlayer({
 
           {visual.controlFlow && (
             <text
-              x={200}
+              x={210}
               y={240}
               textAnchor="middle"
               className="transistor-switch-demo-current-label"
@@ -834,24 +857,24 @@ function TransistorScenarioPlayer({
               řídicí cesta → B
             </text>
           )}
-          {visual.baseCurrentFlow && (
+          {showInternalLoad && (
             <text
               x={360}
-              y={280}
+              y={168}
               textAnchor="middle"
               className="transistor-switch-demo-current-label"
             >
-              proud báze B→E→návrat
+              Modelovaný průchod proudu uvnitř tranzistoru
             </text>
           )}
           {visual.loadCurrentFlow && (
             <text
-              x={280}
-              y={20}
+              x={250}
+              y={14}
               textAnchor="middle"
               className="transistor-switch-demo-current-label"
             >
-              proud zátěže +→LED→C→E→−
+              proud zátěže +→Rled→LED→C→E→−
             </text>
           )}
           {visual.pathBlocked && (
@@ -866,6 +889,10 @@ function TransistorScenarioPlayer({
           )}
         </svg>
       </div>
+
+      <p className="transistor-switch-demo-legend" role="note">
+        {INTERNAL_PATH_NOTE}
+      </p>
 
       <ul className="animated-demo__state" aria-label="Stav situace textem">
         <li>
@@ -1005,6 +1032,7 @@ export function TransistorSwitchDemoView({
       />
 
       <p className="transistor-switch-demo-note">{MODEL_NOTE}</p>
+      <p className="transistor-switch-demo-note">{INTERNAL_PATH_NOTE}</p>
       <p className="transistor-switch-demo-note">{BASE_RESISTOR_NOTE}</p>
       <p className="transistor-switch-demo-note">{CONVENTIONAL_NOTE}</p>
       <p className="transistor-switch-demo-note">{SCOPE_NOTE}</p>
