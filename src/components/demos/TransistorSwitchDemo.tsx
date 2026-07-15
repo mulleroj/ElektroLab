@@ -58,7 +58,7 @@ const ON_STEPS: DemoStep[] = [
   {
     title: 'Malý proud báze',
     description:
-      'Malý řídicí proud báze teče cestou B–E. Tento proud LED nenapájí — jen řídí tranzistor.',
+      'Malý řídicí proud báze teče cestou B–E ke společnému návratu. Tento proud LED nenapájí — jen řídí tranzistor.',
   },
   {
     title: 'Sepnutí a proud zátěže',
@@ -89,15 +89,40 @@ const CONVENTIONAL_NOTE =
 const SCOPE_NOTE =
   'Model neznázorňuje MOSFET ani přesnou saturační charakteristiku tranzistoru.';
 
+/** Exact topology join points (SVG user units). */
+const TOPO = {
+  sourcePlus: { x: 100, y: 52 },
+  sourceMinus: { x: 100, y: 112 },
+  rledLeft: { x: 118, y: 52 },
+  rledRight: { x: 188, y: 52 },
+  ledLeft: { x: 206, y: 52 },
+  ledRight: { x: 268, y: 52 },
+  cTip: { x: 448, y: 108 },
+  baseMid: { x: 400, y: 168 },
+  baseTop: { x: 400, y: 138 },
+  baseBot: { x: 400, y: 198 },
+  eTip: { x: 448, y: 248 },
+  controlOut: { x: 100, y: 288 },
+  rbLeft: { x: 118, y: 288 },
+  rbRight: { x: 198, y: 288 },
+  commonY: 310,
+} as const;
+
 interface TransistorVisual {
   controlSignal: string;
-  baseState: string;
+  modelType: string;
+  baseTerminalState: string;
+  collectorTerminalState: string;
+  emitterTerminalState: string;
   transistorState: string;
+  collectorBranchState: string;
   baseCurrent: string;
   loadCurrent: string;
   ledState: string;
   resistorBaseState: string;
   resistorLedState: string;
+  energySourceState: string;
+  commonReturnState: string;
   scenarioResult: string;
   ledOn: boolean;
   pathBlocked: boolean;
@@ -106,11 +131,10 @@ interface TransistorVisual {
   highlightTransistor: boolean;
   highlightLed: boolean;
   highlightLoadPath: boolean;
-  controlPulse: boolean;
-  basePulse: boolean;
-  transistorPulse: boolean;
+  controlFlow: boolean;
   baseCurrentFlow: boolean;
   loadCurrentFlow: boolean;
+  transistorPulse: boolean;
   ledReceiving: boolean;
 }
 
@@ -119,16 +143,12 @@ function getSteps(scenarioId: ScenarioId): DemoStep[] {
 }
 
 function deriveVisual(scenarioId: ScenarioId, stepIndex: number): TransistorVisual {
-  const base: TransistorVisual = {
-    controlSignal: '—',
-    baseState: 'B — báze',
-    transistorState: 'NEVYHODNOCENO',
-    baseCurrent: 'NEAKTIVNÍ',
-    loadCurrent: 'NEAKTIVNÍ',
-    ledState: 'ZHASNUTÁ',
-    resistorBaseState: 'OMEZENÍ PROUDU BÁZE',
-    resistorLedState: 'OCHRANNÝ/OMEZOVACÍ PRVEK',
-    scenarioResult: 'Připravený přehled',
+  const shared = {
+    modelType: 'NPN BJT',
+    resistorBaseState: 'OMEZENÍ PROUDU BÁZE (bez hodnoty)',
+    resistorLedState: 'OCHRANNÝ/OMEZOVACÍ PRVEK (bez hodnoty)',
+    energySourceState: 'HLAVNÍ ZDROJ — dodává energii LED',
+    commonReturnState: 'SPOLEČNÝ NÁVRAT u E a zdroje −',
     ledOn: false,
     pathBlocked: false,
     highlightControl: false,
@@ -136,20 +156,27 @@ function deriveVisual(scenarioId: ScenarioId, stepIndex: number): TransistorVisu
     highlightTransistor: false,
     highlightLed: false,
     highlightLoadPath: false,
-    controlPulse: false,
-    basePulse: false,
-    transistorPulse: false,
+    controlFlow: false,
     baseCurrentFlow: false,
     loadCurrentFlow: false,
+    transistorPulse: false,
     ledReceiving: false,
   };
 
   if (scenarioId === 'off') {
+    // OFF: no motion flags in any step.
     if (stepIndex === 0) {
       return {
-        ...base,
+        ...shared,
         controlSignal: 'VYPNUTÝ',
+        baseTerminalState: 'B — bez aktivního řízení',
+        collectorTerminalState: 'C — připojen k LED větvi',
+        emitterTerminalState: 'E — na společném návratu',
         transistorState: 'VYPNUTÝ (ROZEPNUTÝ)',
+        collectorBranchState: 'C–E ROZEPNUTÁ',
+        baseCurrent: 'NEAKTIVNÍ',
+        loadCurrent: 'NEAKTIVNÍ',
+        ledState: 'ZHASNUTÁ',
         highlightControl: true,
         highlightTransistor: true,
         highlightLed: true,
@@ -158,10 +185,16 @@ function deriveVisual(scenarioId: ScenarioId, stepIndex: number): TransistorVisu
     }
     if (stepIndex === 1) {
       return {
-        ...base,
-        controlSignal: 'VYPNUTÝ — CHYBÍ',
+        ...shared,
+        controlSignal: 'BEZ AKTIVNÍHO SIGNÁLU',
+        baseTerminalState: 'B — bez aktivního řízení',
+        collectorTerminalState: 'C — připojen k LED větvi',
+        emitterTerminalState: 'E — na společném návratu',
         transistorState: 'VYPNUTÝ (ROZEPNUTÝ)',
-        controlPulse: true,
+        collectorBranchState: 'C–E ROZEPNUTÁ',
+        baseCurrent: 'NEAKTIVNÍ',
+        loadCurrent: 'NEAKTIVNÍ',
+        ledState: 'ZHASNUTÁ',
         highlightControl: true,
         highlightBaseResistor: true,
         scenarioResult: 'Řídicí signál na bázi nepřichází',
@@ -169,11 +202,16 @@ function deriveVisual(scenarioId: ScenarioId, stepIndex: number): TransistorVisu
     }
     if (stepIndex === 2) {
       return {
-        ...base,
+        ...shared,
         controlSignal: 'VYPNUTÝ',
-        baseCurrent: 'NEAKTIVNÍ',
+        baseTerminalState: 'B — bez aktivního řízení',
+        collectorTerminalState: 'C — připojen k LED větvi',
+        emitterTerminalState: 'E — na společném návratu',
         transistorState: 'VYPNUTÝ (ROZEPNUTÝ)',
-        basePulse: true,
+        collectorBranchState: 'C–E ROZEPNUTÁ',
+        baseCurrent: 'PROUD BÁZE NEAKTIVNÍ',
+        loadCurrent: 'NEAKTIVNÍ',
+        ledState: 'ZHASNUTÁ',
         highlightBaseResistor: true,
         highlightTransistor: true,
         scenarioResult: 'Proud báze v modelu neaktivní',
@@ -181,13 +219,17 @@ function deriveVisual(scenarioId: ScenarioId, stepIndex: number): TransistorVisu
     }
     if (stepIndex === 3) {
       return {
-        ...base,
+        ...shared,
         controlSignal: 'VYPNUTÝ',
-        baseCurrent: 'NEAKTIVNÍ',
+        baseTerminalState: 'B — bez aktivního řízení',
+        collectorTerminalState: 'C — připojen k LED větvi',
+        emitterTerminalState: 'E — na společném návratu',
         transistorState: 'VYPNUTÝ (ROZEPNUTÝ)',
+        collectorBranchState: 'C–E VĚTEV ROZEPNUTÁ',
+        baseCurrent: 'NEAKTIVNÍ',
         loadCurrent: 'BĚŽNOU CESTOU NEPROCHÁZÍ',
+        ledState: 'ZHASNUTÁ',
         pathBlocked: true,
-        transistorPulse: true,
         highlightTransistor: true,
         highlightLoadPath: true,
         highlightLed: true,
@@ -195,10 +237,14 @@ function deriveVisual(scenarioId: ScenarioId, stepIndex: number): TransistorVisu
       };
     }
     return {
-      ...base,
+      ...shared,
       controlSignal: 'VYPNUTÝ',
-      baseCurrent: 'NEAKTIVNÍ',
+      baseTerminalState: 'B — bez aktivního řízení',
+      collectorTerminalState: 'C — připojen k LED větvi',
+      emitterTerminalState: 'E — na společném návratu',
       transistorState: 'VYPNUTÝ (ROZEPNUTÝ)',
+      collectorBranchState: 'C–E ROZEPNUTÁ',
+      baseCurrent: 'NEAKTIVNÍ',
       loadCurrent: 'BĚŽNOU CESTOU NEPROCHÁZÍ',
       ledState: 'NESVÍTÍ',
       pathBlocked: true,
@@ -208,9 +254,16 @@ function deriveVisual(scenarioId: ScenarioId, stepIndex: number): TransistorVisu
 
   if (stepIndex === 0) {
     return {
-      ...base,
+      ...shared,
       controlSignal: 'PŘIPRAVENÝ K ZAPNUTÍ',
+      baseTerminalState: 'B — čeká na řízení přes Rb',
+      collectorTerminalState: 'C — připojen k LED větvi',
+      emitterTerminalState: 'E — na společném návratu',
       transistorState: 'VYPNUTÝ (ROZEPNUTÝ)',
+      collectorBranchState: 'C–E ROZEPNUTÁ',
+      baseCurrent: 'NEAKTIVNÍ',
+      loadCurrent: 'NEAKTIVNÍ',
+      ledState: 'ZHASNUTÁ',
       highlightControl: true,
       highlightTransistor: true,
       highlightLed: true,
@@ -219,10 +272,17 @@ function deriveVisual(scenarioId: ScenarioId, stepIndex: number): TransistorVisu
   }
   if (stepIndex === 1) {
     return {
-      ...base,
+      ...shared,
       controlSignal: 'ZAPNUTÝ',
+      baseTerminalState: 'B — řízená přes Rb',
+      collectorTerminalState: 'C — připojen k LED větvi',
+      emitterTerminalState: 'E — na společném návratu',
       transistorState: 'VYPNUTÝ (ROZEPNUTÝ)',
-      controlPulse: true,
+      collectorBranchState: 'C–E ROZEPNUTÁ',
+      baseCurrent: 'NEAKTIVNÍ',
+      loadCurrent: 'NEAKTIVNÍ',
+      ledState: 'ZHASNUTÁ',
+      controlFlow: true,
       highlightControl: true,
       highlightBaseResistor: true,
       scenarioResult: 'Řídicí signál vede přes rezistor báze na B',
@@ -230,12 +290,17 @@ function deriveVisual(scenarioId: ScenarioId, stepIndex: number): TransistorVisu
   }
   if (stepIndex === 2) {
     return {
-      ...base,
+      ...shared,
       controlSignal: 'ZAPNUTÝ',
-      baseCurrent: 'MALÝ PROUD BÁZE (ŘÍZENÍ)',
+      baseTerminalState: 'B — řízená přes Rb',
+      collectorTerminalState: 'C — připojen k LED větvi',
+      emitterTerminalState: 'E — na společném návratu',
       transistorState: 'PŘIPRAVEN K SEPNUTÍ',
+      collectorBranchState: 'C–E PŘIPRAVENÁ',
+      baseCurrent: 'MALÝ PROUD BÁZE (ŘÍZENÍ)',
+      loadCurrent: 'NEAKTIVNÍ',
+      ledState: 'ZHASNUTÁ',
       baseCurrentFlow: true,
-      basePulse: true,
       highlightBaseResistor: true,
       highlightTransistor: true,
       scenarioResult: 'Malý proud báze řídí tranzistor, LED nenapájí',
@@ -243,10 +308,14 @@ function deriveVisual(scenarioId: ScenarioId, stepIndex: number): TransistorVisu
   }
   if (stepIndex === 3) {
     return {
-      ...base,
+      ...shared,
       controlSignal: 'ZAPNUTÝ',
-      baseCurrent: 'MALÝ PROUD BÁZE (ŘÍZENÍ)',
+      baseTerminalState: 'B — řízená přes Rb',
+      collectorTerminalState: 'C — připojen k LED větvi',
+      emitterTerminalState: 'E — na společném návratu',
       transistorState: 'SEPNUTÝ (VODÍ)',
+      collectorBranchState: 'C–E VODÍ',
+      baseCurrent: 'MALÝ PROUD BÁZE (ŘÍZENÍ)',
       loadCurrent: 'MŮŽE PROCHÁZET ZÁTĚŽÍ',
       ledState: 'PŘIJÍMÁ PROUD',
       transistorPulse: true,
@@ -259,10 +328,14 @@ function deriveVisual(scenarioId: ScenarioId, stepIndex: number): TransistorVisu
     };
   }
   return {
-    ...base,
+    ...shared,
     controlSignal: 'ZAPNUTÝ',
-    baseCurrent: 'MALÝ PROUD BÁZE (ŘÍZENÍ)',
+    baseTerminalState: 'B — řízená přes Rb',
+    collectorTerminalState: 'C — připojen k LED větvi',
+    emitterTerminalState: 'E — na společném návratu',
     transistorState: 'SEPNUTÝ (VODÍ)',
+    collectorBranchState: 'C–E VODÍ',
+    baseCurrent: 'MALÝ PROUD BÁZE (ŘÍZENÍ)',
     loadCurrent: 'PROCHÁZÍ V MODELU',
     ledState: 'SVÍTÍ',
     ledOn: true,
@@ -346,20 +419,14 @@ function TransistorScenarioPlayer({
 
   const controlClass = `transistor-switch-demo-block transistor-switch-demo-control${
     visual.highlightControl ? ' transistor-switch-demo-block--active' : ''
-  }${
-    visual.controlPulse && showMotion
-      ? ' transistor-switch-demo-control--pulse'
-      : ''
   }`;
 
   const rbClass = `transistor-switch-demo-block transistor-switch-demo-rb${
     visual.highlightBaseResistor ? ' transistor-switch-demo-block--active' : ''
-  }${
-    visual.basePulse && showMotion ? ' transistor-switch-demo-rb--pulse' : ''
   }`;
 
-  const transistorClass = `transistor-switch-demo-block transistor-switch-demo-q${
-    visual.highlightTransistor ? ' transistor-switch-demo-block--active' : ''
+  const transistorClass = `transistor-switch-demo-q${
+    visual.highlightTransistor ? ' transistor-switch-demo-q--active' : ''
   }${
     visual.transistorPulse && showMotion
       ? ' transistor-switch-demo-q--pulse'
@@ -370,8 +437,8 @@ function TransistorScenarioPlayer({
       : ''
   }`;
 
-  const ledClass = `transistor-switch-demo-block transistor-switch-demo-led${
-    visual.highlightLed ? ' transistor-switch-demo-block--active' : ''
+  const ledClass = `transistor-switch-demo-led${
+    visual.highlightLed ? ' transistor-switch-demo-led--active' : ''
   }${visual.ledOn ? ' transistor-switch-demo-led--on' : ''}${
     visual.ledReceiving && showMotion
       ? ' transistor-switch-demo-led--receiving'
@@ -386,29 +453,29 @@ function TransistorScenarioPlayer({
     visual.highlightLoadPath ? ' transistor-switch-demo-block--active' : ''
   }`;
 
-  const loadWireClass = `transistor-switch-demo-wire${
+  const loadWire = `transistor-switch-demo-wire${
     visual.pathBlocked ? ' transistor-switch-demo-wire--blocked' : ''
   }${
     visual.loadCurrentFlow && showMotion
       ? ' transistor-switch-demo-load--flow'
       : ''
-  }`;
-
-  const loadPathClass = `transistor-switch-demo-path${
-    visual.pathBlocked ? ' transistor-switch-demo-path--blocked' : ''
   }${
-    visual.loadCurrentFlow && showMotion
-      ? ' transistor-switch-demo-load--flow'
+    visual.highlightLoadPath && !visual.loadCurrentFlow
+      ? ' transistor-switch-demo-wire--emphasis'
       : ''
   }`;
 
-  const baseWireClass = `transistor-switch-demo-wire${
-    visual.baseCurrentFlow && showMotion
-      ? ' transistor-switch-demo-base--flow'
+  const controlWire = `transistor-switch-demo-wire${
+    visual.controlFlow && showMotion
+      ? ' transistor-switch-demo-control--flow'
+      : ''
+  }${
+    visual.highlightControl || visual.highlightBaseResistor
+      ? ' transistor-switch-demo-wire--emphasis'
       : ''
   }`;
 
-  const basePathClass = `transistor-switch-demo-path${
+  const baseWire = `transistor-switch-demo-wire${
     visual.baseCurrentFlow && showMotion
       ? ' transistor-switch-demo-base--flow'
       : ''
@@ -441,14 +508,14 @@ function TransistorScenarioPlayer({
       >
         <svg
           className="transistor-switch-demo-svg"
-          viewBox="0 0 720 300"
+          viewBox="0 0 560 360"
           focusable="false"
         >
-          {/* Hlavní zdroj */}
+          {/* HLAVNÍ ZDROJ */}
           <g className={sourceClass}>
-            <rect x={16} y={28} width={96} height={88} rx={8} />
+            <rect x={16} y={28} width={84} height={100} rx={8} />
             <text
-              x={64}
+              x={58}
               y={50}
               textAnchor="middle"
               className="transistor-switch-demo-label"
@@ -456,174 +523,61 @@ function TransistorScenarioPlayer({
               HLAVNÍ ZDROJ
             </text>
             <text
-              x={40}
-              y={78}
+              x={78}
+              y={72}
               textAnchor="middle"
               className="transistor-switch-demo-pole transistor-switch-demo-pole--plus"
             >
               +
             </text>
             <text
-              x={88}
-              y={78}
+              x={78}
+              y={112}
               textAnchor="middle"
               className="transistor-switch-demo-pole transistor-switch-demo-pole--minus"
             >
               −
             </text>
             <text
-              x={64}
-              y={100}
+              x={58}
+              y={132}
               textAnchor="middle"
               className="transistor-switch-demo-sublabel"
             >
-              nízké napětí
+              energie LED
             </text>
           </g>
 
-          {/* Load path: + → Rled → LED → C */}
-          <rect
-            x={112}
-            y={54}
-            width={36}
-            height={10}
-            rx={3}
-            className={loadWireClass}
+          {/* + → Rled */}
+          <line
+            x1={TOPO.sourcePlus.x}
+            y1={TOPO.sourcePlus.y}
+            x2={TOPO.rledLeft.x}
+            y2={TOPO.rledLeft.y}
+            className={loadWire}
           />
 
           <g className={rledClass}>
-            <rect x={148} y={28} width={72} height={62} rx={8} />
+            <rect x={118} y={28} width={70} height={48} rx={6} />
             <text
-              x={184}
-              y={48}
+              x={153}
+              y={46}
               textAnchor="middle"
               className="transistor-switch-demo-label"
             >
               REZISTOR LED
             </text>
             <rect
-              x={168}
-              y={56}
+              x={137}
+              y={52}
               width={32}
-              height={12}
+              height={10}
               rx={2}
               className="transistor-switch-demo-resistor-symbol"
             />
             <text
-              x={184}
-              y={80}
-              textAnchor="middle"
-              className="transistor-switch-demo-sublabel"
-            >
-              ochrana
-            </text>
-          </g>
-
-          <rect
-            x={220}
-            y={54}
-            width={28}
-            height={10}
-            rx={3}
-            className={loadWireClass}
-          />
-
-          <g className={ledClass}>
-            <rect x={248} y={24} width={88} height={70} rx={8} />
-            <text
-              x={292}
-              y={44}
-              textAnchor="middle"
-              className="transistor-switch-demo-label"
-            >
-              LED ZÁTĚŽ
-            </text>
-            <circle
-              cx={292}
-              cy={62}
-              r={12}
-              className={`transistor-switch-demo-led-bulb${
-                visual.ledOn ? ' transistor-switch-demo-led-bulb--on' : ''
-              }`}
-            />
-            <text
-              x={292}
-              y={86}
-              textAnchor="middle"
-              className="transistor-switch-demo-sublabel"
-            >
-              {visual.ledState}
-            </text>
-          </g>
-
-          <rect
-            x={336}
-            y={54}
-            width={40}
-            height={10}
-            rx={3}
-            className={loadWireClass}
-          />
-
-          {/* Control block */}
-          <g className={controlClass}>
-            <rect x={16} y={160} width={100} height={72} rx={8} />
-            <text
-              x={66}
-              y={182}
-              textAnchor="middle"
-              className="transistor-switch-demo-label"
-            >
-              ŘÍZENÍ
-            </text>
-            <text
-              x={66}
-              y={204}
-              textAnchor="middle"
-              className="transistor-switch-demo-sublabel"
-            >
-              {visual.controlSignal}
-            </text>
-            <text
-              x={66}
-              y={220}
-              textAnchor="middle"
-              className="transistor-switch-demo-sublabel"
-            >
-              řídicí vstup
-            </text>
-          </g>
-
-          <rect
-            x={116}
-            y={188}
-            width={32}
-            height={10}
-            rx={3}
-            className={baseWireClass}
-          />
-
-          <g className={rbClass}>
-            <rect x={148} y={160} width={80} height={72} rx={8} />
-            <text
-              x={188}
-              y={182}
-              textAnchor="middle"
-              className="transistor-switch-demo-label"
-            >
-              REZISTOR BÁZE
-            </text>
-            <rect
-              x={172}
-              y={192}
-              width={32}
-              height={12}
-              rx={2}
-              className="transistor-switch-demo-resistor-symbol"
-            />
-            <text
-              x={188}
-              y={220}
+              x={153}
+              y={72}
               textAnchor="middle"
               className="transistor-switch-demo-sublabel"
             >
@@ -631,150 +585,279 @@ function TransistorScenarioPlayer({
             </text>
           </g>
 
-          <rect
-            x={228}
-            y={188}
-            width={40}
-            height={10}
-            rx={3}
-            className={baseWireClass}
+          {/* Rled → LED */}
+          <line
+            x1={TOPO.rledRight.x}
+            y1={TOPO.rledRight.y}
+            x2={TOPO.ledLeft.x}
+            y2={TOPO.ledLeft.y}
+            className={loadWire}
           />
 
-          {/* NPN transistor */}
-          <g className={transistorClass}>
-            <rect x={376} y={100} width={160} height={140} rx={8} />
+          {/* Standard LED symbol (anode left → cathode right) */}
+          <g className={ledClass}>
+            <polygon
+              points="210,36 210,68 250,52"
+              className="transistor-switch-demo-led-body"
+            />
+            <line
+              x1={250}
+              y1={36}
+              x2={250}
+              y2={68}
+              className="transistor-switch-demo-led-cathode"
+            />
+            <line
+              x1={256}
+              y1={40}
+              x2={268}
+              y2={32}
+              className="transistor-switch-demo-led-ray"
+            />
+            <line
+              x1={256}
+              y1={48}
+              x2={268}
+              y2={40}
+              className="transistor-switch-demo-led-ray"
+            />
+            <polygon points="266,30 270,34 262,36" className="transistor-switch-demo-led-ray-head" />
+            <polygon points="266,38 270,42 262,44" className="transistor-switch-demo-led-ray-head" />
             <text
-              x={456}
-              y={122}
+              x={230}
+              y={86}
+              textAnchor="middle"
+              className="transistor-switch-demo-label"
+            >
+              LED
+            </text>
+            <text
+              x={230}
+              y={100}
+              textAnchor="middle"
+              className="transistor-switch-demo-sublabel"
+            >
+              {visual.ledState}
+            </text>
+          </g>
+
+          {/* LED → C tip (continuous) */}
+          <path
+            d={`M ${TOPO.ledRight.x} ${TOPO.ledRight.y} L ${TOPO.cTip.x} ${TOPO.ledRight.y} L ${TOPO.cTip.x} ${TOPO.cTip.y}`}
+            fill="none"
+            className={loadWire}
+          />
+
+          {/* ŘÍZENÍ */}
+          <g className={controlClass}>
+            <rect x={16} y={248} width={84} height={80} rx={8} />
+            <text
+              x={58}
+              y={272}
+              textAnchor="middle"
+              className="transistor-switch-demo-label"
+            >
+              ŘÍZENÍ
+            </text>
+            <text
+              x={58}
+              y={294}
+              textAnchor="middle"
+              className="transistor-switch-demo-sublabel"
+            >
+              {visual.controlSignal}
+            </text>
+            <text
+              x={58}
+              y={314}
+              textAnchor="middle"
+              className="transistor-switch-demo-sublabel"
+            >
+              řídicí vstup
+            </text>
+          </g>
+
+          {/* ŘÍZENÍ → Rb */}
+          <line
+            x1={TOPO.controlOut.x}
+            y1={TOPO.controlOut.y}
+            x2={TOPO.rbLeft.x}
+            y2={TOPO.rbLeft.y}
+            className={controlWire}
+          />
+
+          <g className={rbClass}>
+            <rect x={118} y={258} width={80} height={60} rx={6} />
+            <text
+              x={158}
+              y={278}
+              textAnchor="middle"
+              className="transistor-switch-demo-label"
+            >
+              REZISTOR BÁZE
+            </text>
+            <rect
+              x={142}
+              y={286}
+              width={32}
+              height={10}
+              rx={2}
+              className="transistor-switch-demo-resistor-symbol"
+            />
+            <text
+              x={158}
+              y={310}
+              textAnchor="middle"
+              className="transistor-switch-demo-sublabel"
+            >
+              bez hodnoty
+            </text>
+          </g>
+
+          {/* Rb → B (ends exactly at base mid) */}
+          <path
+            d={`M ${TOPO.rbRight.x} ${TOPO.rbRight.y} L 320 ${TOPO.rbRight.y} L 320 ${TOPO.baseMid.y} L ${TOPO.baseMid.x} ${TOPO.baseMid.y}`}
+            fill="none"
+            className={controlWire}
+          />
+
+          {/* Standard NPN BJT symbol */}
+          <g className={transistorClass}>
+            {/* Vertical base bar */}
+            <line
+              x1={TOPO.baseTop.x}
+              y1={TOPO.baseTop.y}
+              x2={TOPO.baseBot.x}
+              y2={TOPO.baseBot.y}
+              className="transistor-switch-demo-base-bar"
+            />
+            {/* Collector branch up-right */}
+            <line
+              x1={TOPO.baseTop.x}
+              y1={TOPO.baseTop.y + 8}
+              x2={TOPO.cTip.x}
+              y2={TOPO.cTip.y}
+              className="transistor-switch-demo-collector"
+            />
+            {/* Emitter branch down-right */}
+            <line
+              x1={TOPO.baseBot.x}
+              y1={TOPO.baseBot.y - 8}
+              x2={TOPO.eTip.x}
+              y2={TOPO.eTip.y}
+              className="transistor-switch-demo-emitter"
+            />
+            {/* NPN arrow on emitter, pointing away from base */}
+            <polygon
+              points="442,240 422,226 432,214"
+              className="transistor-switch-demo-emitter-arrow"
+            />
+            <text
+              x={378}
+              y={172}
+              textAnchor="middle"
+              className="transistor-switch-demo-terminal"
+            >
+              B
+            </text>
+            <text
+              x={462}
+              y={106}
+              className="transistor-switch-demo-terminal"
+            >
+              C
+            </text>
+            <text
+              x={462}
+              y={252}
+              className="transistor-switch-demo-terminal"
+            >
+              E
+            </text>
+            <text
+              x={400}
+              y={126}
               textAnchor="middle"
               className="transistor-switch-demo-label"
             >
               NPN BJT
             </text>
             <text
-              x={456}
-              y={138}
-              textAnchor="middle"
-              className="transistor-switch-demo-sublabel"
-            >
-              low-side spínač
-            </text>
-
-            {/* Collector terminal C at top */}
-            <line
-              x1={456}
-              y1={148}
-              x2={456}
-              y2={168}
-              className="transistor-switch-demo-lead"
-            />
-            <text
-              x={470}
-              y={160}
-              className="transistor-switch-demo-terminal"
-            >
-              C
-            </text>
-
-            {/* Horizontal base bar */}
-            <line
-              x1={430}
-              y1={168}
-              x2={482}
-              y2={168}
-              className="transistor-switch-demo-bar"
-            />
-
-            {/* Emitter slant with outward NPN arrow */}
-            <line
-              x1={456}
-              y1={168}
-              x2={456}
-              y2={210}
-              className="transistor-switch-demo-lead"
-            />
-            <polygon
-              points="456,210 448,196 464,196"
-              className="transistor-switch-demo-emitter-arrow"
-            />
-            <text
-              x={470}
-              y={206}
-              className="transistor-switch-demo-terminal"
-            >
-              E
-            </text>
-
-            {/* Base lead from left */}
-            <line
-              x1={390}
-              y1={188}
-              x2={430}
-              y2={168}
-              className="transistor-switch-demo-lead"
-            />
-            <text
               x={400}
-              y={182}
-              className="transistor-switch-demo-terminal"
-            >
-              B
-            </text>
-
-            <text
-              x={456}
-              y={228}
-              textAnchor="middle"
+              y={220}
+              textAnchor="end"
               className="transistor-switch-demo-sublabel"
             >
               {visual.transistorState}
             </text>
           </g>
 
-          {/* Emitter return to source − */}
+          {/* E → common return → source − */}
           <path
-            d="M 456 240 L 456 268 L 88 268 L 88 116"
+            d={`M ${TOPO.eTip.x} ${TOPO.eTip.y} L ${TOPO.eTip.x} ${TOPO.commonY} L ${TOPO.sourceMinus.x} ${TOPO.commonY} L ${TOPO.sourceMinus.x} ${TOPO.sourceMinus.y}`}
             fill="none"
-            strokeWidth={8}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className={loadPathClass}
+            className={loadWire}
           />
 
-          {/* Control return hint to common */}
-          <path
-            d="M 268 198 L 300 198 L 300 250 L 456 250"
-            fill="none"
-            strokeWidth={5}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className={basePathClass}
-          />
-
+          {/* Modeled B–E path overlay only when base current is active */}
           {visual.baseCurrentFlow && (
+            <path
+              d={`M ${TOPO.baseMid.x} ${TOPO.baseMid.y} L ${TOPO.baseBot.x} ${TOPO.baseBot.y - 8} L ${TOPO.eTip.x} ${TOPO.eTip.y} L ${TOPO.eTip.x} ${TOPO.commonY}`}
+              fill="none"
+              className={baseWire}
+            />
+          )}
+
+          {/* Common return marker */}
+          <circle
+            cx={TOPO.eTip.x}
+            cy={TOPO.commonY}
+            r={5}
+            className="transistor-switch-demo-common-node"
+          />
+          <text
+            x={340}
+            y={TOPO.commonY + 18}
+            textAnchor="middle"
+            className="transistor-switch-demo-common-label"
+          >
+            SPOLEČNÝ NÁVRAT
+          </text>
+
+          {visual.controlFlow && (
             <text
               x={200}
-              y={248}
+              y={240}
               textAnchor="middle"
               className="transistor-switch-demo-current-label"
             >
-              řídicí proud báze →
+              řídicí cesta → B
+            </text>
+          )}
+          {visual.baseCurrentFlow && (
+            <text
+              x={360}
+              y={280}
+              textAnchor="middle"
+              className="transistor-switch-demo-current-label"
+            >
+              proud báze B→E→návrat
             </text>
           )}
           {visual.loadCurrentFlow && (
             <text
               x={280}
-              y={16}
+              y={20}
               textAnchor="middle"
               className="transistor-switch-demo-current-label"
             >
-              konvenční proud zátěže →
+              proud zátěže +→LED→C→E→−
             </text>
           )}
           {visual.pathBlocked && (
             <text
-              x={456}
-              y={90}
+              x={400}
+              y={95}
               textAnchor="middle"
               className="transistor-switch-demo-blocked-label"
             >
@@ -789,28 +872,46 @@ function TransistorScenarioPlayer({
           Aktivní situace: <strong>{scenarioLabel}</strong>
         </li>
         <li>
+          Typ modelu: <strong>{visual.modelType}</strong>
+        </li>
+        <li>
           Řídicí signál: <strong>{visual.controlSignal}</strong>
-        </li>
-        <li>
-          Vývody: <strong>B — báze, C — kolektor, E — emitor (NPN)</strong>
-        </li>
-        <li>
-          Stav tranzistoru: <strong>{visual.transistorState}</strong>
-        </li>
-        <li>
-          Proud báze: <strong>{visual.baseCurrent}</strong>
-        </li>
-        <li>
-          Proud zátěže (C–E): <strong>{visual.loadCurrent}</strong>
         </li>
         <li>
           Rezistor báze: <strong>{visual.resistorBaseState}</strong>
         </li>
         <li>
+          B — báze: <strong>{visual.baseTerminalState}</strong>
+        </li>
+        <li>
+          Proud báze: <strong>{visual.baseCurrent}</strong>
+        </li>
+        <li>
+          Stav tranzistoru: <strong>{visual.transistorState}</strong>
+        </li>
+        <li>
+          C — kolektor: <strong>{visual.collectorTerminalState}</strong>
+        </li>
+        <li>
+          E — emitor: <strong>{visual.emitterTerminalState}</strong>
+        </li>
+        <li>
+          Kolektorová větev C–E: <strong>{visual.collectorBranchState}</strong>
+        </li>
+        <li>
+          Proud zátěže: <strong>{visual.loadCurrent}</strong>
+        </li>
+        <li>
           Rezistor LED: <strong>{visual.resistorLedState}</strong>
         </li>
         <li>
-          LED zátěž: <strong>{visual.ledState}</strong>
+          Stav LED: <strong>{visual.ledState}</strong>
+        </li>
+        <li>
+          Zdroj energie LED: <strong>{visual.energySourceState}</strong>
+        </li>
+        <li>
+          Společný návrat/reference: <strong>{visual.commonReturnState}</strong>
         </li>
         <li>
           Výsledek: <strong>{visual.scenarioResult}</strong>
