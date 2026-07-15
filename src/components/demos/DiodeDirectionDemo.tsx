@@ -328,6 +328,11 @@ function DiodeScenarioPlayer({
       ? ' diode-direction-demo-anim--paused'
       : '';
   const isForward = scenarioId === 'forward';
+  const diodeAnodeX = isForward ? 324 : 368;
+  const diodeCathodeX = isForward ? 368 : 324;
+  const diodeSymbolTransform = isForward
+    ? undefined
+    : 'translate(341, 148) scale(-1, 1) translate(-341, -148)';
 
   const sourceClass = `diode-direction-demo-block diode-direction-demo-source${
     visual.highlightSource ? ' diode-direction-demo-block--active' : ''
@@ -478,14 +483,7 @@ function DiodeScenarioPlayer({
             className={wireClass('d')}
           />
 
-          <g
-            className={diodeClass}
-            transform={
-              isForward
-                ? undefined
-                : 'translate(358, 148) scale(-1, 1) translate(-358, -148)'
-            }
-          >
+          <g className={diodeClass}>
             <rect x={296} y={88} width={124} height={96} rx={8} />
             <text
               x={358}
@@ -495,19 +493,24 @@ function DiodeScenarioPlayer({
             >
               TESTOVANÁ DIODA
             </text>
-            <polygon
-              points="330,148 350,136 350,160"
-              className="diode-direction-demo-diode-symbol"
-            />
-            <line
-              x1={352}
-              y1={136}
-              x2={352}
-              y2={160}
-              className="diode-direction-demo-diode-bar"
-            />
+            <g
+              className="diode-direction-demo-diode-symbol-group"
+              transform={diodeSymbolTransform}
+            >
+              <polygon
+                points="330,148 350,136 350,160"
+                className="diode-direction-demo-diode-symbol"
+              />
+              <line
+                x1={352}
+                y1={136}
+                x2={352}
+                y2={160}
+                className="diode-direction-demo-diode-bar"
+              />
+            </g>
             <text
-              x={324}
+              x={diodeAnodeX}
               y={152}
               textAnchor="middle"
               className="diode-direction-demo-terminal"
@@ -515,7 +518,7 @@ function DiodeScenarioPlayer({
               A
             </text>
             <text
-              x={368}
+              x={diodeCathodeX}
               y={152}
               textAnchor="middle"
               className="diode-direction-demo-terminal"
