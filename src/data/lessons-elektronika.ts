@@ -28,7 +28,7 @@ export const elektronikaLessons: MicroLesson[] = [
       type: 'diode-direction',
       title: 'Kterým směrem dioda pouští proud?',
       description:
-        'Přepni diodu mezi propustným a závěrným směrem a sleduj, kdy LED svítí.',
+        'Vyber směr zapojení a projdi kroky. Sleduj, jak orientace diody ovlivní průchod proudu a rozsvícení LED.',
     },
     activity: {
       measurementJudgment: {

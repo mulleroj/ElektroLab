@@ -3594,3 +3594,209 @@ input:focus-visible {
     transform: translateX(0);
   }
 }
+
+/* MVP-11I: animované scénáře diody */
+
+.diode-direction-demo-switch-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.diode-direction-demo-scenarios {
+  flex-wrap: wrap;
+}
+
+.diode-direction-demo-note {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.diode-direction-demo-label {
+  font-size: 11px;
+  font-weight: 700;
+  fill: var(--color-text);
+}
+
+.diode-direction-demo-sublabel {
+  font-size: 10px;
+  fill: var(--color-text-muted);
+}
+
+.diode-direction-demo-pole {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.diode-direction-demo-pole--plus {
+  fill: var(--color-primary);
+}
+
+.diode-direction-demo-pole--minus {
+  fill: var(--color-text-muted);
+}
+
+.diode-direction-demo-terminal {
+  font-size: 12px;
+  font-weight: 700;
+  fill: var(--color-primary);
+}
+
+.diode-direction-demo-current-label {
+  font-size: 11px;
+  fill: var(--color-text-muted);
+}
+
+.diode-direction-demo-block rect {
+  fill: var(--color-surface);
+  stroke: var(--color-border);
+  stroke-width: 2;
+  transition: stroke 0.25s ease;
+}
+
+.diode-direction-demo-block--active rect {
+  stroke: var(--color-primary);
+  stroke-width: 3;
+}
+
+.diode-direction-demo-resistor-symbol {
+  fill: var(--color-border);
+  stroke: var(--color-text-muted);
+  stroke-width: 1;
+}
+
+.diode-direction-demo-diode-symbol {
+  fill: var(--color-surface);
+  stroke: var(--color-border);
+  stroke-width: 2;
+}
+
+.diode-direction-demo-diode-bar {
+  stroke: var(--color-text);
+  stroke-width: 3;
+}
+
+.diode-direction-demo-diode--blocking .diode-direction-demo-diode-symbol {
+  fill: #fef2f2;
+  stroke: var(--color-error, #dc2626);
+}
+
+.diode-direction-demo-diode--blocking .diode-direction-demo-diode-bar {
+  stroke: var(--color-error, #dc2626);
+}
+
+.diode-direction-demo-wire {
+  fill: var(--color-border);
+  opacity: 0.4;
+}
+
+.diode-direction-demo-wire--blocked {
+  opacity: 0.2;
+  stroke: var(--color-error, #dc2626);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+  fill: none;
+}
+
+.diode-direction-demo-current--flow {
+  animation: diode-direction-demo-current-flow 1.4s ease-in-out infinite;
+}
+
+@keyframes diode-direction-demo-current-flow {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scaleX(0.85);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scaleX(1);
+  }
+}
+
+.diode-direction-demo-polarity--pulse rect {
+  animation: diode-direction-demo-polarity-pulse 1.3s ease-in-out infinite;
+}
+
+@keyframes diode-direction-demo-polarity-pulse {
+  0%,
+  100% {
+    stroke-width: 2;
+  }
+  50% {
+    stroke-width: 3;
+    fill: #eff6ff;
+  }
+}
+
+.diode-direction-demo-diode--pulse .diode-direction-demo-diode-symbol {
+  animation: diode-direction-demo-diode-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes diode-direction-demo-diode-pulse {
+  0%,
+  100% {
+    fill: var(--color-surface);
+    stroke-width: 2;
+  }
+  50% {
+    fill: #ecfdf5;
+    stroke-width: 3;
+  }
+}
+
+.diode-direction-demo-led-bulb {
+  fill: var(--color-border);
+  stroke: var(--color-text-muted);
+  stroke-width: 1.5;
+  transition: fill 0.35s ease, stroke 0.35s ease;
+}
+
+.diode-direction-demo-led-bulb--on {
+  fill: #fde68a;
+  stroke: #d97706;
+}
+
+.diode-direction-demo-led--on rect {
+  stroke: #d97706;
+}
+
+.diode-direction-demo-led--receiving .diode-direction-demo-led-bulb {
+  animation: diode-direction-demo-led-receiving 1.4s ease-in-out infinite;
+}
+
+@keyframes diode-direction-demo-led-receiving {
+  0%,
+  100% {
+    fill: var(--color-border);
+  }
+  50% {
+    fill: #fef9c3;
+  }
+}
+
+.diode-direction-demo-anim--paused,
+.diode-direction-demo-anim--paused * {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diode-direction-demo-block rect,
+  .diode-direction-demo-diode-symbol,
+  .diode-direction-demo-led-bulb {
+    transition: none;
+  }
+
+  .diode-direction-demo-current--flow,
+  .diode-direction-demo-polarity--pulse rect,
+  .diode-direction-demo-diode--pulse .diode-direction-demo-diode-symbol,
+  .diode-direction-demo-led--receiving .diode-direction-demo-led-bulb {
+    animation: none;
+  }
+
+  .diode-direction-demo-led-bulb--on {
+    fill: #fde68a;
+    stroke: #d97706;
+  }
+}
