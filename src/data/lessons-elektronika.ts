@@ -137,7 +137,7 @@ export const elektronikaLessons: MicroLesson[] = [
       type: 'transistor-switch',
       title: 'Malý signál spíná větší proud',
       description:
-        'Zapínej a vypínej řídicí signál na bázi a sleduj, kdy tranzistor sepne a LED svítí.',
+        'Vyber vypnutý nebo zapnutý řídicí signál a projdi kroky. Sleduj, jak malý proud báze umožní větší proud zátěží a rozsvícení LED.',
     },
     activity: {
       measurementJudgment: {
