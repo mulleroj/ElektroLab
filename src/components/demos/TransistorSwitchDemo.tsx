@@ -460,13 +460,17 @@ function TransistorScenarioPlayer({
     visual.highlightLoadPath ? ' transistor-switch-demo-block--active' : ''
   }`;
 
+  // External load wires stay geometrically connected. pathBlocked must NOT
+  // mark the return wire (or other metal wires) as cut — only the modeled
+  // internal C–E path represents the open switch inside the transistor.
   const loadWire = `transistor-switch-demo-wire${
-    visual.pathBlocked ? ' transistor-switch-demo-wire--blocked' : ''
-  }${
     visual.loadCurrentFlow && showMotion
       ? ' transistor-switch-demo-load--flow'
       : ''
   }${
+    // When C–E is open (pathBlocked), keep all external metal wires neutral —
+    // no blocked cut and no load emphasis on +→LED→C or E→return→−.
+    !visual.pathBlocked &&
     (visual.highlightLoadPath || visual.loadCurrentFlow) &&
     !(visual.loadCurrentFlow && showMotion)
       ? ' transistor-switch-demo-wire--emphasis'
@@ -488,7 +492,8 @@ function TransistorScenarioPlayer({
   const showInternalBase = visual.baseCurrentFlow;
   const showInternalLoad =
     visual.loadCurrentFlow ||
-    (visual.ledOn && visual.transistorState.includes('SEPNUTÝ'));
+    (visual.ledOn && visual.transistorState.includes('SEPNUTÝ')) ||
+    visual.pathBlocked;
 
   const internalBaseClass = `transistor-switch-demo-internal-current-path transistor-switch-demo-internal-current-path--base${
     showInternalBase && showMotion
@@ -497,6 +502,10 @@ function TransistorScenarioPlayer({
   }`;
 
   const internalLoadClass = `transistor-switch-demo-internal-current-path transistor-switch-demo-internal-current-path--load${
+    visual.pathBlocked && !visual.loadCurrentFlow
+      ? ' transistor-switch-demo-internal-current-path--blocked'
+      : ''
+  }${
     visual.loadCurrentFlow && showMotion
       ? ' transistor-switch-demo-internal-current-path--flow'
       : ''
@@ -857,7 +866,7 @@ function TransistorScenarioPlayer({
               řídicí cesta → B
             </text>
           )}
-          {showInternalLoad && (
+          {showInternalLoad && !visual.pathBlocked && (
             <text
               x={360}
               y={168}
