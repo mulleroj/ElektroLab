@@ -109,6 +109,9 @@ const WIRE_B_Y = 197;
 const WIRE_NOT_Y = 150;
 const OUT_Y = 150;
 const LED_X = 528;
+// Poloměr LED; konec výstupního vodiče se odvozuje z této geometrie, aby se
+// vodič fyzicky dotýkal obrysu LED (ne světelných paprsků) pro Y=0 i Y=1.
+const LED_RADIUS = 24;
 const LED_RAYS = [
   [528, 114, 528, 100],
   [528, 186, 528, 200],
@@ -190,15 +193,23 @@ function LogicGatePlayer({
       inputsShown && value === 1 ? ' logic-gate-demo-pad--one' : ''
     }`;
   // Logická 0 = souvislý neutrální vodič bez pohybu; flow má jen signál 1.
+  // Vstupní flow patří výhradně kroku „Přenos k hradlu“ (stepIndex === 2);
+  // ve vyhodnocení a výsledku už žádný vstupní pohyb neběží.
   const inputWireClass = (value: Bit) =>
     `logic-gate-demo-wire${
       transfer && value === 1 ? ' logic-gate-demo-wire--on' : ''
     }${
-      transfer && value === 1 && showMotion ? ' logic-gate-demo-wire--flow' : ''
+      stepIndex === 2 && value === 1 && showMotion
+        ? ' logic-gate-demo-wire--flow'
+        : ''
     }`;
+  // Výstupní vodič: aktivní (statické zvýraznění) od vyhodnocení dál pro Y=1;
+  // směrový tok gate → LED běží jen ve vyhodnocení (stepIndex === 3) a jen při
+  // autoplay. V kroku Výsledek (completed) už žádný pohyb není.
+  const outputFlow = stepIndex === 3 && y === 1 && showMotion;
   const outputWireClass = `logic-gate-demo-wire${
-    resultShown && y === 1 ? ' logic-gate-demo-wire--on' : ''
-  }`;
+    evaluated && y === 1 ? ' logic-gate-demo-wire--on' : ''
+  }${outputFlow ? ' logic-gate-demo-wire--flow-out' : ''}`;
   const bodyClass = `logic-gate-demo-body${
     evaluated ? ' logic-gate-demo-body--active' : ''
   }`;
@@ -207,10 +218,22 @@ function LogicGatePlayer({
   const exprText = expression(gate, a, b, inputsShown, evaluated);
   const outWireStartX = isNot ? GATE_RIGHT + 16 : GATE_RIGHT;
 
+  // Jediný živý region (stav v AnimatedDemoControls) nese i důležitý výsledek:
+  // u vyhodnocení výraz, u výsledku hodnotu Y a stav LED. Lokální popis kroku
+  // níže už není live region, takže se čtečce nic neduplikuje.
+  let liveStepTitle = step.title;
+  if (stepIndex === 3) {
+    liveStepTitle = `Vyhodnocení: ${expression(gate, a, b, true, true)}`;
+  } else if (stepIndex === 4) {
+    liveStepTitle = `Výsledek: Y = ${y}, LED ${y === 1 ? 'svítí' : 'nesvítí'}`;
+  }
+
   return (
     <>
       {!motion.allowAutoPlay && (
-        <p className="calm-step-hint" role="status">
+        // Statický pokyn (po načtení se nemění) → není live/status region,
+        // aby nepřidával další oznámení ke stavu kroku v ovládání.
+        <p className="calm-step-hint">
           Automatické přehrávání je vypnuté — průchod signálu procházej
           vlastním tempem tlačítkem „Další krok“.
         </p>
@@ -220,7 +243,7 @@ function LogicGatePlayer({
         status={status}
         stepIndex={stepIndex}
         stepCount={steps.length}
-        stepTitle={step.title}
+        stepTitle={liveStepTitle}
         autoPlayAllowed={motion.allowAutoPlay}
         onPlay={playback.play}
         onPause={playback.pause}
@@ -358,7 +381,7 @@ function LogicGatePlayer({
           {/* Výstup a LED */}
           <path
             className={outputWireClass}
-            d={`M ${outWireStartX} ${OUT_Y} H ${LED_X - 28}`}
+            d={`M ${outWireStartX} ${OUT_Y} H ${LED_X - LED_RADIUS}`}
           />
           <text
             className="logic-gate-demo-label"
@@ -380,7 +403,7 @@ function LogicGatePlayer({
             className={`logic-gate-demo-led${ledOn ? ' logic-gate-demo-led--on' : ''}`}
             cx={LED_X}
             cy={OUT_Y}
-            r={24}
+            r={LED_RADIUS}
           />
           {ledOn && (
             <g className="logic-gate-demo-led-rays">
@@ -422,7 +445,9 @@ function LogicGatePlayer({
         </li>
       </ul>
 
-      <div className="logic-gate__explain" role="status" aria-live="polite">
+      {/* Popis kroku zůstává viditelný a čitelný jako běžný text, ale už není
+          druhý live region — krok oznamuje jediný stavový řádek v ovládání. */}
+      <div className="logic-gate__explain">
         <strong>{step.title}.</strong> {step.description}
       </div>
     </>
@@ -472,7 +497,9 @@ export function LogicGateDemoView({
         </p>
       )}
 
-      <p className="logic-gate-demo-switch-hint" role="status">
+      {/* Statický pokyn (obsah se po načtení nemění) → běžný text, ne live
+          region, aby jediným měnícím se hlášením zůstal stav kroku. */}
+      <p className="logic-gate-demo-switch-hint">
         Přepnutím hradla nebo změnou vstupu se průchod vrátí na začátek —
         hotová hradla zůstávají hotová.
       </p>

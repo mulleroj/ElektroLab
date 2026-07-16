@@ -4244,6 +4244,13 @@ input:focus-visible {
   animation: logic-gate-demo-flow 0.9s linear infinite;
 }
 
+/* Výstupní tok gate → LED: jen krok Vyhodnocení při autoplay a jen pro Y = 1.
+   Vlastní třída (ne --flow), aby šlo vstupní a výstupní tok odlišit v DOM. */
+.logic-gate-demo-wire--flow-out {
+  stroke-dasharray: 7 5;
+  animation: logic-gate-demo-flow 0.9s linear infinite;
+}
+
 @keyframes logic-gate-demo-flow {
   from {
     stroke-dashoffset: 0;
@@ -4317,7 +4324,8 @@ input:focus-visible {
     transition: none;
   }
 
-  .logic-gate-demo-wire--flow {
+  .logic-gate-demo-wire--flow,
+  .logic-gate-demo-wire--flow-out {
     animation: none;
   }
 }
