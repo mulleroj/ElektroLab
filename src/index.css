@@ -4010,6 +4010,13 @@ input:focus-visible {
   stroke-width: 2.75;
 }
 
+.transistor-switch-demo-internal-current-path--blocked {
+  stroke: var(--color-error, #dc2626);
+  stroke-width: 2.5;
+  stroke-dasharray: 4 5;
+  opacity: 0.75;
+}
+
 .transistor-switch-demo-internal-current-path--flow {
   animation: transistor-switch-demo-internal-flow 1.25s linear infinite;
 }
