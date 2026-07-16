@@ -1759,28 +1759,10 @@ input:focus-visible {
   margin: 1rem 0 0.75rem;
 }
 
-.logic-gate__panel {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 1rem 1.25rem;
-  margin: 0 0 1rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
 .logic-gate__inputs {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-}
-
-.logic-gate__symbol {
-  font-weight: 700;
-  font-size: 1.25rem;
-  color: var(--color-primary);
 }
 
 .logic-io {
@@ -1792,10 +1774,6 @@ input:focus-visible {
   background: var(--color-bg);
   cursor: pointer;
   text-align: left;
-}
-
-.logic-io--output {
-  cursor: default;
 }
 
 .logic-io--one {
@@ -4179,5 +4157,167 @@ input:focus-visible {
   .transistor-switch-demo-led--on .transistor-switch-demo-led-body {
     fill: #fde68a;
     stroke: #d97706;
+  }
+}
+
+/* MVP-11K: animovaný průchod signálu logickými hradly (LogicGateDemo) */
+
+.logic-gate-demo-switch-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.logic-gate-demo-inputs {
+  margin: 0 0 0.75rem;
+}
+
+/* Dostatečná dotyková plocha přepínačů vstupů i na mobilu */
+.logic-gate-demo-input {
+  min-height: 2.75rem;
+}
+
+.logic-gate-demo-progress {
+  margin: 0.5rem 0 0;
+  font-weight: 600;
+}
+
+.logic-gate-demo-note {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.logic-gate-demo-label {
+  font-size: 15px;
+  font-weight: 600;
+  fill: var(--color-text-muted);
+}
+
+.logic-gate-demo-label--state {
+  fill: var(--color-text);
+}
+
+.logic-gate-demo-expression {
+  font-size: 21px;
+  font-weight: 700;
+  fill: var(--color-text);
+}
+
+.logic-gate-demo-pad {
+  fill: var(--color-surface);
+  stroke: #94a3b8;
+  stroke-width: 2;
+  transition: fill 0.4s ease, stroke 0.4s ease, stroke-width 0.4s ease;
+}
+
+/* Hodnota 1: výplň i silnější obrys (změna není jen barvou) + číslo v textu */
+.logic-gate-demo-pad--one {
+  fill: #e8f0f8;
+  stroke: var(--color-primary);
+  stroke-width: 3;
+}
+
+.logic-gate-demo-pad-text {
+  font-size: 16px;
+  font-weight: 700;
+  fill: var(--color-text);
+}
+
+/* Logická 0 = souvislý neutrální vodič; nikdy nevypadá přerušeně */
+.logic-gate-demo-wire {
+  stroke: #94a3b8;
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke 0.4s ease, stroke-width 0.4s ease;
+}
+
+.logic-gate-demo-wire--on {
+  stroke: var(--color-primary);
+  stroke-width: 5;
+}
+
+/* Pohyb signálu jen při autoplay a jen pro logickou 1 */
+.logic-gate-demo-wire--flow {
+  stroke-dasharray: 7 5;
+  animation: logic-gate-demo-flow 0.9s linear infinite;
+}
+
+@keyframes logic-gate-demo-flow {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+.logic-gate-demo-body {
+  fill: var(--color-surface);
+  stroke: var(--color-text);
+  stroke-width: 2.5;
+  transition: fill 0.4s ease, stroke 0.4s ease;
+}
+
+.logic-gate-demo-body--active {
+  fill: #e8f0f8;
+  stroke: var(--color-primary);
+}
+
+.logic-gate-demo-symbol {
+  font-size: 34px;
+  font-weight: 700;
+  fill: var(--color-text);
+}
+
+.logic-gate-demo-bubble {
+  fill: var(--color-surface);
+  stroke: var(--color-text);
+  stroke-width: 2.5;
+  transition: stroke 0.4s ease;
+}
+
+.logic-gate-demo-bubble--active {
+  stroke: var(--color-primary);
+}
+
+.logic-gate-demo-led {
+  fill: var(--color-surface);
+  stroke: var(--color-text);
+  stroke-width: 3;
+  transition: fill 0.4s ease, stroke 0.4s ease;
+}
+
+.logic-gate-demo-led--on {
+  fill: var(--color-accent);
+  stroke: #d97706;
+}
+
+.logic-gate-demo-led-rays line {
+  stroke: #d97706;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+/* Pauza při autoplay zmrazí aktuální snímek pohybu signálu */
+.logic-gate-demo-anim--paused,
+.logic-gate-demo-anim--paused * {
+  animation-play-state: paused;
+}
+
+/* Reduced motion: stavy se mění skokem, žádný pohyb signálu.
+   Klidný režim řeší globální pravidlo .calm-mode * výše. */
+@media (prefers-reduced-motion: reduce) {
+  .logic-gate-demo-pad,
+  .logic-gate-demo-wire,
+  .logic-gate-demo-body,
+  .logic-gate-demo-bubble,
+  .logic-gate-demo-led {
+    transition: none;
+  }
+
+  .logic-gate-demo-wire--flow {
+    animation: none;
   }
 }
