@@ -102,10 +102,12 @@ const BULB_TOP_TERMINAL = { x: 344, y: BULB_CENTER.y - BULB_RADIUS }; // 116
 const BULB_BOTTOM_TERMINAL = { x: 344, y: BULB_CENTER.y + BULB_RADIUS }; // 164
 const RETURN_Y = 210;
 
-// Vnější proudová cesta od + k − (mimo vnitřek zdroje): horní větev přes spínač,
-// pravá strana přes žárovku, spodní návrat. Jediný spojitý path → při animaci se
-// pohybují všechny úseky současně (žádný postupný „světelný bod“).
-const FLOW_PATH = `M ${SOURCE_POSITIVE.x} ${SOURCE_POSITIVE.y} H ${TOP_RIGHT.x} V ${RETURN_Y} H ${SOURCE_NEGATIVE.x}`;
+// Vnější proudová cesta od + k −: začíná na kladné (dlouhé) desce, horním
+// vývodem zdroje pokračuje do horní větve přes spínač, pravou stranou přes
+// žárovku a spodním návratem se spodním vývodem vrací na zápornou (krátkou)
+// desku. Mezera mezi deskami baterie zůstává bez toku. Jediný spojitý path →
+// při animaci se pohybují všechny úseky současně (žádný „světelný bod“).
+const FLOW_PATH = `M ${SOURCE_POSITIVE.x} ${PLATE_LONG_Y} V ${SOURCE_POSITIVE.y} H ${TOP_RIGHT.x} V ${RETURN_Y} H ${SOURCE_NEGATIVE.x} V ${PLATE_SHORT_Y}`;
 
 interface CircuitVisual {
   switchClosed: boolean;
@@ -328,6 +330,11 @@ function CircuitScenarioPlayer({
   const bulbCls = `circuit-switch-demo-bulb${
     visual.bulbReceiving ? ' circuit-switch-demo-bulb--receiving' : ''
   }${visual.bulbOn ? ' circuit-switch-demo-bulb--on' : ''}`;
+  // Vlákno (kříž) v kroku „Proud prochází“ staticky zvýrazněné — spotřebič je
+  // součástí série. Žádná dash animace ani pulse uvnitř žárovky.
+  const crossCls = `circuit-switch-demo-bulb-cross${
+    visual.bulbReceiving ? ' circuit-switch-demo-bulb-cross--active' : ''
+  }`;
 
   // Jediný živý region je stavový řádek v AnimatedDemoControls. U klíčových
   // kroků nese i výsledek (proud / žárovka), aby čtečka nemusela číst SVG.
@@ -372,13 +379,11 @@ function CircuitScenarioPlayer({
 
       {/* Schéma je názorná grafika — úplný stav obvodu je vždy popsán textem
           ve výpisu stavu a v popisu kroku níže. */}
-      <div
-        className={`animated-demo__stage${pausedMod}`}
-        aria-hidden="true"
-      >
+      <div className={`animated-demo__stage${pausedMod}`}>
         <svg
           className="circuit-switch-demo-svg"
           viewBox="0 0 400 280"
+          aria-hidden="true"
           focusable="false"
         >
           {/* Vnější vodiče smyčky (bez vnitřku zdroje) */}
@@ -413,14 +418,15 @@ function CircuitScenarioPlayer({
             d={`M ${TOP_RIGHT.x} ${RETURN_Y} H ${SOURCE_NEGATIVE.x}`}
           />
 
-          {/* Vnitřní vývody zdroje (součást baterie, neutrální) */}
+          {/* Vývody zdroje: v uzavřené smyčce jsou aktivní součástí cesty,
+              v rozepnutém stavu zůstávají fyzicky přítomné a neutrální */}
           <path
-            className="circuit-switch-demo-wire"
+            className={wireCls}
             fill="none"
             d={`M ${SOURCE_POSITIVE.x} ${SOURCE_POSITIVE.y} V ${PLATE_LONG_Y}`}
           />
           <path
-            className="circuit-switch-demo-wire"
+            className={wireCls}
             fill="none"
             d={`M ${SOURCE_NEGATIVE.x} ${SOURCE_NEGATIVE.y} V ${PLATE_SHORT_Y}`}
           />
@@ -516,7 +522,20 @@ function CircuitScenarioPlayer({
             </text>
           )}
 
-          {/* Žárovka: kruh s křížem (značka svítidla) */}
+          {/* Tok proudu: jediný spojitý overlay od kladné desky přes vnější
+              cestu na zápornou desku. Kreslí se pod žárovkou — její neprůhledná
+              výplň dash uvnitř kruhu zakryje, spojitost zůstává na terminálech. */}
+          {showFlowOverlay && (
+            <path
+              className="circuit-switch-demo-flow"
+              fill="none"
+              d={FLOW_PATH}
+            />
+          )}
+
+          {/* Žárovka: kruh s křížem (značka svítidla). Neprůhledná výplň kruhu
+              (barva pozadí stage) leží nad flow overlayem, takže dash není
+              uvnitř značky vidět; obrys, kříž a terminály se kreslí nad ní. */}
           <circle
             className={bulbCls}
             cx={BULB_CENTER.x}
@@ -524,18 +543,31 @@ function CircuitScenarioPlayer({
             r={BULB_RADIUS}
           />
           <line
-            className="circuit-switch-demo-bulb-cross"
+            className={crossCls}
             x1={BULB_CENTER.x - 17}
             y1={BULB_CENTER.y - 17}
             x2={BULB_CENTER.x + 17}
             y2={BULB_CENTER.y + 17}
           />
           <line
-            className="circuit-switch-demo-bulb-cross"
+            className={crossCls}
             x1={BULB_CENTER.x - 17}
             y1={BULB_CENTER.y + 17}
             x2={BULB_CENTER.x + 17}
             y2={BULB_CENTER.y - 17}
+          />
+          {/* Terminály žárovky: elektrické join pointy horního a spodního vodiče */}
+          <circle
+            className="circuit-switch-demo-contact"
+            cx={BULB_TOP_TERMINAL.x}
+            cy={BULB_TOP_TERMINAL.y}
+            r={4}
+          />
+          <circle
+            className="circuit-switch-demo-contact"
+            cx={BULB_BOTTOM_TERMINAL.x}
+            cy={BULB_BOTTOM_TERMINAL.y}
+            r={4}
           />
           {visual.bulbOn && (
             <g className="circuit-switch-demo-bulb-rays">
@@ -576,15 +608,6 @@ function CircuitScenarioPlayer({
           >
             návratová cesta k −
           </text>
-
-          {/* Tok proudu: jediný spojitý overlay po celé vnější cestě */}
-          {showFlowOverlay && (
-            <path
-              className="circuit-switch-demo-flow"
-              fill="none"
-              d={FLOW_PATH}
-            />
-          )}
 
           {/* Směrové šipky konvenčního proudu (staticky, closed krok 3–4) */}
           {visual.showCurrentArrows && (
