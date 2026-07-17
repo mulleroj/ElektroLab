@@ -1039,71 +1039,6 @@ input:focus-visible {
   margin: 1rem 0;
 }
 
-.demo-schemas {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin: 1rem 0;
-}
-
-.demo-schema {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 1rem;
-  background: #f8fafc;
-}
-
-.demo-schema--done {
-  border-color: var(--color-success);
-  background: var(--color-success-bg);
-}
-
-.demo-schema h4 {
-  margin: 0 0 0.75rem;
-}
-
-.demo-schema__buttons {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-top: 0.75rem;
-}
-
-.schema-visual {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.25rem;
-  min-height: 4rem;
-  padding: 0.75rem;
-  background: var(--color-surface);
-  border-radius: var(--radius);
-}
-
-.schema-visual--parallel {
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.schema-branch {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.schema-node {
-  font-size: 1.25rem;
-  padding: 0.25rem 0.5rem;
-  background: #eef2f7;
-  border-radius: 4px;
-}
-
-.schema-line {
-  width: 1.5rem;
-  height: 3px;
-  background: var(--color-primary);
-}
-
 .symbols-demo-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -1270,10 +1205,6 @@ input:focus-visible {
   }
 
   .matching-activity__columns {
-    grid-template-columns: 1fr;
-  }
-
-  .demo-schemas {
     grid-template-columns: 1fr;
   }
 }
@@ -4486,6 +4417,212 @@ input:focus-visible {
   }
 
   .circuit-switch-demo-flow {
+    animation: none;
+  }
+}
+
+/* MVP-11M: animované sériové a paralelní zapojení (SeriesParallelDemo) */
+
+.series-parallel-demo-switch-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.series-parallel-demo-scenarios {
+  margin: 0.5rem 0 1rem;
+}
+
+.series-parallel-demo-progress {
+  margin: 0.5rem 0 0;
+  font-weight: 600;
+}
+
+.series-parallel-demo-note {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.series-parallel-demo__explain {
+  margin: 0.75rem 0 0;
+  padding: 0.75rem 1rem;
+  background: var(--color-bg);
+  border-left: 4px solid var(--color-primary);
+  border-radius: var(--radius);
+}
+
+/* Vodiče: bez zvýraznění souvislé a neutrální — obvod je vždy uzavřený. */
+.series-parallel-demo-wire {
+  stroke: #94a3b8;
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke 0.4s ease, stroke-width 0.4s ease;
+}
+
+/* Aktivní (zvýrazněná) proudová cesta: mění se barva i tloušťka */
+.series-parallel-demo-wire--on {
+  stroke: var(--color-primary);
+  stroke-width: 5;
+}
+
+/* Tok proudu: dash overlay kontrastní vůči aktivnímu podkladovému vodiči
+   (--color-primary, 5 px). Série má jediný spojitý path; paralelní zapojení
+   čtyři současně mountované pathy se stejnou rychlostí, dasharray i delay.
+   --sp-demo-flow-phase = délka předchozí cesty modulo dash periody (14) —
+   drží fázi dash patternu v rozdělovacím a spojovacím uzlu opticky spojitou.
+   Pohybuje se celá délka najednou — žádný „světelný bod“. */
+.series-parallel-demo-flow {
+  --sp-demo-flow-phase: 0px;
+  stroke: var(--color-accent);
+  stroke-width: 2.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 7 7;
+  animation: series-parallel-demo-flow 0.9s linear infinite;
+}
+
+@keyframes series-parallel-demo-flow {
+  from {
+    stroke-dashoffset: var(--sp-demo-flow-phase, 0px);
+  }
+  to {
+    stroke-dashoffset: calc(var(--sp-demo-flow-phase, 0px) - 28px);
+  }
+}
+
+/* Baterie: dvě nestejně dlouhé desky (dlouhá = +, krátká a silnější = −) */
+.series-parallel-demo-battery-plate {
+  stroke: var(--color-text);
+  stroke-linecap: round;
+}
+
+.series-parallel-demo-battery-plate--long {
+  stroke-width: 3;
+}
+
+.series-parallel-demo-battery-plate--short {
+  stroke-width: 6;
+}
+
+.series-parallel-demo-pole {
+  font-size: 20px;
+  font-weight: 700;
+  fill: var(--color-text);
+}
+
+/* Terminály žárovek: skutečné elektrické join pointy vodičů */
+.series-parallel-demo-contact {
+  fill: var(--color-text);
+  stroke: none;
+}
+
+/* Rozdělovací a spojovací uzel: plný kroužek přesně na souřadnicích uzlu */
+.series-parallel-demo-node {
+  fill: var(--color-text);
+  stroke: none;
+}
+
+/* Zvýraznění uzlů v kroku „Rozdělení na větve“ — mění se barva i poloměr
+   (v JSX), navíc se zobrazují textové popisky. */
+.series-parallel-demo-node--highlight {
+  fill: var(--color-primary);
+}
+
+.series-parallel-demo-node-label {
+  font-size: 14px;
+  font-weight: 700;
+  fill: var(--color-primary);
+}
+
+/* Výplň odpovídá pozadí .animated-demo__stage (#f8fafc) a je neprůhledná —
+   zakrývá flow overlay procházející pod značkou žárovky. */
+.series-parallel-demo-bulb {
+  fill: #f8fafc;
+  stroke: var(--color-text);
+  stroke-width: 3;
+  transition: fill 0.4s ease, stroke 0.4s ease, stroke-width 0.4s ease;
+}
+
+/* Prochází jí proud: silnější obrys (rozdíl není jen barvou), ještě nesvítí */
+.series-parallel-demo-bulb--receiving {
+  stroke: var(--color-primary);
+  stroke-width: 5;
+}
+
+/* Jednotný stav „svítí“ v obou zapojeních: stejná výplň i paprsky,
+   žádné procento jasu ani rozdílný relativní jas. */
+.series-parallel-demo-bulb--on {
+  fill: var(--color-accent);
+  stroke: #d97706;
+}
+
+.series-parallel-demo-bulb-cross {
+  stroke: var(--color-text);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transition: stroke 0.4s ease, stroke-width 0.4s ease;
+}
+
+/* Krok „proud prochází“: vlákna obou žárovek staticky zvýrazněná (bez
+   animace) — spotřebiče jsou zřetelně součástí proudové cesty. */
+.series-parallel-demo-bulb-cross--active {
+  stroke: var(--color-primary);
+  stroke-width: 3.5;
+}
+
+/* Dekorativní paprsky — nikdy nejsou elektrickým join pointem */
+.series-parallel-demo-bulb-rays line {
+  stroke: #d97706;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+/* Směr konvenčního proudu: statické šipky (směr nenese jen barva) */
+.series-parallel-demo-arrow polygon {
+  fill: var(--color-primary);
+  stroke: none;
+}
+
+.series-parallel-demo-label {
+  font-size: 15px;
+  font-weight: 600;
+  fill: var(--color-text-muted);
+}
+
+/* Pauza při autoplay zmrazí aktuální snímek toku proudu */
+.series-parallel-demo-anim--paused,
+.series-parallel-demo-anim--paused * {
+  animation-play-state: paused;
+}
+
+/* Mobil: SVG se zmenšuje s viewBoxem, proto se popisky v user units zvětšují,
+   aby zůstaly čitelné i na 375 px. */
+@media (max-width: 480px) {
+  .series-parallel-demo-label {
+    font-size: 18px;
+  }
+
+  .series-parallel-demo-pole {
+    font-size: 26px;
+  }
+
+  .series-parallel-demo-node-label {
+    font-size: 16px;
+  }
+}
+
+/* Reduced motion: stavy se mění skokem, proud se nikdy nerozpohybuje.
+   Klidný režim řeší globální pravidlo .calm-mode * výše. */
+@media (prefers-reduced-motion: reduce) {
+  .series-parallel-demo-wire,
+  .series-parallel-demo-bulb,
+  .series-parallel-demo-bulb-cross {
+    transition: none;
+  }
+
+  .series-parallel-demo-flow {
     animation: none;
   }
 }

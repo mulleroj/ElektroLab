@@ -282,7 +282,7 @@ export const lessons: MicroLesson[] = [
       type: 'series-parallel',
       title: 'Sériové nebo paralelní?',
       description:
-        'Podívej se na dvě schémata a rozhodni, které je sériové a které paralelní.',
+        'Vyber sériové nebo paralelní zapojení a projdi pět kroků. Sleduj, kolik má proud cest a jak se v obou zapojeních chová proud a napětí.',
     },
     activity: {
       connectionType: {
