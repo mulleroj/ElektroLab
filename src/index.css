@@ -1027,53 +1027,9 @@ input:focus-visible {
   color: var(--color-primary);
 }
 
-.circuit-diagram {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.25rem;
-  padding: 1.5rem 1rem;
-  background: #f8fafc;
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius);
-  margin: 1rem 0;
-}
-
-.circuit-diagram__part {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  min-width: 3.5rem;
-}
-
-.circuit-diagram__icon {
-  font-size: 1.5rem;
-}
-
-.circuit-diagram__wire {
-  width: 2rem;
-  height: 4px;
-  background: var(--color-primary);
-  border-radius: 2px;
-}
-
-.circuit-diagram__wire--broken {
-  background: repeating-linear-gradient(
-    90deg,
-    #94a3b8,
-    #94a3b8 4px,
-    transparent 4px,
-    transparent 8px
-  );
-}
-
-.circuit-diagram__bulb--on .circuit-diagram__icon {
-  filter: drop-shadow(0 0 8px #fbbf24);
-}
+/* Pozn.: `.circuit-diagram__controls` je sdílená řada tlačítek (používá ji osm
+   dem). Ostatní `.circuit-diagram*` třídy patřily starému HTML/flex schématu
+   CircuitSwitchDemo a zanikly s přechodem na SVG (MVP-11L). */
 
 .circuit-diagram__controls,
 .meter-circuit__controls {
@@ -4326,6 +4282,210 @@ input:focus-visible {
 
   .logic-gate-demo-wire--flow,
   .logic-gate-demo-wire--flow-out {
+    animation: none;
+  }
+}
+
+/* MVP-11L: animovaný uzavřený a přerušený obvod (CircuitSwitchDemo) */
+
+.circuit-switch-demo-switch-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.circuit-switch-demo-scenarios {
+  margin: 0.5rem 0 1rem;
+}
+
+.circuit-switch-demo-progress {
+  margin: 0.5rem 0 0;
+  font-weight: 600;
+}
+
+.circuit-switch-demo-note {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.circuit-switch-demo__explain {
+  margin: 0.75rem 0 0;
+  padding: 0.75rem 1rem;
+  background: var(--color-bg);
+  border-left: 4px solid var(--color-primary);
+  border-radius: var(--radius);
+}
+
+/* Vodiče: bez proudu jsou souvislé a neutrální — nikdy nevypadají přerušeně.
+   Jediná mezera ve schématu vzniká zvednutým ramenem spínače. */
+.circuit-switch-demo-wire {
+  stroke: #94a3b8;
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke 0.4s ease, stroke-width 0.4s ease;
+}
+
+/* Uzavřená smyčka pod proudem: mění se barva i tloušťka (nejen barva) */
+.circuit-switch-demo-wire--on {
+  stroke: var(--color-primary);
+  stroke-width: 5;
+}
+
+/* Tok proudu: jediný spojitý overlay po celé vnější cestě + → −.
+   Užší a kontrastní vůči aktivnímu podkladovému vodiči (--color-primary,
+   5 px): mezery mezi čárkami odkrývají modrý podklad, takže pohyb dash
+   patternu je zřetelný. Pohybuje se celá délka najednou — žádný jednotlivý
+   „světelný bod“, který by naznačoval oběh jediného elektronu. */
+.circuit-switch-demo-flow {
+  stroke: var(--color-accent);
+  stroke-width: 2.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 7 7;
+  animation: circuit-switch-demo-flow 0.9s linear infinite;
+}
+
+@keyframes circuit-switch-demo-flow {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+
+/* Baterie: dvě nestejně dlouhé desky (dlouhá = +, krátká a silnější = −) */
+.circuit-switch-demo-battery-plate {
+  stroke: var(--color-text);
+  stroke-linecap: round;
+}
+
+.circuit-switch-demo-battery-plate--long {
+  stroke-width: 3;
+}
+
+.circuit-switch-demo-battery-plate--short {
+  stroke-width: 6;
+}
+
+.circuit-switch-demo-pole {
+  font-size: 20px;
+  font-weight: 700;
+  fill: var(--color-text);
+}
+
+.circuit-switch-demo-contact {
+  fill: var(--color-text);
+  stroke: none;
+}
+
+/* Jemné zvýraznění oblasti spínače v kroku „Kontrola spínače“ / „Sepnutí“ */
+.circuit-switch-demo-highlight {
+  fill: #e8f0f8;
+  stroke: var(--color-primary);
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+}
+
+.circuit-switch-demo-gap-label {
+  font-size: 14px;
+  font-weight: 700;
+  fill: var(--color-error, #dc2626);
+}
+
+/* Výplň odpovídá pozadí .animated-demo__stage (#f8fafc) a je neprůhledná —
+   zakrývá flow overlay procházející pod značkou žárovky. */
+.circuit-switch-demo-bulb {
+  fill: #f8fafc;
+  stroke: var(--color-text);
+  stroke-width: 3;
+  transition: fill 0.4s ease, stroke 0.4s ease, stroke-width 0.4s ease;
+}
+
+/* Přijímá energii: silnější obrys (rozdíl není jen barvou), ale ještě nesvítí */
+.circuit-switch-demo-bulb--receiving {
+  stroke: var(--color-primary);
+  stroke-width: 5;
+}
+
+.circuit-switch-demo-bulb--on {
+  fill: var(--color-accent);
+  stroke: #d97706;
+}
+
+.circuit-switch-demo-bulb-cross {
+  stroke: var(--color-text);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transition: stroke 0.4s ease, stroke-width 0.4s ease;
+}
+
+/* Krok „Proud prochází“: vlákno staticky zvýrazněné (bez animace) — spotřebič
+   je zřetelně součástí sériové cesty. */
+.circuit-switch-demo-bulb-cross--active {
+  stroke: var(--color-primary);
+  stroke-width: 3.5;
+}
+
+/* Dekorativní paprsky — nikdy nejsou elektrickým join pointem */
+.circuit-switch-demo-bulb-rays line {
+  stroke: #d97706;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+/* Směr konvenčního proudu: statické šipky (směr nenese jen barva) */
+.circuit-switch-demo-arrow polygon {
+  fill: var(--color-primary);
+  stroke: none;
+}
+
+.circuit-switch-demo-label {
+  font-size: 15px;
+  font-weight: 600;
+  fill: var(--color-text-muted);
+}
+
+/* Stav žárovky přímo ve schématu (informaci nese i text, nejen barva) */
+.circuit-switch-demo-label--state {
+  fill: var(--color-text);
+  font-weight: 700;
+}
+
+/* Pauza při autoplay zmrazí aktuální snímek toku proudu */
+.circuit-switch-demo-anim--paused,
+.circuit-switch-demo-anim--paused * {
+  animation-play-state: paused;
+}
+
+/* Mobil: SVG se zmenšuje s viewBoxem, proto se popisky v user units zvětšují,
+   aby zůstaly čitelné i na 375 px. */
+@media (max-width: 480px) {
+  .circuit-switch-demo-label {
+    font-size: 18px;
+  }
+
+  .circuit-switch-demo-pole {
+    font-size: 26px;
+  }
+
+  .circuit-switch-demo-gap-label {
+    font-size: 17px;
+  }
+}
+
+/* Reduced motion: stavy se mění skokem, proud se nikdy nerozpohybuje.
+   Klidný režim řeší globální pravidlo .calm-mode * výše. */
+@media (prefers-reduced-motion: reduce) {
+  .circuit-switch-demo-wire,
+  .circuit-switch-demo-bulb,
+  .circuit-switch-demo-bulb-cross {
+    transition: none;
+  }
+
+  .circuit-switch-demo-flow {
     animation: none;
   }
 }
