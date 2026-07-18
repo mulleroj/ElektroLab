@@ -10,6 +10,7 @@ export interface SubjectBadgeRule {
 }
 
 export const SUBJECT_BADGES: SubjectBadgeRule[] = [
+  { subjectId: 'zaklady', year: 1, badgeId: 'zakladni-elev' },
   { subjectId: 'mereni', year: 1, badgeId: 'merici-elev' },
   { subjectId: 'rozvody', badgeId: 'bezpecny-rozvodar' },
   { subjectId: 'elektronika', badgeId: 'elektronicky-elev' },

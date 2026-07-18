@@ -637,6 +637,31 @@ test('retry lekce po udělení předmětového odznaku vrátí prázdné subject
   );
 });
 
+test('lekce o výkonu je hned po Ohmově zákonu a před sériovým zapojením', () => {
+  const order = getMvpLessonsBySubject('zaklady', 1)
+    .filter((l) => l.topicId === 'stejnosmerny-proud')
+    .map((l) => l.id);
+  const ohm = order.indexOf('ohmuv-zakon');
+  const power = order.indexOf('elektricky-vykon-a-energie');
+  const series = order.indexOf('seriove-paralelni');
+  assert.ok(ohm >= 0 && power >= 0 && series >= 0);
+  assert.equal(power, ohm + 1);
+  assert.equal(series, power + 1);
+});
+
+test('dokončení všech lekcí Základů udělí předmětový odznak zakladni-elev', () => {
+  const lessons = getMvpLessonsBySubject('zaklady', 1);
+  assert.ok(lessons.length > 0, 'Základy musí mít MVP lekce');
+  const last = lessons[lessons.length - 1];
+  for (const l of lessons.slice(0, -1)) {
+    const partial = completeLessonFully(l.id, l.badgeId);
+    assert.deepEqual(partial.subjectBadgeIdsAwarded, []);
+  }
+  const result = completeLessonFully(last.id, last.badgeId);
+  assert.deepEqual(result.subjectBadgeIdsAwarded, ['zakladni-elev']);
+  assert.equal(result.state.earnedBadges.includes('zakladni-elev'), true);
+});
+
 test('lekce bez lekčního odznaku vrátí přesné XP a lessonBadgeAwarded: false', () => {
   const before = loadProgress().totalXp;
   const result = applyQuizCompletion(loadProgress(), {

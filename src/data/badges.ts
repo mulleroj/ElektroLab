@@ -20,6 +20,12 @@ export const badges: Badge[] = [
     icon: '📐',
   },
   {
+    id: 'vykon-pod-kontrolou',
+    title: 'Výkon pod kontrolou',
+    description: 'Rozlišuješ výkon a energii a umíš použít P = U · I.',
+    icon: '💡',
+  },
+  {
     id: 'seriove-paralelne',
     title: 'Sériově i paralelně',
     description: 'Rozlišíš sériové a paralelní zapojení.',
@@ -30,6 +36,12 @@ export const badges: Badge[] = [
     title: 'Čtenář značek',
     description: 'Poznáš základní elektrotechnické značky.',
     icon: '📋',
+  },
+  {
+    id: 'zakladni-elev',
+    title: 'Základní elév',
+    description: 'Dokončil jsi všechny dostupné mikrolekce ze Základů elektrotechniky.',
+    icon: '🎖️',
   },
   {
     id: 'merici-elev',
