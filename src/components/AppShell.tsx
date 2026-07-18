@@ -64,7 +64,11 @@ export function AppShell({
           </a>
         </div>
       </header>
-      <main className="app-main">{children}</main>
+      {/* tabIndex={-1}: cíl programového návratu fokusu (zavření onboardingu
+          při prvním spuštění); v pořadí tabulátoru není. */}
+      <main className="app-main" tabIndex={-1}>
+        {children}
+      </main>
       <footer className="app-footer">
         <p>Školní výuková simulace — nepracuj pod napětím bez odborného dohledu.</p>
       </footer>

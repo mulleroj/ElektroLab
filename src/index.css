@@ -4756,3 +4756,20 @@ input:focus-visible {
 .btn--danger:hover:not(:disabled) {
   background: #991b1b;
 }
+
+/* ===== MVP-12A2: Přístupnost fokusů ===== */
+
+/* Cíle programového fokusu (přechod kroku lekce, návrat z onboardingu).
+   Nejsou v pořadí tabulátoru (tabIndex=-1) — fokus na ně míří skriptem.
+   :focus bez :focus-visible nechá myší klik bez rušivého obrysu;
+   :focus-visible ukáže stejný ring jako u tlačítek a odkazů. */
+.lesson-step-content:focus,
+.app-main:focus {
+  outline: none;
+}
+
+.lesson-step-content:focus-visible,
+.app-main:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
