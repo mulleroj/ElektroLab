@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { MicroLesson, ProgressState, LessonStep, QuizScore } from '../types';
 import { getNextStepAfterIntro } from '../types';
 import { SafetyNote } from './SafetyNote';
@@ -56,15 +56,36 @@ export function LessonPage({
   // ne domněnka „uživatel právě dokončil quiz, tedy dostal odměny".
   const [quizOutcome, setQuizOutcome] = useState<QuizCompletionResult | null>(null);
 
+  // MVP-12A2: po uživatelem vyvolaném přechodu kroku by fokus spadl na body
+  // (tlačítko „Pokračovat" zmizí z DOM). Fokus proto přechází na kontejner
+  // nového kroku. Příznak v ref zajišťuje, že se fokus přesune jen po
+  // skutečné změně kroku přes goToStep — ne při otevření lekce, změně routy
+  // (remount přes key) ani při běžném re-renderu.
+  const stepFocusRef = useRef<HTMLDivElement>(null);
+  const pendingStepFocusRef = useRef(false);
+
+  useEffect(() => {
+    if (!pendingStepFocusRef.current) {
+      return;
+    }
+    pendingStepFocusRef.current = false;
+    stepFocusRef.current?.focus();
+  }, [step]);
+
+  const goToStep = (next: LessonStep) => {
+    pendingStepFocusRef.current = true;
+    setStep(next);
+  };
+
   const handleActivityComplete = () => {
     onActivityComplete();
-    setStep('quiz');
+    goToStep('quiz');
   };
 
   const handleQuizComplete = (correct: number, total: number) => {
     setQuizResult({ correct, total });
     setQuizOutcome(onQuizComplete(correct, total));
-    setStep('complete');
+    goToStep('complete');
   };
 
   const badge = lesson.badgeId ? getBadgeById(lesson.badgeId) : undefined;
@@ -128,132 +149,142 @@ export function LessonPage({
         </ol>
       </nav>
 
-      {step === 'intro' && (
-        <article className="lesson-intro">
-          <div className="lesson-intro__section">
-            <h2>Cíl lekce</h2>
-            <p>{lesson.goal}</p>
-          </div>
-          <div className="lesson-intro__section lesson-intro__hook">
-            <h2>Háček z praxe</h2>
-            <p>{lesson.hook}</p>
-          </div>
-          <div className="lesson-intro__section">
-            <h2>Vysvětlení</h2>
-            <p>{lesson.explanation}</p>
-          </div>
-          {lesson.typicalMistake && (
-            <div className="lesson-intro__section lesson-intro__mistake">
-              <h2>Typická chyba</h2>
-              <p>{lesson.typicalMistake}</p>
+      {/* Cíl programového fokusu po přechodu kroku: má accessible name
+          („Krok lekce: …"), tabIndex={-1} ho drží mimo pořadí tabulátoru. */}
+      <div
+        ref={stepFocusRef}
+        tabIndex={-1}
+        role="group"
+        aria-label={`Krok lekce: ${stepLabels[step]}`}
+        className="lesson-step-content"
+      >
+        {step === 'intro' && (
+          <article className="lesson-intro">
+            <div className="lesson-intro__section">
+              <h2>Cíl lekce</h2>
+              <p>{lesson.goal}</p>
             </div>
-          )}
-          <blockquote className="memory-sentence">
-            <p>„{lesson.memorySentence}"</p>
-          </blockquote>
-          {projectorMode ? (
-            <div className="lesson-intro__projector-actions">
-              {hasDemo && (
-                <button
-                  type="button"
-                  className="btn btn--primary btn--large"
-                  onClick={() => setStep('demo')}
-                >
-                  Spustit ukázku
-                </button>
-              )}
-              <button
-                type="button"
-                className={`btn btn--large ${hasDemo ? 'btn--secondary' : 'btn--primary'}`}
-                onClick={() => setStep('activity')}
-              >
-                Přejít na úkol
-              </button>
+            <div className="lesson-intro__section lesson-intro__hook">
+              <h2>Háček z praxe</h2>
+              <p>{lesson.hook}</p>
             </div>
-          ) : (
-            <button
-              type="button"
-              className="btn btn--primary btn--large"
-              onClick={() => setStep(getNextStepAfterIntro(lesson))}
-            >
-              {hasDemo ? 'Pokračovat na ukázku' : 'Pokračovat na úkol'}
-            </button>
-          )}
-        </article>
-      )}
-
-      {step === 'demo' && lesson.interactiveDemo && (
-        <InteractiveDemoRenderer
-          demo={lesson.interactiveDemo}
-          calmMode={calmMode}
-          onContinue={() => setStep('activity')}
-        />
-      )}
-
-      {step === 'activity' && (
-        <ActivityRenderer
-          activity={lesson.activity}
-          calmMode={calmMode}
-          onComplete={handleActivityComplete}
-        />
-      )}
-
-      {step === 'quiz' && (
-        <Quiz
-          questions={lesson.quiz}
-          calmMode={calmMode}
-          onComplete={handleQuizComplete}
-        />
-      )}
-
-      {step === 'complete' && (
-        <article className="lesson-complete">
-          <h2>🎉 Lekce dokončena!</h2>
-          <p className="lesson-complete__memory">„{lesson.memorySentence}"</p>
-          {quizResult && (
-            <p className="lesson-complete__quiz-score">
-              Výsledek mini testu: {quizResult.correct}/{quizResult.total}
-            </p>
-          )}
-          <div className="lesson-complete__rewards">
-            {projectorMode ? (
-              <p>
-                Režim na projektor — pokrok a XP se neukládají. Žáci si lekci projdou
-                sami ve svém zařízení.
-              </p>
-            ) : quizOutcome && quizOutcome.xpAwarded > 0 ? (
-              <p>Za mini test získáváš {quizOutcome.xpAwarded} XP.</p>
-            ) : (
-              <>
-                <p>{badge ? 'XP a odznak za tuto lekci už máš.' : 'XP za tuto lekci už máš.'}</p>
-                {isValidQuizScore(lessonProgress.bestQuizScore) && (
-                  <p className="lesson-complete__best-score">
-                    Nejlepší uložený výsledek: {lessonProgress.bestQuizScore.correct}/
-                    {lessonProgress.bestQuizScore.total}
-                  </p>
-                )}
-              </>
-            )}
-            {badge && quizOutcome?.lessonBadgeAwarded && (
-              <div className="badge-earned">
-                <span className="badge-earned__icon" aria-hidden="true">
-                  {badge.icon}
-                </span>
-                <div>
-                  <strong>Nový odznak: {badge.title}</strong>
-                  <p>{badge.description}</p>
-                </div>
+            <div className="lesson-intro__section">
+              <h2>Vysvětlení</h2>
+              <p>{lesson.explanation}</p>
+            </div>
+            {lesson.typicalMistake && (
+              <div className="lesson-intro__section lesson-intro__mistake">
+                <h2>Typická chyba</h2>
+                <p>{lesson.typicalMistake}</p>
               </div>
             )}
-          </div>
-          <a
-            href={`#/topic/${lesson.subjectId}/${lesson.topicId}`}
-            className="btn btn--primary"
-          >
-            Zpět na téma
-          </a>
-        </article>
-      )}
+            <blockquote className="memory-sentence">
+              <p>„{lesson.memorySentence}"</p>
+            </blockquote>
+            {projectorMode ? (
+              <div className="lesson-intro__projector-actions">
+                {hasDemo && (
+                  <button
+                    type="button"
+                    className="btn btn--primary btn--large"
+                    onClick={() => goToStep('demo')}
+                  >
+                    Spustit ukázku
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className={`btn btn--large ${hasDemo ? 'btn--secondary' : 'btn--primary'}`}
+                  onClick={() => goToStep('activity')}
+                >
+                  Přejít na úkol
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="btn btn--primary btn--large"
+                onClick={() => goToStep(getNextStepAfterIntro(lesson))}
+              >
+                {hasDemo ? 'Pokračovat na ukázku' : 'Pokračovat na úkol'}
+              </button>
+            )}
+          </article>
+        )}
+
+        {step === 'demo' && lesson.interactiveDemo && (
+          <InteractiveDemoRenderer
+            demo={lesson.interactiveDemo}
+            calmMode={calmMode}
+            onContinue={() => goToStep('activity')}
+          />
+        )}
+
+        {step === 'activity' && (
+          <ActivityRenderer
+            activity={lesson.activity}
+            calmMode={calmMode}
+            onComplete={handleActivityComplete}
+          />
+        )}
+
+        {step === 'quiz' && (
+          <Quiz
+            questions={lesson.quiz}
+            calmMode={calmMode}
+            onComplete={handleQuizComplete}
+          />
+        )}
+
+        {step === 'complete' && (
+          <article className="lesson-complete">
+            <h2>🎉 Lekce dokončena!</h2>
+            <p className="lesson-complete__memory">„{lesson.memorySentence}"</p>
+            {quizResult && (
+              <p className="lesson-complete__quiz-score">
+                Výsledek mini testu: {quizResult.correct}/{quizResult.total}
+              </p>
+            )}
+            <div className="lesson-complete__rewards">
+              {projectorMode ? (
+                <p>
+                  Režim na projektor — pokrok a XP se neukládají. Žáci si lekci projdou
+                  sami ve svém zařízení.
+                </p>
+              ) : quizOutcome && quizOutcome.xpAwarded > 0 ? (
+                <p>Za mini test získáváš {quizOutcome.xpAwarded} XP.</p>
+              ) : (
+                <>
+                  <p>{badge ? 'XP a odznak za tuto lekci už máš.' : 'XP za tuto lekci už máš.'}</p>
+                  {isValidQuizScore(lessonProgress.bestQuizScore) && (
+                    <p className="lesson-complete__best-score">
+                      Nejlepší uložený výsledek: {lessonProgress.bestQuizScore.correct}/
+                      {lessonProgress.bestQuizScore.total}
+                    </p>
+                  )}
+                </>
+              )}
+              {badge && quizOutcome?.lessonBadgeAwarded && (
+                <div className="badge-earned">
+                  <span className="badge-earned__icon" aria-hidden="true">
+                    {badge.icon}
+                  </span>
+                  <div>
+                    <strong>Nový odznak: {badge.title}</strong>
+                    <p>{badge.description}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+            <a
+              href={`#/topic/${lesson.subjectId}/${lesson.topicId}`}
+              className="btn btn--primary"
+            >
+              Zpět na téma
+            </a>
+          </article>
+        )}
+      </div>
     </section>
   );
 }

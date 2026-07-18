@@ -1,19 +1,28 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
+import { useModalFocusManagement } from './useModalFocusManagement';
 
 interface OnboardingProps {
   onClose: () => void;
 }
 
 export function Onboarding({ onClose }: OnboardingProps) {
+  const dialogRef = useRef<HTMLElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    closeButtonRef.current?.focus();
-  }, []);
+  useModalFocusManagement({
+    containerRef: dialogRef,
+    initialFocusRef: closeButtonRef,
+    onEscape: onClose,
+    // Při prvním spuštění onboarding neotevřelo žádné tlačítko — fokus se
+    // pak vrací na hlavní obsah aplikace místo na body.
+    getFallbackFocusTarget: () =>
+      document.querySelector<HTMLElement>('.app-main'),
+  });
 
   return (
     <div className="onboarding-overlay">
       <section
+        ref={dialogRef}
         className="onboarding"
         role="dialog"
         aria-modal="true"
