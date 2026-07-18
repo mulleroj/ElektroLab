@@ -149,8 +149,8 @@ export function recordQuizScore(
  */
 export interface QuizCompletionResult {
   state: ProgressState;
-  /** Právě teď byly přiděleny XP za mini test (první dokončení). */
-  xpAwarded: boolean;
+  /** Počet XP právě přidělených tímto voláním (0 při retry i v projektorovém režimu). */
+  xpAwarded: number;
   /** Právě teď byl udělen lekční odznak. */
   lessonBadgeAwarded: boolean;
   /** Předmětové odznaky nově udělené tímto dokončením. */
@@ -175,13 +175,15 @@ export function applyQuizCompletion(
   },
 ): QuizCompletionResult {
   if (opts.projectorMode) {
-    return { state, xpAwarded: false, lessonBadgeAwarded: false, subjectBadgeIdsAwarded: [] };
+    return { state, xpAwarded: 0, lessonBadgeAwarded: false, subjectBadgeIdsAwarded: [] };
   }
 
   let next = recordQuizScore(state, opts.lessonId, opts.correct, opts.total);
   const beforeQuiz = next;
   next = completeQuiz(next, opts.lessonId, opts.xp, opts.badgeId);
-  const xpAwarded = next.totalXp !== beforeQuiz.totalXp;
+  // Odvozeno ze skutečné změny stavu, ne z druhé kopie obchodní logiky.
+  // Math.max chrání hlášení před záporem při neobvyklém uloženém stavu.
+  const xpAwarded = Math.max(0, next.totalXp - beforeQuiz.totalXp);
   const lessonBadgeAwarded =
     opts.badgeId !== undefined &&
     !beforeQuiz.earnedBadges.includes(opts.badgeId) &&

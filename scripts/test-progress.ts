@@ -47,6 +47,7 @@ import {
   LAST_LESSON_KEY,
 } from '../src/lib/progress';
 import { migrateProgressLessonReferences } from '../src/lib/lessonIdMigration';
+import { getMvpLessonsBySubject } from '../src/data/lessons';
 import type { ProgressState } from '../src/types';
 
 const PROGRESS_KEY = 'elektrolab-progress';
@@ -350,6 +351,27 @@ test('migrace: legacy 6/9 vs canonical 4/6 → vyhrává 6/9 (větší total)', 
   });
 });
 
+test('migrace: canonical 4/6 před legacy 6/9 → vyhrává 6/9 (větší total)', () => {
+  const { state } = migrateProgressLessonReferences(
+    migrationState({
+      'zakladni-znacky': {
+        activityCompleted: true,
+        quizCompleted: true,
+        bestQuizScore: { correct: 4, total: 6 },
+      },
+      'zakladni-znacKy': {
+        activityCompleted: true,
+        quizCompleted: true,
+        bestQuizScore: { correct: 6, total: 9 },
+      },
+    }),
+  );
+  assert.deepEqual(state.lessons['zakladni-znacky'].bestQuizScore, {
+    correct: 6,
+    total: 9,
+  });
+});
+
 test('migrace: obě pořadí klíčů vytvoří hluboce shodný výsledek', () => {
   const legacyEntry = {
     activityCompleted: true,
@@ -363,12 +385,23 @@ test('migrace: obě pořadí klíčů vytvoří hluboce shodný výsledek', () =
     bestQuizScore: { correct: 4, total: 6 },
     completedAt: '2026-02-01T08:00:00.000Z',
   };
-  const legacyFirst = migrateProgressLessonReferences(
-    migrationState({ 'zakladni-znacKy': legacyEntry, 'zakladni-znacky': canonicalEntry }),
-  );
-  const canonicalFirst = migrateProgressLessonReferences(
-    migrationState({ 'zakladni-znacky': canonicalEntry, 'zakladni-znacKy': legacyEntry }),
-  );
+  // Netriviální top-level pole ověří, že migrace mění jen lessons.
+  const base = { totalXp: 35, earnedBadges: ['prvni-obvod'], calmMode: true };
+  const legacyFirst = migrateProgressLessonReferences({
+    ...base,
+    lessons: { 'zakladni-znacKy': legacyEntry, 'zakladni-znacky': canonicalEntry },
+  });
+  const canonicalFirst = migrateProgressLessonReferences({
+    ...base,
+    lessons: { 'zakladni-znacky': canonicalEntry, 'zakladni-znacKy': legacyEntry },
+  });
+  // Celý návrat migrace: progress (XP, odznaky, režim, lessons) i changed.
+  assert.deepEqual(legacyFirst.state, canonicalFirst.state);
+  assert.equal(legacyFirst.changed, true);
+  assert.equal(canonicalFirst.changed, true);
+  assert.equal(legacyFirst.state.totalXp, 35);
+  assert.deepEqual(legacyFirst.state.earnedBadges, ['prvni-obvod']);
+  assert.equal(legacyFirst.state.calmMode, true);
   assert.deepEqual(legacyFirst.state.lessons, canonicalFirst.state.lessons);
 });
 
@@ -462,26 +495,60 @@ test('migrace: klíč __proto__ nezmění prototyp ani výsledek migrace', () =>
   assert.equal(state.totalXp, 20);
 });
 
+test('migrace: vlastní klíč constructor nezpůsobí falešnou migraci ani pollution', () => {
+  // JSON.parse vytvoří skutečný vlastní klíč "constructor" v lessons.
+  const input = migrationState(
+    JSON.parse('{"constructor":{"activityCompleted":true,"quizCompleted":true}}'),
+  );
+  const { state, changed } = migrateProgressLessonReferences(input);
+  assert.equal(changed, false);
+  assert.equal(state, input);
+  assert.deepEqual(getLessonProgress(state, 'constructor'), {
+    activityCompleted: true,
+    quizCompleted: true,
+  });
+  // Prototypy zůstávají čisté.
+  assert.equal(({} as Record<string, unknown>).activityCompleted, undefined);
+  assert.equal(typeof {}.constructor, 'function');
+});
+
+test('migrace: vlastní klíč prototype nezpůsobí falešnou migraci ani pollution', () => {
+  const input = migrationState(
+    JSON.parse('{"prototype":{"activityCompleted":true,"quizCompleted":true}}'),
+  );
+  const { state, changed } = migrateProgressLessonReferences(input);
+  assert.equal(changed, false);
+  assert.equal(state, input);
+  assert.deepEqual(getLessonProgress(state, 'prototype'), {
+    activityCompleted: true,
+    quizCompleted: true,
+  });
+  assert.equal(({} as Record<string, unknown>).activityCompleted, undefined);
+  assert.equal(Object.getPrototypeOf({}), Object.prototype);
+});
+
 // --- Metadata o nově udělených odměnách (pravdivé UI) ----------------------
 
-test('první dokončení hlásí nově udělené XP i odznak', () => {
+test('první dokončení vrátí přesný počet XP přidělených quizem', () => {
+  const before = loadProgress().totalXp;
   const result = finishQuiz(2, 3);
-  assert.equal(result.xpAwarded, true);
+  assert.equal(result.xpAwarded, 10);
+  assert.equal(result.xpAwarded, result.state.totalXp - before);
   assert.equal(result.lessonBadgeAwarded, true);
   assert.deepEqual(result.subjectBadgeIdsAwarded, []);
 });
 
-test('druhý pokus nehlásí nové XP ani nový lekční odznak', () => {
+test('druhý pokus vrátí xpAwarded 0 a žádný nový lekční odznak', () => {
   finishQuiz(2, 3);
   const result = finishQuiz(2, 3);
-  assert.equal(result.xpAwarded, false);
+  assert.equal(result.xpAwarded, 0);
   assert.equal(result.lessonBadgeAwarded, false);
 });
 
 test('lepší retry aktualizuje nejlepší skóre, ale nehlásí nové odměny', () => {
   finishQuiz(1, 3);
   const result = finishQuiz(3, 3);
-  assert.equal(result.xpAwarded, false);
+  assert.equal(result.xpAwarded, 0);
   assert.equal(result.lessonBadgeAwarded, false);
   assert.deepEqual(getLessonProgress(result.state, LESSON_ID).bestQuizScore, {
     correct: 3,
@@ -492,7 +559,7 @@ test('lepší retry aktualizuje nejlepší skóre, ale nehlásí nové odměny',
 test('horší retry ponechá nejlepší skóre a nehlásí nové odměny', () => {
   finishQuiz(3, 3);
   const result = finishQuiz(1, 3);
-  assert.equal(result.xpAwarded, false);
+  assert.equal(result.xpAwarded, 0);
   assert.equal(result.lessonBadgeAwarded, false);
   assert.deepEqual(getLessonProgress(result.state, LESSON_ID).bestQuizScore, {
     correct: 3,
@@ -502,7 +569,7 @@ test('horší retry ponechá nejlepší skóre a nehlásí nové odměny', () =>
 
 test('projektorový pokus nehlásí trvale získané odměny', () => {
   const result = finishQuiz(3, 3, true);
-  assert.equal(result.xpAwarded, false);
+  assert.equal(result.xpAwarded, 0);
   assert.equal(result.lessonBadgeAwarded, false);
   assert.deepEqual(result.subjectBadgeIdsAwarded, []);
   assert.equal(localStorage.getItem(PROGRESS_KEY), null);
@@ -517,6 +584,72 @@ test('uložený stav obsahuje XP a odznak jen jednou i po opakování', () => {
   };
   assert.equal(stored.totalXp, 10);
   assert.deepEqual(stored.earnedBadges, ['testovaci-odznak']);
+});
+
+// --- Předmětové odznaky a lekce bez lekčního odznaku -----------------------
+
+/** Dokončí aktivitu i mini test lekce přes produkční funkce pokroku. */
+function completeLessonFully(lessonId: string, badgeId?: string) {
+  const afterActivity = completeActivity(loadProgress(), lessonId, 20);
+  return applyQuizCompletion(afterActivity, {
+    lessonId,
+    xp: 15,
+    badgeId,
+    correct: 3,
+    total: 3,
+    projectorMode: false,
+  });
+}
+
+test('dokončení poslední lekce předmětu udělí nový předmětový odznak', () => {
+  const lessons = getMvpLessonsBySubject('rozvody');
+  assert.ok(lessons.length > 0, 'předmět rozvody musí mít MVP lekce');
+  const last = lessons[lessons.length - 1];
+  for (const l of lessons.slice(0, -1)) {
+    const partial = completeLessonFully(l.id, l.badgeId);
+    assert.deepEqual(partial.subjectBadgeIdsAwarded, []);
+  }
+  const result = completeLessonFully(last.id, last.badgeId);
+  assert.deepEqual(result.subjectBadgeIdsAwarded, ['bezpecny-rozvodar']);
+  assert.equal(result.state.earnedBadges.includes('bezpecny-rozvodar'), true);
+  const stored = storedProgress() as { earnedBadges: string[] };
+  assert.equal(stored.earnedBadges.includes('bezpecny-rozvodar'), true);
+});
+
+test('retry lekce po udělení předmětového odznaku vrátí prázdné subjectBadgeIdsAwarded', () => {
+  const lessons = getMvpLessonsBySubject('rozvody');
+  for (const l of lessons) completeLessonFully(l.id, l.badgeId);
+  const last = lessons[lessons.length - 1];
+  const retry = applyQuizCompletion(loadProgress(), {
+    lessonId: last.id,
+    xp: 15,
+    badgeId: last.badgeId,
+    correct: 3,
+    total: 3,
+    projectorMode: false,
+  });
+  assert.deepEqual(retry.subjectBadgeIdsAwarded, []);
+  assert.equal(retry.xpAwarded, 0);
+  assert.equal(retry.lessonBadgeAwarded, false);
+  assert.equal(
+    retry.state.earnedBadges.filter((b) => b === 'bezpecny-rozvodar').length,
+    1,
+  );
+});
+
+test('lekce bez lekčního odznaku vrátí přesné XP a lessonBadgeAwarded: false', () => {
+  const before = loadProgress().totalXp;
+  const result = applyQuizCompletion(loadProgress(), {
+    lessonId: LESSON_ID,
+    xp: 10,
+    correct: 2,
+    total: 3,
+    projectorMode: false,
+  });
+  assert.equal(result.xpAwarded, 10);
+  assert.equal(result.xpAwarded, result.state.totalXp - before);
+  assert.equal(result.lessonBadgeAwarded, false);
+  assert.deepEqual(result.state.earnedBadges, []);
 });
 
 console.log('');

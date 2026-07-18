@@ -221,8 +221,8 @@ export function LessonPage({
                 Režim na projektor — pokrok a XP se neukládají. Žáci si lekci projdou
                 sami ve svém zařízení.
               </p>
-            ) : quizOutcome?.xpAwarded ? (
-              <p>Získáváš celkem {lesson.activityXp + lesson.quizXp} XP za tuto lekci.</p>
+            ) : quizOutcome && quizOutcome.xpAwarded > 0 ? (
+              <p>Za mini test získáváš {quizOutcome.xpAwarded} XP.</p>
             ) : (
               <>
                 <p>{badge ? 'XP a odznak za tuto lekci už máš.' : 'XP za tuto lekci už máš.'}</p>
