@@ -46,6 +46,8 @@ import {
   isLessonComplete,
   LAST_LESSON_KEY,
 } from '../src/lib/progress';
+import { migrateProgressLessonReferences } from '../src/lib/lessonIdMigration';
+import type { ProgressState } from '../src/types';
 
 const PROGRESS_KEY = 'elektrolab-progress';
 const ONBOARDING_KEY = 'elektrolab-onboarding-seen';
@@ -83,11 +85,16 @@ function finishQuiz(correct: number, total: number, projectorMode = false) {
   });
 }
 
+/** Stav pro přímé testy migrace — lessons přesně v zadaném pořadí klíčů. */
+function migrationState(lessons: ProgressState['lessons']): ProgressState {
+  return { totalXp: 0, earnedBadges: [], lessons, calmMode: false };
+}
+
 console.log('ElektroLab progress tests (MVP-12A)');
 console.log('');
 
 test('uloží skóre 2/3 do trvalého pokroku', () => {
-  const next = finishQuiz(2, 3);
+  const next = finishQuiz(2, 3).state;
   assert.deepEqual(getLessonProgress(next, LESSON_ID).bestQuizScore, {
     correct: 2,
     total: 3,
@@ -99,7 +106,7 @@ test('uloží skóre 2/3 do trvalého pokroku', () => {
 });
 
 test('uloží skóre 3/3 do trvalého pokroku', () => {
-  const next = finishQuiz(3, 3);
+  const next = finishQuiz(3, 3).state;
   assert.deepEqual(getLessonProgress(next, LESSON_ID).bestQuizScore, {
     correct: 3,
     total: 3,
@@ -108,7 +115,7 @@ test('uloží skóre 3/3 do trvalého pokroku', () => {
 
 test('horší opakovaný výsledek nepřepíše lepší', () => {
   finishQuiz(3, 3);
-  const next = finishQuiz(1, 3);
+  const next = finishQuiz(1, 3).state;
   assert.deepEqual(getLessonProgress(next, LESSON_ID).bestQuizScore, {
     correct: 3,
     total: 3,
@@ -117,7 +124,7 @@ test('horší opakovaný výsledek nepřepíše lepší', () => {
 
 test('lepší opakovaný výsledek přepíše horší', () => {
   finishQuiz(1, 3);
-  const next = finishQuiz(3, 3);
+  const next = finishQuiz(3, 3).state;
   assert.deepEqual(getLessonProgress(next, LESSON_ID).bestQuizScore, {
     correct: 3,
     total: 3,
@@ -202,7 +209,7 @@ test('poškozené bestQuizScore se ignoruje a přepíše prvním platným výsle
 
 test('projektorový režim skóre ani pokrok trvale neuloží', () => {
   const prev = loadProgress();
-  const next = applyQuizCompletion(prev, {
+  const result = applyQuizCompletion(prev, {
     lessonId: LESSON_ID,
     xp: 10,
     badgeId: 'testovaci-odznak',
@@ -210,20 +217,20 @@ test('projektorový režim skóre ani pokrok trvale neuloží', () => {
     total: 3,
     projectorMode: true,
   });
-  assert.equal(next, prev);
+  assert.equal(result.state, prev);
   assert.equal(localStorage.getItem(PROGRESS_KEY), null);
 });
 
 test('opakování quizu nepřidělí podruhé XP ani odznak', () => {
   finishQuiz(2, 3);
-  const next = finishQuiz(3, 3);
+  const next = finishQuiz(3, 3).state;
   assert.equal(next.totalXp, 10);
   assert.deepEqual(next.earnedBadges, ['testovaci-odznak']);
 });
 
 test('reset odstraní XP, dokončení, skóre i odznaky', () => {
   let state = completeActivity(loadProgress(), LESSON_ID, 5);
-  state = finishQuiz(2, 3);
+  state = finishQuiz(2, 3).state;
   const next = resetProgress(state);
   assert.equal(next.totalXp, 0);
   assert.deepEqual(next.earnedBadges, []);
@@ -275,6 +282,241 @@ test('po resetu UI podklady ukazují nulový pokrok', () => {
   assert.equal(next.totalXp, 0);
   assert.deepEqual(next.earnedBadges, []);
   assert.equal(getLessonProgress(next, LESSON_ID).bestQuizScore, undefined);
+});
+
+// --- Deterministická migrace shodných poměrů skóre -------------------------
+
+test('migrace: legacy 2/3 před canonical 4/6 → vyhrává 4/6 (větší total)', () => {
+  const { state, changed } = migrateProgressLessonReferences(
+    migrationState({
+      'zakladni-znacKy': {
+        activityCompleted: true,
+        quizCompleted: true,
+        bestQuizScore: { correct: 2, total: 3 },
+      },
+      'zakladni-znacky': {
+        activityCompleted: true,
+        quizCompleted: true,
+        bestQuizScore: { correct: 4, total: 6 },
+      },
+    }),
+  );
+  assert.equal(changed, true);
+  assert.deepEqual(state.lessons['zakladni-znacky'].bestQuizScore, {
+    correct: 4,
+    total: 6,
+  });
+});
+
+test('migrace: canonical 4/6 před legacy 2/3 → vyhrává 4/6 (větší total)', () => {
+  const { state } = migrateProgressLessonReferences(
+    migrationState({
+      'zakladni-znacky': {
+        activityCompleted: true,
+        quizCompleted: true,
+        bestQuizScore: { correct: 4, total: 6 },
+      },
+      'zakladni-znacKy': {
+        activityCompleted: true,
+        quizCompleted: true,
+        bestQuizScore: { correct: 2, total: 3 },
+      },
+    }),
+  );
+  assert.deepEqual(state.lessons['zakladni-znacky'].bestQuizScore, {
+    correct: 4,
+    total: 6,
+  });
+});
+
+test('migrace: legacy 6/9 vs canonical 4/6 → vyhrává 6/9 (větší total)', () => {
+  const { state } = migrateProgressLessonReferences(
+    migrationState({
+      'zakladni-znacKy': {
+        activityCompleted: true,
+        quizCompleted: true,
+        bestQuizScore: { correct: 6, total: 9 },
+      },
+      'zakladni-znacky': {
+        activityCompleted: true,
+        quizCompleted: true,
+        bestQuizScore: { correct: 4, total: 6 },
+      },
+    }),
+  );
+  assert.deepEqual(state.lessons['zakladni-znacky'].bestQuizScore, {
+    correct: 6,
+    total: 9,
+  });
+});
+
+test('migrace: obě pořadí klíčů vytvoří hluboce shodný výsledek', () => {
+  const legacyEntry = {
+    activityCompleted: true,
+    quizCompleted: true,
+    bestQuizScore: { correct: 2, total: 3 },
+    completedAt: '2026-01-10T10:00:00.000Z',
+  };
+  const canonicalEntry = {
+    activityCompleted: false,
+    quizCompleted: true,
+    bestQuizScore: { correct: 4, total: 6 },
+    completedAt: '2026-02-01T08:00:00.000Z',
+  };
+  const legacyFirst = migrateProgressLessonReferences(
+    migrationState({ 'zakladni-znacKy': legacyEntry, 'zakladni-znacky': canonicalEntry }),
+  );
+  const canonicalFirst = migrateProgressLessonReferences(
+    migrationState({ 'zakladni-znacky': canonicalEntry, 'zakladni-znacKy': legacyEntry }),
+  );
+  assert.deepEqual(legacyFirst.state.lessons, canonicalFirst.state.lessons);
+});
+
+test('migrace: 2/3 vyhraje nad 3/5 (vyšší podíl)', () => {
+  const { state } = migrateProgressLessonReferences(
+    migrationState({
+      'zakladni-znacKy': {
+        activityCompleted: true,
+        quizCompleted: true,
+        bestQuizScore: { correct: 2, total: 3 },
+      },
+      'zakladni-znacky': {
+        activityCompleted: true,
+        quizCompleted: true,
+        bestQuizScore: { correct: 3, total: 5 },
+      },
+    }),
+  );
+  assert.deepEqual(state.lessons['zakladni-znacky'].bestQuizScore, {
+    correct: 2,
+    total: 3,
+  });
+});
+
+test('migrace: neplatné canonical skóre nahradí platné legacy skóre', () => {
+  const { state, changed } = migrateProgressLessonReferences(
+    migrationState({
+      'zakladni-znacky': {
+        activityCompleted: true,
+        quizCompleted: true,
+        bestQuizScore: { correct: 'tři', total: -1 } as never,
+      },
+      'zakladni-znacKy': {
+        activityCompleted: true,
+        quizCompleted: true,
+        bestQuizScore: { correct: 2, total: 3 },
+      },
+    }),
+  );
+  assert.equal(changed, true);
+  assert.deepEqual(state.lessons['zakladni-znacky'].bestQuizScore, {
+    correct: 2,
+    total: 3,
+  });
+});
+
+test('migrace: samotné neplatné canonical skóre se odstraní i z uloženého stavu', () => {
+  localStorage.setItem(
+    PROGRESS_KEY,
+    JSON.stringify({
+      totalXp: 10,
+      earnedBadges: [],
+      lessons: {
+        [LESSON_ID]: {
+          activityCompleted: true,
+          quizCompleted: true,
+          bestQuizScore: { correct: 99, total: 0 },
+        },
+      },
+      calmMode: false,
+    }),
+  );
+  const state = loadProgress();
+  assert.equal(getLessonProgress(state, LESSON_ID).bestQuizScore, undefined);
+  const stored = storedProgress() as {
+    lessons: Record<string, { bestQuizScore?: unknown }>;
+  };
+  assert.equal('bestQuizScore' in stored.lessons[LESSON_ID], false);
+  assert.equal(stored.lessons[LESSON_ID].activityCompleted, true);
+});
+
+test('migrace: klíč __proto__ nezmění prototyp ani výsledek migrace', () => {
+  localStorage.setItem(
+    PROGRESS_KEY,
+    '{"totalXp":20,"earnedBadges":[],"lessons":{' +
+      '"__proto__":{"activityCompleted":true,"quizCompleted":true},' +
+      '"zakladni-znacKy":{"activityCompleted":true,"quizCompleted":true,' +
+      '"bestQuizScore":{"correct":2,"total":3}}},"calmMode":false}',
+  );
+  const state = loadProgress();
+  // Globální ani lokální prototyp nesmí být znečištěný.
+  assert.equal(({} as Record<string, unknown>).activityCompleted, undefined);
+  assert.equal(
+    Object.getPrototypeOf(state.lessons),
+    Object.prototype,
+  );
+  assert.deepEqual(getLessonProgress(state, 'zakladni-znacky').bestQuizScore, {
+    correct: 2,
+    total: 3,
+  });
+  assert.equal(state.totalXp, 20);
+});
+
+// --- Metadata o nově udělených odměnách (pravdivé UI) ----------------------
+
+test('první dokončení hlásí nově udělené XP i odznak', () => {
+  const result = finishQuiz(2, 3);
+  assert.equal(result.xpAwarded, true);
+  assert.equal(result.lessonBadgeAwarded, true);
+  assert.deepEqual(result.subjectBadgeIdsAwarded, []);
+});
+
+test('druhý pokus nehlásí nové XP ani nový lekční odznak', () => {
+  finishQuiz(2, 3);
+  const result = finishQuiz(2, 3);
+  assert.equal(result.xpAwarded, false);
+  assert.equal(result.lessonBadgeAwarded, false);
+});
+
+test('lepší retry aktualizuje nejlepší skóre, ale nehlásí nové odměny', () => {
+  finishQuiz(1, 3);
+  const result = finishQuiz(3, 3);
+  assert.equal(result.xpAwarded, false);
+  assert.equal(result.lessonBadgeAwarded, false);
+  assert.deepEqual(getLessonProgress(result.state, LESSON_ID).bestQuizScore, {
+    correct: 3,
+    total: 3,
+  });
+});
+
+test('horší retry ponechá nejlepší skóre a nehlásí nové odměny', () => {
+  finishQuiz(3, 3);
+  const result = finishQuiz(1, 3);
+  assert.equal(result.xpAwarded, false);
+  assert.equal(result.lessonBadgeAwarded, false);
+  assert.deepEqual(getLessonProgress(result.state, LESSON_ID).bestQuizScore, {
+    correct: 3,
+    total: 3,
+  });
+});
+
+test('projektorový pokus nehlásí trvale získané odměny', () => {
+  const result = finishQuiz(3, 3, true);
+  assert.equal(result.xpAwarded, false);
+  assert.equal(result.lessonBadgeAwarded, false);
+  assert.deepEqual(result.subjectBadgeIdsAwarded, []);
+  assert.equal(localStorage.getItem(PROGRESS_KEY), null);
+});
+
+test('uložený stav obsahuje XP a odznak jen jednou i po opakování', () => {
+  finishQuiz(2, 3);
+  finishQuiz(3, 3);
+  const stored = storedProgress() as {
+    totalXp: number;
+    earnedBadges: string[];
+  };
+  assert.equal(stored.totalXp, 10);
+  assert.deepEqual(stored.earnedBadges, ['testovaci-odznak']);
 });
 
 console.log('');

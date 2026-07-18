@@ -32,3 +32,16 @@ export function isValidQuizScore(value: unknown): value is QuizScore {
 export function isBetterQuizScore(a: QuizScore, b: QuizScore): boolean {
   return a.correct * b.total > b.correct * a.total;
 }
+
+/**
+ * Deterministický výběr lepšího ze dvou platných skóre při slučování
+ * (migrace legacy + canonical záznamu). Vyšší podíl vyhrává; při shodném
+ * podílu vyhrává skóre s větším `total`; při shodě obojího jsou skóre
+ * fakticky totožná a vrací se `a`. Výsledek tak nezávisí na pořadí klíčů
+ * v uložených datech. Celočíselné křížové násobení — bez plovoucí čárky.
+ */
+export function pickBetterQuizScore(a: QuizScore, b: QuizScore): QuizScore {
+  const cross = a.correct * b.total - b.correct * a.total;
+  if (cross !== 0) return cross > 0 ? a : b;
+  return a.total >= b.total ? a : b;
+}

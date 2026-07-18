@@ -143,9 +143,25 @@ export function recordQuizScore(
 }
 
 /**
+ * Co bylo při právě dokončeném pokusu skutečně nově uděleno. UI z toho
+ * pozná první dokončení od opakovaného pokusu — nesmí novost odvozovat
+ * jen z toho, že uživatel právě dokončil komponentu Quiz.
+ */
+export interface QuizCompletionResult {
+  state: ProgressState;
+  /** Právě teď byly přiděleny XP za mini test (první dokončení). */
+  xpAwarded: boolean;
+  /** Právě teď byl udělen lekční odznak. */
+  lessonBadgeAwarded: boolean;
+  /** Předmětové odznaky nově udělené tímto dokončením. */
+  subjectBadgeIdsAwarded: string[];
+}
+
+/**
  * Kompletní zpracování dokončeného mini testu: nejlepší skóre, XP a odznak
  * za lekci (jen jednou) a případné oborové odznaky. V projektorovém režimu
- * se nic neukládá a stav se vrací beze změny.
+ * se nic neukládá, stav se vrací beze změny a žádná odměna se nehlásí.
+ * Metadata o nově udělených odměnách se odvozují ze skutečné změny stavu.
  */
 export function applyQuizCompletion(
   state: ProgressState,
@@ -157,12 +173,21 @@ export function applyQuizCompletion(
     total: number;
     projectorMode: boolean;
   },
-): ProgressState {
-  if (opts.projectorMode) return state;
+): QuizCompletionResult {
+  if (opts.projectorMode) {
+    return { state, xpAwarded: false, lessonBadgeAwarded: false, subjectBadgeIdsAwarded: [] };
+  }
 
   let next = recordQuizScore(state, opts.lessonId, opts.correct, opts.total);
+  const beforeQuiz = next;
   next = completeQuiz(next, opts.lessonId, opts.xp, opts.badgeId);
+  const xpAwarded = next.totalXp !== beforeQuiz.totalXp;
+  const lessonBadgeAwarded =
+    opts.badgeId !== undefined &&
+    !beforeQuiz.earnedBadges.includes(opts.badgeId) &&
+    next.earnedBadges.includes(opts.badgeId);
 
+  const subjectBadgeIdsAwarded: string[] = [];
   for (const sb of SUBJECT_BADGES) {
     if (next.earnedBadges.includes(sb.badgeId)) continue;
     const ids = getMvpLessonsBySubject(sb.subjectId, sb.year).map((l) => l.id);
@@ -171,11 +196,12 @@ export function applyQuizCompletion(
         ...next,
         earnedBadges: [...next.earnedBadges, sb.badgeId],
       };
+      subjectBadgeIdsAwarded.push(sb.badgeId);
       saveProgress(next);
     }
   }
 
-  return next;
+  return { state: next, xpAwarded, lessonBadgeAwarded, subjectBadgeIdsAwarded };
 }
 
 /**

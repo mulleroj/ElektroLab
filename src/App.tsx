@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Route, ProgressState } from './types';
+import type { QuizCompletionResult } from './lib/progress';
 import { parseHash, navigate } from './lib/routing';
 import {
   loadProgress,
@@ -97,13 +98,28 @@ function App() {
   );
 
   const handleQuizComplete = useCallback(
-    (lessonId: string, xp: number, correct: number, total: number, badgeId?: string) => {
+    (
+      lessonId: string,
+      xp: number,
+      correct: number,
+      total: number,
+      badgeId?: string,
+    ): QuizCompletionResult => {
       // Projektorový režim řeší applyQuizCompletion — nic se pak neukládá.
-      setProgress((prev) =>
-        applyQuizCompletion(prev, { lessonId, xp, badgeId, correct, total, projectorMode }),
-      );
+      // Počítá se přímo z aktuálního stavu, aby šla metadata o právě
+      // udělených odměnách vrátit synchronně do výsledné obrazovky.
+      const result = applyQuizCompletion(progress, {
+        lessonId,
+        xp,
+        badgeId,
+        correct,
+        total,
+        projectorMode,
+      });
+      setProgress(result.state);
+      return result;
     },
-    [projectorMode],
+    [progress, projectorMode],
   );
 
   const handleResetProgress = useCallback(() => {
