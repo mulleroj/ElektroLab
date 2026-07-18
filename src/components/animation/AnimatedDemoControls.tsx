@@ -189,9 +189,10 @@ export function AnimatedDemoControls({
           Resetovat
         </button>
       </div>
-      {/* Viditelný stavový řádek se mění s každým krokem, proto je z živého
-          oznamování vyjmut — jinak by autoplay chrlil hlášení každé ~2 s. */}
-      <p className="animated-demo-controls__status" aria-hidden="true">
+      {/* Viditelný stavový řádek: v accessibility tree zůstává dohledatelný
+          (číslo a název kroku), ale není živý region — jinak by autoplay
+          chrlil hlášení každé ~2 s. Live oznámení zajišťuje skrytý status níže. */}
+      <p className="animated-demo-controls__status">
         Krok {stepIndex + 1} z {stepCount}: {stepTitle} — {statusLabels[status]}.
       </p>
       {/* Živý region pro čtečku: při autoplay ohlásí jen start animace,

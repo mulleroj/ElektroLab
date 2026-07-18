@@ -4760,9 +4760,16 @@ input:focus-visible {
 /* ===== MVP-12A2: Přístupnost fokusů ===== */
 
 /* Cíle programového fokusu (přechod kroku lekce, návrat z onboardingu).
-   Nejsou v pořadí tabulátoru — fokus na ně míří jen skriptem, takže
-   obrys kolem celého bloku by jen mátl. */
+   Nejsou v pořadí tabulátoru (tabIndex=-1) — fokus na ně míří skriptem.
+   :focus bez :focus-visible nechá myší klik bez rušivého obrysu;
+   :focus-visible ukáže stejný ring jako u tlačítek a odkazů. */
 .lesson-step-content:focus,
 .app-main:focus {
   outline: none;
+}
+
+.lesson-step-content:focus-visible,
+.app-main:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
 }
