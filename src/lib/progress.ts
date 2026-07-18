@@ -1,7 +1,11 @@
 import type { ProgressState, LessonProgress } from '../types';
 import { migrateProgressLessonReferences } from './lessonIdMigration';
+import { isValidQuizScore, isBetterQuizScore } from './quizScore';
+import { SUBJECT_BADGES } from '../data/subjectBadges';
+import { getMvpLessonsBySubject } from '../data/lessons';
 
 const STORAGE_KEY = 'elektrolab-progress';
+export const LAST_LESSON_KEY = 'elektrolab-last-lesson';
 
 const defaultProgress: ProgressState = {
   totalXp: 0,
@@ -102,6 +106,98 @@ export function completeQuiz(
   };
   saveProgress(updated);
   return updated;
+}
+
+/**
+ * Zapíše nejlepší dosažené skóre mini testu. Horší nebo shodný opakovaný
+ * pokus dřívější lepší výsledek nepřepíše; neplatné vstupy se ignorují.
+ * Poškozené dříve uložené skóre se přepíše prvním platným výsledkem.
+ */
+export function recordQuizScore(
+  state: ProgressState,
+  lessonId: string,
+  correct: number,
+  total: number,
+): ProgressState {
+  const score = { correct, total };
+  if (!isValidQuizScore(score)) return state;
+
+  const existing = getLessonProgress(state, lessonId);
+  const previousBest = isValidQuizScore(existing.bestQuizScore)
+    ? existing.bestQuizScore
+    : undefined;
+  if (previousBest && !isBetterQuizScore(score, previousBest)) return state;
+
+  const updated: ProgressState = {
+    ...state,
+    lessons: {
+      ...state.lessons,
+      [lessonId]: {
+        ...existing,
+        bestQuizScore: score,
+      },
+    },
+  };
+  saveProgress(updated);
+  return updated;
+}
+
+/**
+ * Kompletní zpracování dokončeného mini testu: nejlepší skóre, XP a odznak
+ * za lekci (jen jednou) a případné oborové odznaky. V projektorovém režimu
+ * se nic neukládá a stav se vrací beze změny.
+ */
+export function applyQuizCompletion(
+  state: ProgressState,
+  opts: {
+    lessonId: string;
+    xp: number;
+    badgeId?: string;
+    correct: number;
+    total: number;
+    projectorMode: boolean;
+  },
+): ProgressState {
+  if (opts.projectorMode) return state;
+
+  let next = recordQuizScore(state, opts.lessonId, opts.correct, opts.total);
+  next = completeQuiz(next, opts.lessonId, opts.xp, opts.badgeId);
+
+  for (const sb of SUBJECT_BADGES) {
+    if (next.earnedBadges.includes(sb.badgeId)) continue;
+    const ids = getMvpLessonsBySubject(sb.subjectId, sb.year).map((l) => l.id);
+    if (ids.length > 0 && ids.every((id) => isLessonComplete(next, id))) {
+      next = {
+        ...next,
+        earnedBadges: [...next.earnedBadges, sb.badgeId],
+      };
+      saveProgress(next);
+    }
+  }
+
+  return next;
+}
+
+/**
+ * Smaže pokrok uložený v tomto zařízení: XP, dokončení, skóre, odznaky
+ * a poslední otevřenou lekci. Zachovává uživatelská nastavení, která nejsou
+ * pokrokem (zklidněný režim, onboardingový příznak). Bezpečné i na prázdném
+ * stavu — opakované volání nezpůsobí chybu.
+ */
+export function resetProgress(state: ProgressState): ProgressState {
+  const next: ProgressState = { ...defaultProgress, calmMode: state.calmMode };
+  try {
+    if (next.calmMode) {
+      // Zklidněný režim je nastavení, ne pokrok — přežije reset.
+      saveProgress(next);
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+    localStorage.removeItem(LAST_LESSON_KEY);
+  } catch {
+    // Bez dostupného localStorage stačí vynulovat stav v paměti.
+  }
+  return next;
 }
 
 export function toggleCalmMode(state: ProgressState): ProgressState {

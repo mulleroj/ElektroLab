@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { MicroLesson, ProgressState, LessonStep } from '../types';
+import type { MicroLesson, ProgressState, LessonStep, QuizScore } from '../types';
 import { getNextStepAfterIntro } from '../types';
 import { SafetyNote } from './SafetyNote';
 import { InteractiveDemoRenderer } from './InteractiveDemoRenderer';
@@ -16,7 +16,7 @@ interface LessonPageProps {
   calmMode: boolean;
   projectorMode: boolean;
   onActivityComplete: () => void;
-  onQuizComplete: () => void;
+  onQuizComplete: (correct: number, total: number) => void;
 }
 
 const stepLabels: Record<LessonStep, string> = {
@@ -47,14 +47,18 @@ export function LessonPage({
   const topic = getTopicById(lesson.topicId);
 
   const [step, setStep] = useState<LessonStep>(() => getInitialStep(lessonProgress));
+  // Výsledek právě dokončeného mini testu — jen lokální stav komponenty,
+  // takže se zobrazí i v projektorovém režimu, kde se nic neukládá.
+  const [quizResult, setQuizResult] = useState<QuizScore | null>(null);
 
   const handleActivityComplete = () => {
     onActivityComplete();
     setStep('quiz');
   };
 
-  const handleQuizComplete = () => {
-    onQuizComplete();
+  const handleQuizComplete = (correct: number, total: number) => {
+    setQuizResult({ correct, total });
+    onQuizComplete(correct, total);
     setStep('complete');
   };
 
@@ -204,6 +208,11 @@ export function LessonPage({
         <article className="lesson-complete">
           <h2>🎉 Lekce dokončena!</h2>
           <p className="lesson-complete__memory">„{lesson.memorySentence}"</p>
+          {quizResult && (
+            <p className="lesson-complete__quiz-score">
+              Výsledek mini testu: {quizResult.correct}/{quizResult.total}
+            </p>
+          )}
           <div className="lesson-complete__rewards">
             {projectorMode ? (
               <p>

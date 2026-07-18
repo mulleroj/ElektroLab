@@ -2,24 +2,26 @@ import type { ProgressState } from '../types';
 import { subjects } from '../data/subjects';
 import { lessons, getLessonById } from '../data/lessons';
 import { getBadgeById } from '../data/badges';
-import { isLessonComplete } from '../lib/progress';
+import { isLessonComplete, LAST_LESSON_KEY } from '../lib/progress';
 import { SubjectCard } from './SubjectCard';
+import { ResetProgress } from './ResetProgress';
 import { navigate } from '../lib/routing';
 import { migrateLessonId } from '../lib/lessonIdMigration';
 
 interface HomePageProps {
   progress: ProgressState;
+  onResetProgress: () => void;
 }
 
 const RECOMMENDED_FIRST_LESSON_ID = 'co-je-obvod';
 
 function getLastOpenedLesson() {
   try {
-    const stored = localStorage.getItem('elektrolab-last-lesson');
+    const stored = localStorage.getItem(LAST_LESSON_KEY);
     if (!stored) return undefined;
     const id = migrateLessonId(stored);
     if (id !== stored) {
-      localStorage.setItem('elektrolab-last-lesson', id);
+      localStorage.setItem(LAST_LESSON_KEY, id);
     }
     const lesson = getLessonById(id);
     return lesson?.mvpAvailable ? lesson : undefined;
@@ -28,7 +30,7 @@ function getLastOpenedLesson() {
   }
 }
 
-export function HomePage({ progress }: HomePageProps) {
+export function HomePage({ progress, onResetProgress }: HomePageProps) {
   const mvpLessons = lessons.filter((l) => l.mvpAvailable);
   const completedLessons = mvpLessons.filter((l) => isLessonComplete(progress, l.id));
   const lastOpened = getLastOpenedLesson();
@@ -152,6 +154,8 @@ export function HomePage({ progress }: HomePageProps) {
           </div>
         ))}
       </div>
+
+      <ResetProgress onReset={onResetProgress} />
     </section>
   );
 }

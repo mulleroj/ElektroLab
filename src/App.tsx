@@ -4,15 +4,15 @@ import { parseHash, navigate } from './lib/routing';
 import {
   loadProgress,
   completeActivity,
-  completeQuiz,
+  applyQuizCompletion,
+  resetProgress,
   toggleCalmMode,
-  isLessonComplete,
-  saveProgress,
+  LAST_LESSON_KEY,
 } from './lib/progress';
 import { getValidatedLesson } from './lib/validation';
 import { getSubjectById } from './data/subjects';
 import { getTopicById } from './data/topics';
-import { getLessonById, getMvpLessonsBySubject } from './data/lessons';
+import { getLessonById } from './data/lessons';
 import { AppShell } from './components/AppShell';
 import { HomePage } from './components/HomePage';
 import { SubjectPage } from './components/SubjectPage';
@@ -21,11 +21,8 @@ import { LessonPage } from './components/LessonPage';
 import { TeacherPage } from './components/TeacherPage';
 import { Onboarding } from './components/Onboarding';
 
-import { SUBJECT_BADGES } from './data/subjectBadges';
-
 const PROJECTOR_KEY = 'elektrolab-projector';
 const ONBOARDING_KEY = 'elektrolab-onboarding-seen';
-const LAST_LESSON_KEY = 'elektrolab-last-lesson';
 
 function loadOnboardingSeen(): boolean {
   try {
@@ -100,26 +97,18 @@ function App() {
   );
 
   const handleQuizComplete = useCallback(
-    (lessonId: string, xp: number, badgeId?: string) => {
-      if (projectorMode) return;
-      setProgress((prev) => {
-        let next = completeQuiz(prev, lessonId, xp, badgeId);
-        for (const sb of SUBJECT_BADGES) {
-          if (next.earnedBadges.includes(sb.badgeId)) continue;
-          const ids = getMvpLessonsBySubject(sb.subjectId, sb.year).map((l) => l.id);
-          if (ids.length > 0 && ids.every((id) => isLessonComplete(next, id))) {
-            next = {
-              ...next,
-              earnedBadges: [...next.earnedBadges, sb.badgeId],
-            };
-            saveProgress(next);
-          }
-        }
-        return next;
-      });
+    (lessonId: string, xp: number, correct: number, total: number, badgeId?: string) => {
+      // Projektorový režim řeší applyQuizCompletion — nic se pak neukládá.
+      setProgress((prev) =>
+        applyQuizCompletion(prev, { lessonId, xp, badgeId, correct, total, projectorMode }),
+      );
     },
     [projectorMode],
   );
+
+  const handleResetProgress = useCallback(() => {
+    setProgress((prev) => resetProgress(prev));
+  }, []);
 
   const openLessonOnProjector = useCallback((lessonId: string) => {
     setProjectorMode(true);
@@ -129,7 +118,7 @@ function App() {
   const renderPage = () => {
     switch (route.page) {
       case 'home':
-        return <HomePage progress={progress} />;
+        return <HomePage progress={progress} onResetProgress={handleResetProgress} />;
 
       case 'teacher':
         return (
@@ -192,8 +181,8 @@ function App() {
             onActivityComplete={() =>
               handleActivityComplete(lesson.id, lesson.activityXp)
             }
-            onQuizComplete={() =>
-              handleQuizComplete(lesson.id, lesson.quizXp, lesson.badgeId)
+            onQuizComplete={(correct, total) =>
+              handleQuizComplete(lesson.id, lesson.quizXp, correct, total, lesson.badgeId)
             }
           />
         );

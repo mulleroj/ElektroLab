@@ -4,7 +4,7 @@ import type { QuizQuestion } from '../types';
 interface QuizProps {
   questions: QuizQuestion[];
   calmMode: boolean;
-  onComplete: () => void;
+  onComplete: (correct: number, total: number) => void;
 }
 
 export function Quiz({ questions, calmMode, onComplete }: QuizProps) {
@@ -32,7 +32,7 @@ export function Quiz({ questions, calmMode, onComplete }: QuizProps) {
       setAnswered(false);
     } else {
       setFinished(true);
-      onComplete();
+      onComplete(correctCount, questions.length);
     }
   };
 

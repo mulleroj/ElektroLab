@@ -2,7 +2,8 @@ import type { Topic, Subject } from '../types';
 import type { ProgressState } from '../types';
 import { getLessonsByTopic } from '../data/lessons';
 import { filterValidLessons } from '../lib/validation';
-import { isLessonComplete } from '../lib/progress';
+import { isLessonComplete, getLessonProgress } from '../lib/progress';
+import { isValidQuizScore } from '../lib/quizScore';
 import { navigate } from '../lib/routing';
 
 interface TopicPageProps {
@@ -39,6 +40,7 @@ export function TopicPage({ topic, subject, progress }: TopicPageProps) {
       <ul className="lesson-list">
         {lessons.map((lesson) => {
           const complete = isLessonComplete(progress, lesson.id);
+          const bestQuizScore = getLessonProgress(progress, lesson.id).bestQuizScore;
           return (
             <li key={lesson.id}>
               <article className="lesson-card">
@@ -53,6 +55,12 @@ export function TopicPage({ topic, subject, progress }: TopicPageProps) {
                 <p className="lesson-card__meta">
                   {lesson.durationMinutes} min · {lesson.difficulty}
                 </p>
+                {/* Skóre jen pokud skutečně existuje — starší dokončené lekce ho nemají. */}
+                {complete && isValidQuizScore(bestQuizScore) && (
+                  <p className="lesson-card__quiz-score">
+                    Výsledek mini testu: {bestQuizScore.correct}/{bestQuizScore.total}
+                  </p>
+                )}
                 <p className="lesson-card__tags">
                   {lesson.interactiveDemo && (
                     <span className="tag tag--demo">🔬 Interaktivní ukázka</span>
