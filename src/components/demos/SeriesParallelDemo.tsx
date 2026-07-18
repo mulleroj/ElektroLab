@@ -581,17 +581,19 @@ function scenarioButtonLabel(
 /**
  * Informativní stav poruchového scénáře (Nevyzkoušeno / Rozpracováno /
  * Hotovo) — je součástí accessible name přepínače, hlavní gating nemění.
+ * Rozpracováno znamená skutečnou interakci s přehrávačem (Spustit nebo
+ * Další krok) — pouhý výběr scénáře stav nemění.
  */
 function faultScenarioButtonLabel(
   label: string,
   id: FaultScenarioId,
-  activeId: FaultScenarioId,
+  started: Set<FaultScenarioId>,
   completed: Set<FaultScenarioId>,
 ): string {
   if (completed.has(id)) {
     return `Hotovo: ${label}`;
   }
-  if (activeId === id) {
+  if (started.has(id)) {
     return `Rozpracováno: ${label}`;
   }
   return `Nevyzkoušeno: ${label}`;
@@ -1181,12 +1183,18 @@ interface ScenarioPlayerProps {
   scenarioId: AnyScenarioId;
   calmMode: boolean;
   onScenarioCompleted: (id: AnyScenarioId) => void;
+  /**
+   * Volá se jen při skutečné interakci s přehrávačem (Spustit / Další
+   * krok) — ne při mountu, přepnutí scénáře, Pauze ani Resetu.
+   */
+  onScenarioStarted?: (id: AnyScenarioId) => void;
 }
 
 function SeriesParallelScenarioPlayer({
   scenarioId,
   calmMode,
   onScenarioCompleted,
+  onScenarioStarted,
 }: ScenarioPlayerProps) {
   const motion = useMotionPolicy(calmMode);
   const steps = getSteps(scenarioId);
@@ -1214,10 +1222,16 @@ function SeriesParallelScenarioPlayer({
     }
   }, [status]);
 
+  const handlePlay = useCallback(() => {
+    onScenarioStarted?.(scenarioId);
+    playback.play();
+  }, [onScenarioStarted, scenarioId, playback]);
+
   const handleNextStep = useCallback(() => {
+    onScenarioStarted?.(scenarioId);
     holdAutoplayMotionRef.current = false;
     playback.nextStep();
-  }, [playback]);
+  }, [onScenarioStarted, scenarioId, playback]);
 
   const handleReset = useCallback(() => {
     holdAutoplayMotionRef.current = false;
@@ -1256,7 +1270,7 @@ function SeriesParallelScenarioPlayer({
         stepCount={steps.length}
         stepTitle={liveStepTitle}
         autoPlayAllowed={motion.allowAutoPlay}
-        onPlay={playback.play}
+        onPlay={handlePlay}
         onPause={playback.pause}
         onNextStep={handleNextStep}
         onReset={handleReset}
@@ -1316,6 +1330,11 @@ export function SeriesParallelDemoView({
   const [faultCompletedScenarios, setFaultCompletedScenarios] = useState<
     Set<FaultScenarioId>
   >(new Set());
+  // Rozpracováno = uživatel v přehrávači scénáře klikl na Spustit nebo
+  // Další krok; pouhý výběr scénáře stav nemění. Jen informativní.
+  const [startedFaultScenarios, setStartedFaultScenarios] = useState<
+    Set<FaultScenarioId>
+  >(() => new Set());
 
   const faultEntryRef = useRef<HTMLButtonElement>(null);
   const faultHeadingRef = useRef<HTMLHeadingElement>(null);
@@ -1353,6 +1372,29 @@ export function SeriesParallelDemoView({
       });
     }
   }, []);
+
+  const markFaultScenarioStarted = useCallback(
+    (scenarioId: FaultScenarioId) => {
+      setStartedFaultScenarios((previous) => {
+        if (previous.has(scenarioId)) {
+          return previous;
+        }
+        const next = new Set(previous);
+        next.add(scenarioId);
+        return next;
+      });
+    },
+    [],
+  );
+
+  const handleScenarioStarted = useCallback(
+    (id: AnyScenarioId) => {
+      if (!isMainScenarioId(id)) {
+        markFaultScenarioStarted(id);
+      }
+    },
+    [markFaultScenarioStarted],
+  );
 
   const allCompleted = completedScenarios.size === SCENARIO_META.length;
 
@@ -1468,7 +1510,7 @@ export function SeriesParallelDemoView({
                 {faultScenarioButtonLabel(
                   s.label,
                   s.id,
-                  activeFaultScenarioId,
+                  startedFaultScenarios,
                   faultCompletedScenarios,
                 )}
               </button>
@@ -1480,6 +1522,7 @@ export function SeriesParallelDemoView({
             scenarioId={activeFaultScenarioId}
             calmMode={calmMode}
             onScenarioCompleted={handleScenarioCompleted}
+            onScenarioStarted={handleScenarioStarted}
           />
 
           {/* Informativní přehled (ne živý region, nic se neukládá) */}
