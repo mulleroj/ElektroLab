@@ -273,7 +273,7 @@ export const lessons: MicroLesson[] = [
     hook:
       'Na štítku LED svítidla čteš 9 W, u rychlovarné konvice 2000 W. Oba spotřebiče mohou jít do stejné zásuvky 230 V — proč mají tak rozdílný příkon?',
     explanation:
-      '**Elektrický výkon** říká, jak rychle spotřebič používá elektrickou energii. Základní vztah je **P = U · I**: výkon P ve wattech (W) je součin napětí U ve voltech (V) a proudu I v ampérech (A). Příklad: 12 V · 2 A = 24 W. Při stejném napětí odebírá spotřebič s vyšším výkonem větší proud — obvod je víc zatížený.\n\n**Elektrická energie** říká, kolik energie spotřebič spotřeboval za určitou dobu. Základní vztah je **E = P · t**. Jednotky energie jsou watthodina (Wh) a kilowatthodina (kWh). Příklad: 100 W po dobu 2 hodin = 200 Wh = 0,2 kWh. Výkon tedy popisuje rychlost spotřeby, energie celkové množství za čas.',
+      '**Elektrický výkon** říká, jak rychle spotřebič používá elektrickou energii. Základní vztah je **P = U · I**: výkon P ve wattech (W) je součin napětí U ve voltech (V) a proudu I v ampérech (A). Příklad: 12 V · 2 A = 24 W. Při stejném napětí odebírá spotřebič s vyšším výkonem větší proud — obvod je víc zatížený. Od výkonu se liší **elektrická energie**: ta říká, kolik energie spotřebič spotřeboval za určitou dobu. Základní vztah je **E = P · t**. Jednotky energie jsou watthodina (Wh) a kilowatthodina (kWh). Příklad: 100 W po dobu 2 hodin = 200 Wh = 0,2 kWh. Výkon tedy popisuje rychlost spotřeby, energie celkové množství za čas.',
     safetyNote:
       'Údaje na štítku spotřebiče se čtou, neodhadují. Vysoký příkon znamená při stejném napětí vyšší proud. Skutečné připojování a posuzování elektrické instalace patří pod dohled učitele nebo kvalifikované osoby. Tato lekce je školní model — nestačí jediný výpočet výkonu k rozhodnutí o bezpečném připojení.',
     memorySentence:
@@ -317,28 +317,27 @@ export const lessons: MicroLesson[] = [
       },
       {
         id: 'q2',
-        text: 'Jaký je správný vztah pro výpočet elektrického výkonu?',
+        text: 'Spotřebič s výkonem 100 W pracuje 2 hodiny. Kolik elektrické energie spotřebuje?',
         options: [
-          { id: 'a', text: 'P = U · I' },
-          { id: 'b', text: 'P = U / I' },
-          { id: 'c', text: 'P = E · t' },
-          { id: 'd', text: 'P = R · I' },
+          { id: 'a', text: '200 Wh, tedy 0,2 kWh' },
+          { id: 'b', text: '50 Wh' },
+          { id: 'c', text: '200 kWh' },
+          { id: 'd', text: '0,02 kWh' },
         ],
         correctOptionId: 'a',
-        explanation: 'Základní vztah pro výkon je P = U · I (napětí krát proud).',
+        explanation: 'E = P · t = 100 W · 2 h = 200 Wh = 0,2 kWh.',
       },
       {
         id: 'q3',
-        text: 'Spotřebič pracuje při napětí 12 V a odebírá proud 2 A. Jaký má výkon?',
+        text: 'Spotřebič pracuje při napětí 24 V a odebírá proud 0,5 A. Jaký má výkon?',
         options: [
-          { id: 'a', text: '24 W' },
-          { id: 'b', text: '6 W' },
-          { id: 'c', text: '14 W' },
-          { id: 'd', text: '24 kWh' },
+          { id: 'a', text: '12 W' },
+          { id: 'b', text: '48 W' },
+          { id: 'c', text: '24,5 W' },
+          { id: 'd', text: '12 kWh' },
         ],
         correctOptionId: 'a',
-        explanation:
-          'P = U · I = 12 · 2 = 24 W. Dělení 12 / 2 = 6 by bylo chybné. Jednotka kWh patří k energii, ne k výkonu.',
+        explanation: 'P = U · I = 24 V · 0,5 A = 12 W.',
       },
     ],
     activityXp: 20,
