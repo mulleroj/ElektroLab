@@ -4626,3 +4626,71 @@ input:focus-visible {
     animation: none;
   }
 }
+
+/* MVP-11N: nepovinný poruchový režim (SeriesParallelDemo) */
+
+.series-parallel-demo-fault-entry {
+  margin: 0.75rem 0 0;
+}
+
+.series-parallel-demo-fault-wrap {
+  margin: 0.75rem 0 0;
+}
+
+.series-parallel-demo-fault-title {
+  margin: 0 0 0.5rem;
+}
+
+.series-parallel-demo-fault-title:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.series-parallel-demo-fault-intro {
+  margin: 0 0 0.75rem;
+  overflow-wrap: break-word;
+}
+
+.series-parallel-demo-fault-scenarios {
+  margin: 0.5rem 0 1rem;
+}
+
+/* Přerušené vlákno vadné žárovky: dva oddělené segmenty s mezerou 14 user
+   units — poruchu nese tvar mezery a textový popisek, barva je jen doplněk */
+.series-parallel-demo-fault-filament line {
+  stroke: #b91c1c;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.series-parallel-demo-fault-label {
+  font-size: 15px;
+  font-weight: 700;
+  fill: #b91c1c;
+}
+
+.series-parallel-demo-fault-progress {
+  margin: 0.5rem 0 0;
+  font-weight: 600;
+}
+
+/* Bezpečnostní poznámka poruchového režimu (běžný text, ne live region) */
+.series-parallel-demo-fault-note {
+  margin: 0.75rem 0 0;
+  padding: 0.75rem 1rem;
+  background: var(--color-bg);
+  border-left: 4px solid #d97706;
+  border-radius: var(--radius);
+  overflow-wrap: break-word;
+}
+
+.series-parallel-demo-fault-back {
+  margin: 0.75rem 0 0;
+}
+
+/* Mobil: popisek poruchy se zvětšuje spolu s ostatními SVG popisky */
+@media (max-width: 480px) {
+  .series-parallel-demo-fault-label {
+    font-size: 18px;
+  }
+}

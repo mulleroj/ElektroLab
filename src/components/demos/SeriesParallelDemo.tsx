@@ -5,16 +5,36 @@ import { AnimatedDemoControls } from '../animation/AnimatedDemoControls';
 import { useAnimatedDemo } from '../animation/useAnimatedDemo';
 import { useMotionPolicy } from '../animation/useMotionPolicy';
 
-type ScenarioId = 'serial' | 'parallel';
+/**
+ * MVP-11N: hlavní gating pracuje výhradně s MainScenarioId — poruchové
+ * scénáře mají vlastní úzký typ a vlastní (jen informativní) Set, takže je
+ * typový systém nedovolí započítat do hlavního průchodu 2/2.
+ */
+type MainScenarioId = 'serial' | 'parallel';
+
+type FaultScenarioId = 'serial-fault' | 'parallel-fault';
+
+type AnyScenarioId = MainScenarioId | FaultScenarioId;
+
+type DemoMode = 'main' | 'fault';
+
+function isMainScenarioId(id: AnyScenarioId): id is MainScenarioId {
+  return id === 'serial' || id === 'parallel';
+}
 
 interface DemoStep {
   title: string;
   description: string;
 }
 
-const SCENARIO_META: { id: ScenarioId; label: string }[] = [
+const SCENARIO_META: { id: MainScenarioId; label: string }[] = [
   { id: 'serial', label: 'Sériové zapojení' },
   { id: 'parallel', label: 'Paralelní zapojení' },
+];
+
+const FAULT_SCENARIO_META: { id: FaultScenarioId; label: string }[] = [
+  { id: 'serial-fault', label: 'Porucha v sérii' },
+  { id: 'parallel-fault', label: 'Porucha v paralelní větvi' },
 ];
 
 const SERIAL_STEPS: DemoStep[] = [
@@ -73,9 +93,61 @@ const PARALLEL_STEPS: DemoStep[] = [
   },
 ];
 
-const STEPS_BY_SCENARIO: Record<ScenarioId, DemoStep[]> = {
+/**
+ * MVP-11N: nepovinné poruchové scénáře — čtyři kroky (0–3). Porucha vzniká
+ * přerušením vlákna uvnitř žárovky; vodiče a zdroj zůstávají v pořádku.
+ */
+const SERIAL_FAULT_STEPS: DemoStep[] = [
+  {
+    title: 'Normální provoz',
+    description:
+      'Stejné sériové zapojení jako v hlavní ukázce: uzavřená smyčka, všechny vodiče jsou součástí jediné proudové cesty a obě žárovky svítí. Zatím žádná porucha.',
+  },
+  {
+    title: 'Vadná první žárovka',
+    description:
+      'Vlákno první žárovky se přerušilo — uvnitř žárovky vznikla mezera. Jediná proudová cesta je tím přerušená, proud přestal téct v celém obvodu najednou a obě žárovky zhasly.',
+  },
+  {
+    title: 'Důsledek pro celý obvod',
+    description:
+      'Proud v celém sériovém obvodu neteče, protože jediná cesta je přerušená uvnitř žárovky. Proud k poruše „nedotéká“ ani se u ní nehromadí — bez uzavřené smyčky neteče nikde. Vodiče i zdroj přitom zůstávají v pořádku.',
+  },
+  {
+    title: 'Shrnutí',
+    description:
+      'V sériovém zapojení porucha jedné žárovky přeruší jedinou proudovou cestu — zhasnou oba spotřebiče. Druhá žárovka je v pořádku, ale nemá uzavřený obvod.',
+  },
+];
+
+const PARALLEL_FAULT_STEPS: DemoStep[] = [
+  {
+    title: 'Normální provoz',
+    description:
+      'Stejné paralelní zapojení jako v hlavní ukázce: proud prochází společným přívodem, v rozdělovacím uzlu se rozdělí do obou větví a společným návratem se vrací k − pólu. Obě žárovky svítí.',
+  },
+  {
+    title: 'Vadná horní žárovka',
+    description:
+      'Vlákno horní žárovky se přerušilo. Celá horní větev je tím otevřená a bez proudu, horní žárovka nesvítí. Dolní větev zůstává uzavřená — dolní žárovka svítí dál.',
+  },
+  {
+    title: 'Proud teče jen neporušenou cestou',
+    description:
+      'Proud prochází společným přívodem, v rozdělovacím uzlu pokračuje jen do neporušené dolní větve a společným návratem se vrací ke zdroji. Do otevřené horní větve proud neteče vůbec.',
+  },
+  {
+    title: 'Shrnutí',
+    description:
+      'V paralelním zapojení porucha přeruší pouze vadnou větev — druhá větev může fungovat dál. Proto paralelně zapojená svítidla nezhasnou všechna najednou.',
+  },
+];
+
+const STEPS_BY_SCENARIO: Record<AnyScenarioId, DemoStep[]> = {
   serial: SERIAL_STEPS,
   parallel: PARALLEL_STEPS,
+  'serial-fault': SERIAL_FAULT_STEPS,
+  'parallel-fault': PARALLEL_FAULT_STEPS,
 };
 
 const FLOW_NOTE =
@@ -86,6 +158,10 @@ const BRIGHTNESS_NOTE =
 
 const CONVENTIONAL_NOTE =
   'Animace znázorňuje konvenční směr proudu od + k −. Nezobrazuje pohyb elektronů.';
+
+/** Bezpečnostní poznámka jen pro poruchový režim (běžný text, ne live region). */
+const FAULT_SAFETY_NOTE =
+  'Vadná žárovka může přerušit proudovou cestu. To, že spotřebič nesvítí, neznamená, že je obvod bezpečný — před kontrolou nebo výměnou vždy odpoj zdroj.';
 
 /**
  * Geometrie sériového schématu (SVG user units, viewBox 0 0 400 260).
@@ -150,6 +226,10 @@ const PAR_BOT_BULB_RIGHT = PAR_BOT_BULB.x + PAR_BULB_R; // 275
  * návrat (177 + 246) % 14 = 3. Fáze se předává komponentově omezenou CSS
  * custom property --sp-demo-flow-phase (žádný JS timer), takže dash při
  * průchodu rozdělovacím i spojovacím uzlem opticky nepřeskakuje.
+ *
+ * MVP-11N: při poruše horní větve se horní path vůbec nemountuje — fáze
+ * dolní větve (9) i návratu (3) jsou dané délkou předchozí cesty, takže se
+ * odebráním horního pathu nemění.
  */
 const PAR_FLOW_FEED = `M ${PAR_SOURCE_X} ${PAR_PLATE_LONG_Y} V ${PAR_FEED_Y} H ${PAR_SPLIT.x}`;
 const PAR_FLOW_TOP = `M ${PAR_SPLIT.x} ${PAR_SPLIT.y} H ${PAR_MERGE.x} V ${PAR_MERGE.y}`;
@@ -172,8 +252,10 @@ interface PanelRow {
 interface DemoVisual {
   /** Série: celá smyčka staticky zvýrazněná (aktivní vodič). */
   loopActive: boolean;
-  /** Paralelně: obě větve staticky zvýrazněné. */
-  branchesActive: boolean;
+  /** Paralelně: horní větev staticky zvýrazněná. */
+  topBranchActive: boolean;
+  /** Paralelně: dolní větev staticky zvýrazněná. */
+  bottomBranchActive: boolean;
   /** Paralelně: společný přívod a návrat staticky zvýrazněné. */
   feedReturnActive: boolean;
   /** Paralelně: zvýraznění rozdělovacího a spojovacího uzlu (krok 1). */
@@ -181,18 +263,28 @@ interface DemoVisual {
   /** Paralelně: textové popisky „rozdělení“ / „sloučení“. */
   showNodeLabels: boolean;
   showArrows: boolean;
-  bulbsReceiving: boolean;
-  bulbsOn: boolean;
-  /** Krok „proud prochází“ — flow overlay se ale kreslí jen při autoplay. */
+  /** Žárovka 1 = první sériová / horní paralelní; žárovka 2 = druhá / dolní. */
+  bulb1Receiving: boolean;
+  bulb2Receiving: boolean;
+  bulb1On: boolean;
+  bulb2On: boolean;
+  /** MVP-11N: žárovka 1 má přerušené vlákno (jen poruchové scénáře). */
+  bulb1Faulty: boolean;
+  /** Krok s flow overlayem — kreslí se ale jen při autoplay. */
   flowActive: boolean;
+  /** Paralelní autoplay: mountovat i horní flow path (false při poruše). */
+  flowIncludesTopBranch: boolean;
   panelRows: PanelRow[];
 }
 
-function getSteps(scenarioId: ScenarioId): DemoStep[] {
+function getSteps(scenarioId: AnyScenarioId): DemoStep[] {
   return STEPS_BY_SCENARIO[scenarioId];
 }
 
-function deriveVisual(scenarioId: ScenarioId, stepIndex: number): DemoVisual {
+function deriveMainVisual(
+  scenarioId: MainScenarioId,
+  stepIndex: number,
+): DemoVisual {
   const bulbsReceiving = stepIndex === 3;
   const bulbsOn = stepIndex === 4;
   const bulbText = bulbsOn
@@ -211,14 +303,19 @@ function deriveVisual(scenarioId: ScenarioId, stepIndex: number): DemoVisual {
     ];
     return {
       loopActive: stepIndex >= 1,
-      branchesActive: false,
+      topBranchActive: false,
+      bottomBranchActive: false,
       feedReturnActive: false,
       nodesHighlighted: false,
       showNodeLabels: false,
       showArrows: stepIndex >= 2,
-      bulbsReceiving,
-      bulbsOn,
+      bulb1Receiving: bulbsReceiving,
+      bulb2Receiving: bulbsReceiving,
+      bulb1On: bulbsOn,
+      bulb2On: bulbsOn,
+      bulb1Faulty: false,
       flowActive: stepIndex === 3,
+      flowIncludesTopBranch: true,
       panelRows: [
         { label: 'Zapojení', value: 'sériové — spotřebiče za sebou' },
         {
@@ -272,18 +369,24 @@ function deriveVisual(scenarioId: ScenarioId, stepIndex: number): DemoVisual {
       : stepIndex === 2
         ? 'samostatná proudová cesta mezi oběma uzly'
         : 'vlastní větev s jednou žárovkou';
+  const branchesActive = stepIndex >= 2;
   return {
     loopActive: false,
-    branchesActive: stepIndex >= 2,
+    topBranchActive: branchesActive,
+    bottomBranchActive: branchesActive,
     feedReturnActive: stepIndex >= 3,
     nodesHighlighted: stepIndex === 1,
     // V completed kroku popisky ustupují paprskům žárovek (uzly popisuje
     // stavový panel); povinné jsou v kroku „Rozdělení na větve“.
     showNodeLabels: stepIndex >= 1 && stepIndex <= 3,
     showArrows: stepIndex >= 3,
-    bulbsReceiving,
-    bulbsOn,
+    bulb1Receiving: bulbsReceiving,
+    bulb2Receiving: bulbsReceiving,
+    bulb1On: bulbsOn,
+    bulb2On: bulbsOn,
+    bulb1Faulty: false,
     flowActive: stepIndex === 3,
+    flowIncludesTopBranch: true,
     panelRows: [
       { label: 'Zapojení', value: 'paralelní — každá žárovka ve vlastní větvi' },
       { label: 'Počet proudových cest', value: 'dvě — horní a dolní větev' },
@@ -337,11 +440,134 @@ function deriveVisual(scenarioId: ScenarioId, stepIndex: number): DemoVisual {
   };
 }
 
+/**
+ * Sériová porucha: od kroku 1 je jediná cesta přerušená uvnitř žárovky 1 —
+ * proud je nulový v celém obvodu najednou (žádné „dotečení“ k poruše),
+ * všechny vodiče zůstávají fyzicky vykreslené, jen neutrální; zdroj beze
+ * změny. Flow overlay smí existovat pouze v normálním kroku 0.
+ */
+function deriveSerialFaultVisual(stepIndex: number): DemoVisual {
+  const normal = stepIndex === 0;
+  const results = [
+    'normální provoz — obě žárovky svítí',
+    'porucha přerušila jedinou proudovou cestu',
+    'bez proudu je celá smyčka najednou',
+    'zhasly oba spotřebiče — jediná cesta je přerušená',
+  ];
+  const panelRows: PanelRow[] = normal
+    ? [
+        { label: 'Zapojení', value: 'sériové — obě žárovky v jediné smyčce' },
+        { label: 'Žárovka 1', value: 'v pořádku — svítí' },
+        { label: 'Proudová cesta', value: 'jediná smyčka — uzavřená' },
+        { label: 'Proud v obvodu', value: 'prochází celou smyčkou od + k −' },
+        { label: 'Žárovka 2', value: 'v pořádku — svítí' },
+        { label: 'Výsledek', value: results[0] },
+      ]
+    : [
+        { label: 'Zapojení', value: 'sériové — obě žárovky v jediné smyčce' },
+        { label: 'Žárovka 1', value: 'vlákno přerušeno — vadná' },
+        {
+          label: 'Proudová cesta',
+          value: 'proudová cesta přerušena uvnitř žárovky 1',
+        },
+        { label: 'Proud v obvodu', value: 'proud neteče — v žádné části obvodu' },
+        { label: 'Žárovka 2', value: 'žárovka 2 je v pořádku, ale nesvítí' },
+        { label: 'Výsledek', value: results[stepIndex] },
+      ];
+  return {
+    loopActive: normal,
+    topBranchActive: false,
+    bottomBranchActive: false,
+    feedReturnActive: false,
+    nodesHighlighted: false,
+    showNodeLabels: false,
+    showArrows: false,
+    bulb1Receiving: false,
+    bulb2Receiving: false,
+    bulb1On: normal,
+    bulb2On: normal,
+    bulb1Faulty: !normal,
+    flowActive: normal,
+    flowIncludesTopBranch: true,
+    panelRows,
+  };
+}
+
+/**
+ * Paralelní porucha: od kroku 1 je otevřená pouze horní větev (přerušené
+ * vlákno horní žárovky) — celá horní větev je neutrální a bez flow, dolní
+ * větev, společný přívod i návrat zůstávají aktivní a dolní žárovka svítí.
+ * Flow overlay: krok 0 čtyři pathy, krok 2 přesně tři (bez horní větve).
+ */
+function deriveParallelFaultVisual(stepIndex: number): DemoVisual {
+  const normal = stepIndex === 0;
+  const results = [
+    'normální provoz — obě žárovky svítí',
+    'porucha zasáhla jen horní větev',
+    'proud teče jen neporušenou dolní větví',
+    'dolní žárovka svítí dál — větve jsou nezávislé',
+  ];
+  const panelRows: PanelRow[] = normal
+    ? [
+        {
+          label: 'Zapojení',
+          value: 'paralelní — každá žárovka ve vlastní větvi',
+        },
+        { label: 'Horní žárovka', value: 'v pořádku — svítí' },
+        { label: 'Horní větev', value: 'uzavřená — proud teče' },
+        { label: 'Dolní větev', value: 'uzavřená — proud teče' },
+        { label: 'Dolní žárovka', value: 'svítí' },
+        { label: 'Společný přívod', value: 'vede proud do obou větví' },
+        { label: 'Společný návrat', value: 'vede proud z obou větví' },
+        { label: 'Výsledek', value: results[0] },
+      ]
+    : [
+        {
+          label: 'Zapojení',
+          value: 'paralelní — každá žárovka ve vlastní větvi',
+        },
+        { label: 'Horní žárovka', value: 'vlákno přerušeno — vadná, nesvítí' },
+        { label: 'Horní větev', value: 'otevřená — bez proudu' },
+        { label: 'Dolní větev', value: 'uzavřená — proud teče' },
+        { label: 'Dolní žárovka', value: 'svítí' },
+        { label: 'Společný přívod', value: 'vede proud neporušené větve' },
+        { label: 'Společný návrat', value: 'vede proud neporušené větve' },
+        { label: 'Výsledek', value: results[stepIndex] },
+      ];
+  return {
+    loopActive: false,
+    topBranchActive: normal,
+    bottomBranchActive: true,
+    feedReturnActive: true,
+    nodesHighlighted: false,
+    showNodeLabels: false,
+    showArrows: false,
+    bulb1Receiving: false,
+    bulb2Receiving: false,
+    bulb1On: normal,
+    bulb2On: true,
+    bulb1Faulty: !normal,
+    flowActive: stepIndex === 0 || stepIndex === 2,
+    flowIncludesTopBranch: normal,
+    panelRows,
+  };
+}
+
+function deriveVisual(scenarioId: AnyScenarioId, stepIndex: number): DemoVisual {
+  if (scenarioId === 'serial-fault') {
+    return deriveSerialFaultVisual(stepIndex);
+  }
+  if (scenarioId === 'parallel-fault') {
+    return deriveParallelFaultVisual(stepIndex);
+  }
+  return deriveMainVisual(scenarioId, stepIndex);
+}
+
 function scenarioButtonLabel(
   label: string,
-  id: ScenarioId,
-  activeId: ScenarioId,
-  completed: Set<ScenarioId>,
+  id: MainScenarioId,
+  activeId: MainScenarioId | null,
+  completed: Set<MainScenarioId>,
 ): string {
   if (completed.has(id)) {
     return `Hotovo: ${label}`;
@@ -350,6 +576,74 @@ function scenarioButtonLabel(
     return `Rozpracováno: ${label}`;
   }
   return `Neprošlo: ${label}`;
+}
+
+/**
+ * Informativní stav poruchového scénáře (Nevyzkoušeno / Rozpracováno /
+ * Hotovo) — je součástí accessible name přepínače, hlavní gating nemění.
+ * Rozpracováno znamená skutečnou interakci s přehrávačem (Spustit nebo
+ * Další krok) — pouhý výběr scénáře stav nemění.
+ */
+function faultScenarioButtonLabel(
+  label: string,
+  id: FaultScenarioId,
+  started: Set<FaultScenarioId>,
+  completed: Set<FaultScenarioId>,
+): string {
+  if (completed.has(id)) {
+    return `Hotovo: ${label}`;
+  }
+  if (started.has(id)) {
+    return `Rozpracováno: ${label}`;
+  }
+  return `Nevyzkoušeno: ${label}`;
+}
+
+/**
+ * Accessible step title pro jediný živý region (stavový řádek ovládání):
+ * u klíčových kroků nese i výsledek, aby čtečka nemusela číst SVG.
+ */
+function getLiveStepTitle(
+  scenarioId: AnyScenarioId,
+  stepIndex: number,
+  fallback: string,
+): string {
+  if (scenarioId === 'serial') {
+    if (stepIndex === 3) {
+      return 'Proud prochází oběma žárovkami současně';
+    }
+    if (stepIndex === 4) {
+      return 'Výsledek: jediná proudová cesta, obě žárovky svítí';
+    }
+  } else if (scenarioId === 'parallel') {
+    if (stepIndex === 3) {
+      return 'Proud se rozdělil do obou větví a slučuje se';
+    }
+    if (stepIndex === 4) {
+      return 'Výsledek: dvě proudové cesty, obě žárovky svítí';
+    }
+  } else if (scenarioId === 'serial-fault') {
+    if (stepIndex === 1) {
+      return 'Vadná první žárovka — proud neteče, obě žárovky zhasly';
+    }
+    if (stepIndex === 2) {
+      return 'Důsledek: celý sériový obvod je bez proudu';
+    }
+    if (stepIndex === 3) {
+      return 'Shrnutí: porucha v sérii zhasne oba spotřebiče';
+    }
+  } else if (scenarioId === 'parallel-fault') {
+    if (stepIndex === 1) {
+      return 'Vadná horní žárovka — dolní žárovka svítí dál';
+    }
+    if (stepIndex === 2) {
+      return 'Proud teče jen neporušenou dolní větví';
+    }
+    if (stepIndex === 3) {
+      return 'Shrnutí: porucha přeruší jen vadnou větev';
+    }
+  }
+  return fallback;
 }
 
 /** Tři dekorativní paprsky nad/pod žárovkou — nikdy nejsou join pointy. */
@@ -376,6 +670,14 @@ interface BulbProps {
   receiving: boolean;
   on: boolean;
   raysDirection: 'up' | 'down';
+  /**
+   * MVP-11N: přerušené vlákno. Místo kříže se kreslí dva oddělené vodorovné
+   * filamentové segmenty s odskočenými konci — mezi jejich konci zůstává
+   * skutečná elektrická mezera 14 SVG user units (≥ 9 px i na 375 px
+   * viewportu). Uvnitř značky nezůstává žádná jiná souvislá čára, kterou
+   * by šlo číst jako vodivou cestu.
+   */
+  faultFilament?: boolean;
 }
 
 /**
@@ -383,31 +685,55 @@ interface BulbProps {
  * nad flow overlayem, takže dash není uvnitř značky vidět; obrys, kříž a
  * terminálové body (skutečné elektrické join pointy vodičů) se kreslí nad ní.
  */
-function Bulb({ cx, cy, r, receiving, on, raysDirection }: BulbProps) {
+function Bulb({
+  cx,
+  cy,
+  r,
+  receiving,
+  on,
+  raysDirection,
+  faultFilament = false,
+}: BulbProps) {
+  // Vadná žárovka nikdy nesvítí ani „nepřijímá proud“ — kruh a terminály
+  // zůstávají beze změny, mění se jen vnitřní vlákno.
+  const lit = on && !faultFilament;
+  const active = receiving && !faultFilament;
   const bulbCls = `series-parallel-demo-bulb${
-    receiving ? ' series-parallel-demo-bulb--receiving' : ''
-  }${on ? ' series-parallel-demo-bulb--on' : ''}`;
+    active ? ' series-parallel-demo-bulb--receiving' : ''
+  }${lit ? ' series-parallel-demo-bulb--on' : ''}`;
   const crossCls = `series-parallel-demo-bulb-cross${
-    receiving ? ' series-parallel-demo-bulb-cross--active' : ''
+    active ? ' series-parallel-demo-bulb-cross--active' : ''
   }`;
   const c = 17;
   return (
     <>
       <circle className={bulbCls} cx={cx} cy={cy} r={r} />
-      <line
-        className={crossCls}
-        x1={cx - c}
-        y1={cy - c}
-        x2={cx + c}
-        y2={cy + c}
-      />
-      <line
-        className={crossCls}
-        x1={cx - c}
-        y1={cy + c}
-        x2={cx + c}
-        y2={cy - c}
-      />
+      {faultFilament ? (
+        <g className="series-parallel-demo-fault-filament">
+          {/* Dva oddělené segmenty vlákna; mezera mezi konci = 14 units */}
+          <line x1={cx - c} y1={cy} x2={cx - 7} y2={cy} />
+          <line x1={cx - 7} y1={cy} x2={cx - 11.5} y2={cy - 8} />
+          <line x1={cx + 7} y1={cy} x2={cx + c} y2={cy} />
+          <line x1={cx + 7} y1={cy} x2={cx + 11.5} y2={cy - 8} />
+        </g>
+      ) : (
+        <>
+          <line
+            className={crossCls}
+            x1={cx - c}
+            y1={cy - c}
+            x2={cx + c}
+            y2={cy + c}
+          />
+          <line
+            className={crossCls}
+            x1={cx - c}
+            y1={cy + c}
+            x2={cx + c}
+            y2={cy - c}
+          />
+        </>
+      )}
       <circle
         className="series-parallel-demo-contact"
         cx={cx - r}
@@ -420,7 +746,7 @@ function Bulb({ cx, cy, r, receiving, on, raysDirection }: BulbProps) {
         cy={cy}
         r={4}
       />
-      {on && bulbRays(cx, cy, raysDirection)}
+      {lit && bulbRays(cx, cy, raysDirection)}
     </>
   );
 }
@@ -552,18 +878,32 @@ function SerialCircuitSvg({ visual, showFlowOverlay }: SvgProps) {
         cx={SERIAL_BULB1.x}
         cy={SERIAL_BULB1.y}
         r={SERIAL_BULB_R}
-        receiving={visual.bulbsReceiving}
-        on={visual.bulbsOn}
+        receiving={visual.bulb1Receiving}
+        on={visual.bulb1On}
         raysDirection="up"
+        faultFilament={visual.bulb1Faulty}
       />
       <Bulb
         cx={SERIAL_BULB2.x}
         cy={SERIAL_BULB2.y}
         r={SERIAL_BULB_R}
-        receiving={visual.bulbsReceiving}
-        on={visual.bulbsOn}
+        receiving={visual.bulb2Receiving}
+        on={visual.bulb2On}
         raysDirection="up"
       />
+
+      {/* MVP-11N: porucha je označena tvarem (mezera ve vlákně) i textem —
+          význam nenese jen barva */}
+      {visual.bulb1Faulty && (
+        <text
+          className="series-parallel-demo-fault-label"
+          x={SERIAL_BULB1.x}
+          y={36}
+          textAnchor="middle"
+        >
+          vadná — přerušeno
+        </text>
+      )}
 
       {/* Popisky žárovek: kotvené k pravému terminálu (anchor end), aby se
           nekřížily s pravou svislou cestou ani mezi sebou */}
@@ -614,8 +954,11 @@ function ParallelCircuitSvg({ visual, showFlowOverlay }: SvgProps) {
   const feedCls = `series-parallel-demo-wire${
     visual.feedReturnActive ? ' series-parallel-demo-wire--on' : ''
   }`;
-  const branchCls = `series-parallel-demo-wire${
-    visual.branchesActive ? ' series-parallel-demo-wire--on' : ''
+  const topBranchCls = `series-parallel-demo-wire${
+    visual.topBranchActive ? ' series-parallel-demo-wire--on' : ''
+  }`;
+  const bottomBranchCls = `series-parallel-demo-wire${
+    visual.bottomBranchActive ? ' series-parallel-demo-wire--on' : ''
   }`;
   const nodeCls = `series-parallel-demo-node${
     visual.nodesHighlighted ? ' series-parallel-demo-node--highlight' : ''
@@ -641,33 +984,33 @@ function ParallelCircuitSvg({ visual, showFlowOverlay }: SvgProps) {
       />
       {/* Horní větev: z rozdělovacího uzlu doprava přes horní žárovku a dolů */}
       <path
-        className={branchCls}
+        className={topBranchCls}
         fill="none"
         d={`M ${PAR_SPLIT.x} ${PAR_SPLIT.y} H ${PAR_TOP_BULB_LEFT}`}
       />
       <path
-        className={branchCls}
+        className={topBranchCls}
         fill="none"
         d={`M ${PAR_TOP_BULB_RIGHT} ${PAR_FEED_Y} H ${PAR_MERGE.x}`}
       />
       <path
-        className={branchCls}
+        className={topBranchCls}
         fill="none"
         d={`M ${PAR_MERGE.x} ${PAR_FEED_Y} V ${PAR_MERGE.y}`}
       />
       {/* Dolní větev: z rozdělovacího uzlu dolů a doprava přes dolní žárovku */}
       <path
-        className={branchCls}
+        className={bottomBranchCls}
         fill="none"
         d={`M ${PAR_SPLIT.x} ${PAR_SPLIT.y} V ${PAR_BOT_Y}`}
       />
       <path
-        className={branchCls}
+        className={bottomBranchCls}
         fill="none"
         d={`M ${PAR_SPLIT.x} ${PAR_BOT_Y} H ${PAR_BOT_BULB_LEFT}`}
       />
       <path
-        className={branchCls}
+        className={bottomBranchCls}
         fill="none"
         d={`M ${PAR_BOT_BULB_RIGHT} ${PAR_BOT_Y} H ${PAR_MERGE.x}`}
       />
@@ -695,10 +1038,12 @@ function ParallelCircuitSvg({ visual, showFlowOverlay }: SvgProps) {
         labelY={258}
       />
 
-      {/* Čtyři synchronizované flow pathy (jen autoplay): přívod, horní
-          větev, dolní větev, návrat. Stejná třída, rychlost i dasharray;
-          fázový offset podle délky předchozí cesty modulo dash periody
-          drží dash pattern v uzlech opticky spojitý. */}
+      {/* Synchronizované flow pathy (jen autoplay): přívod, horní větev,
+          dolní větev, návrat — stejná třída, rychlost i dasharray; fázový
+          offset podle délky předchozí cesty modulo dash periody drží dash
+          pattern v uzlech opticky spojitý. Při poruše horní větve (MVP-11N)
+          se horní path vůbec nemountuje; fáze dolní větve a návratu se tím
+          nemění, návaznost feed → bottom → return v uzlech zůstává. */}
       {showFlowOverlay && (
         <>
           <path
@@ -707,12 +1052,14 @@ function ParallelCircuitSvg({ visual, showFlowOverlay }: SvgProps) {
             fill="none"
             d={PAR_FLOW_FEED}
           />
-          <path
-            className="series-parallel-demo-flow"
-            style={flowPhaseStyle(FLOW_PHASE_BRANCH)}
-            fill="none"
-            d={PAR_FLOW_TOP}
-          />
+          {visual.flowIncludesTopBranch && (
+            <path
+              className="series-parallel-demo-flow"
+              style={flowPhaseStyle(FLOW_PHASE_BRANCH)}
+              fill="none"
+              d={PAR_FLOW_TOP}
+            />
+          )}
           <path
             className="series-parallel-demo-flow"
             style={flowPhaseStyle(FLOW_PHASE_BRANCH)}
@@ -757,18 +1104,31 @@ function ParallelCircuitSvg({ visual, showFlowOverlay }: SvgProps) {
         cx={PAR_TOP_BULB.x}
         cy={PAR_TOP_BULB.y}
         r={PAR_BULB_R}
-        receiving={visual.bulbsReceiving}
-        on={visual.bulbsOn}
+        receiving={visual.bulb1Receiving}
+        on={visual.bulb1On}
         raysDirection="up"
+        faultFilament={visual.bulb1Faulty}
       />
       <Bulb
         cx={PAR_BOT_BULB.x}
         cy={PAR_BOT_BULB.y}
         r={PAR_BULB_R}
-        receiving={visual.bulbsReceiving}
-        on={visual.bulbsOn}
+        receiving={visual.bulb2Receiving}
+        on={visual.bulb2On}
         raysDirection="down"
       />
+
+      {/* MVP-11N: porucha horní žárovky — tvar (mezera ve vlákně) + text */}
+      {visual.bulb1Faulty && (
+        <text
+          className="series-parallel-demo-fault-label"
+          x={PAR_TOP_BULB.x}
+          y={36}
+          textAnchor="middle"
+        >
+          vadná — přerušeno
+        </text>
+      )}
 
       {/* Popisky žárovek mimo vodiče: horní mezi větvemi, dolní vlevo pod
           dolní větví (paprsky dolní žárovky míří dolů od těla) */}
@@ -820,15 +1180,21 @@ function ParallelCircuitSvg({ visual, showFlowOverlay }: SvgProps) {
 }
 
 interface ScenarioPlayerProps {
-  scenarioId: ScenarioId;
+  scenarioId: AnyScenarioId;
   calmMode: boolean;
-  onScenarioCompleted: (id: ScenarioId) => void;
+  onScenarioCompleted: (id: AnyScenarioId) => void;
+  /**
+   * Volá se jen při skutečné interakci s přehrávačem (Spustit / Další
+   * krok) — ne při mountu, přepnutí scénáře, Pauze ani Resetu.
+   */
+  onScenarioStarted?: (id: AnyScenarioId) => void;
 }
 
 function SeriesParallelScenarioPlayer({
   scenarioId,
   calmMode,
   onScenarioCompleted,
+  onScenarioStarted,
 }: ScenarioPlayerProps) {
   const motion = useMotionPolicy(calmMode);
   const steps = getSteps(scenarioId);
@@ -856,10 +1222,16 @@ function SeriesParallelScenarioPlayer({
     }
   }, [status]);
 
+  const handlePlay = useCallback(() => {
+    onScenarioStarted?.(scenarioId);
+    playback.play();
+  }, [onScenarioStarted, scenarioId, playback]);
+
   const handleNextStep = useCallback(() => {
+    onScenarioStarted?.(scenarioId);
     holdAutoplayMotionRef.current = false;
     playback.nextStep();
-  }, [playback]);
+  }, [onScenarioStarted, scenarioId, playback]);
 
   const handleReset = useCallback(() => {
     holdAutoplayMotionRef.current = false;
@@ -874,22 +1246,14 @@ function SeriesParallelScenarioPlayer({
   const pausedMod =
     status === 'paused' && showMotion ? ' series-parallel-demo-anim--paused' : '';
 
-  // Flow overlay existuje jen v kroku „proud prochází“ (index 3) a jen když
-  // autoplay dovoluje souvislý pohyb. Ruční krok 3 je plně statický.
+  // Flow overlay existuje jen v krocích s flowActive a jen když autoplay
+  // dovoluje souvislý pohyb. Ruční krokování je vždy plně statické.
   const showFlowOverlay = visual.flowActive && showMotion;
 
-  // Jediný živý region je stavový řádek v AnimatedDemoControls. U klíčových
-  // kroků nese i výsledek, aby čtečka nemusela číst SVG.
-  let liveStepTitle = step.title;
-  if (scenarioId === 'serial' && stepIndex === 3) {
-    liveStepTitle = 'Proud prochází oběma žárovkami současně';
-  } else if (scenarioId === 'serial' && stepIndex === 4) {
-    liveStepTitle = 'Výsledek: jediná proudová cesta, obě žárovky svítí';
-  } else if (scenarioId === 'parallel' && stepIndex === 3) {
-    liveStepTitle = 'Proud se rozdělil do obou větví a slučuje se';
-  } else if (scenarioId === 'parallel' && stepIndex === 4) {
-    liveStepTitle = 'Výsledek: dvě proudové cesty, obě žárovky svítí';
-  }
+  // Jediný živý region je stavový řádek v AnimatedDemoControls.
+  const liveStepTitle = getLiveStepTitle(scenarioId, stepIndex, step.title);
+
+  const isSerialDiagram = scenarioId === 'serial' || scenarioId === 'serial-fault';
 
   return (
     <>
@@ -906,7 +1270,7 @@ function SeriesParallelScenarioPlayer({
         stepCount={steps.length}
         stepTitle={liveStepTitle}
         autoPlayAllowed={motion.allowAutoPlay}
-        onPlay={playback.play}
+        onPlay={handlePlay}
         onPause={playback.pause}
         onNextStep={handleNextStep}
         onReset={handleReset}
@@ -915,7 +1279,7 @@ function SeriesParallelScenarioPlayer({
       {/* Schéma je názorná grafika — úplný stav zapojení je vždy popsán
           textem ve výpisu stavu a v popisu kroku níže. */}
       <div className={`animated-demo__stage${pausedMod}`}>
-        {scenarioId === 'serial' ? (
+        {isSerialDiagram ? (
           <SerialCircuitSvg visual={visual} showFlowOverlay={showFlowOverlay} />
         ) : (
           <ParallelCircuitSvg
@@ -953,19 +1317,84 @@ export function SeriesParallelDemoView({
   calmMode,
   onContinue,
 }: SeriesParallelDemoProps) {
-  const [activeScenarioId, setActiveScenarioId] = useState<ScenarioId>('serial');
-  const [completedScenarios, setCompletedScenarios] = useState<Set<ScenarioId>>(
-    new Set(),
+  const [mode, setMode] = useState<DemoMode>('main');
+  const [activeMainScenarioId, setActiveMainScenarioId] =
+    useState<MainScenarioId>('serial');
+  const [activeFaultScenarioId, setActiveFaultScenarioId] =
+    useState<FaultScenarioId>('serial-fault');
+  const [completedScenarios, setCompletedScenarios] = useState<
+    Set<MainScenarioId>
+  >(new Set());
+  // Jen informativní stav poruchových scénářů — nemění hlavní gating,
+  // neodemyká onContinue a nikam se neukládá.
+  const [faultCompletedScenarios, setFaultCompletedScenarios] = useState<
+    Set<FaultScenarioId>
+  >(new Set());
+  // Rozpracováno = uživatel v přehrávači scénáře klikl na Spustit nebo
+  // Další krok; pouhý výběr scénáře stav nemění. Jen informativní.
+  const [startedFaultScenarios, setStartedFaultScenarios] = useState<
+    Set<FaultScenarioId>
+  >(() => new Set());
+
+  const faultEntryRef = useRef<HTMLButtonElement>(null);
+  const faultHeadingRef = useRef<HTMLHeadingElement>(null);
+  const prevModeRef = useRef<DemoMode | null>(null);
+
+  // Focus sleduje přepnutí inline režimu: do fault režimu na nadpis sekce,
+  // zpět na vstupní tlačítko. Při prvním mountu se focus nekrade.
+  useEffect(() => {
+    const prevMode = prevModeRef.current;
+    prevModeRef.current = mode;
+    if (prevMode === null || prevMode === mode) {
+      return;
+    }
+    if (mode === 'fault') {
+      faultHeadingRef.current?.focus();
+    } else {
+      faultEntryRef.current?.focus();
+    }
+  }, [mode]);
+
+  const handleScenarioCompleted = useCallback((id: AnyScenarioId) => {
+    if (isMainScenarioId(id)) {
+      setCompletedScenarios((prev) => {
+        if (prev.has(id)) {
+          return prev;
+        }
+        return new Set(prev).add(id);
+      });
+    } else {
+      setFaultCompletedScenarios((prev) => {
+        if (prev.has(id)) {
+          return prev;
+        }
+        return new Set(prev).add(id);
+      });
+    }
+  }, []);
+
+  const markFaultScenarioStarted = useCallback(
+    (scenarioId: FaultScenarioId) => {
+      setStartedFaultScenarios((previous) => {
+        if (previous.has(scenarioId)) {
+          return previous;
+        }
+        const next = new Set(previous);
+        next.add(scenarioId);
+        return next;
+      });
+    },
+    [],
   );
 
-  const handleScenarioCompleted = useCallback((id: ScenarioId) => {
-    setCompletedScenarios((prev) => {
-      if (prev.has(id)) {
-        return prev;
+  const handleScenarioStarted = useCallback(
+    (id: AnyScenarioId) => {
+      if (!isMainScenarioId(id)) {
+        markFaultScenarioStarted(id);
       }
-      return new Set(prev).add(id);
-    });
-  }, []);
+    },
+    [markFaultScenarioStarted],
+  );
 
   const allCompleted = completedScenarios.size === SCENARIO_META.length;
 
@@ -975,57 +1404,147 @@ export function SeriesParallelDemoView({
       <h3>{demo.title}</h3>
       <p>{demo.description}</p>
 
-      {calmMode && (
-        <p className="calm-step-hint">
-          Projdi obě zapojení vlastním tempem ({completedScenarios.size} /{' '}
-          {SCENARIO_META.length} hotovo).
-        </p>
+      {mode === 'main' ? (
+        <>
+          {calmMode && (
+            <p className="calm-step-hint">
+              Projdi obě zapojení vlastním tempem ({completedScenarios.size} /{' '}
+              {SCENARIO_META.length} hotovo).
+            </p>
+          )}
+
+          {/* Statický pokyn (obsah se po načtení nemění) → běžný text, ne
+              živý region, aby jediným měnícím se hlášením zůstal stav kroku. */}
+          <p className="series-parallel-demo-switch-hint">
+            Přepnutím zapojení se jeho průchod vrátí na začátek — hotová
+            zapojení zůstávají hotová.
+          </p>
+
+          <div
+            className="circuit-diagram__controls series-parallel-demo-scenarios"
+            role="group"
+            aria-label="Výběr zapojení"
+          >
+            {SCENARIO_META.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                className={`btn btn--secondary${
+                  activeMainScenarioId === s.id ? ' btn--active' : ''
+                }`}
+                aria-pressed={activeMainScenarioId === s.id}
+                onClick={() => setActiveMainScenarioId(s.id)}
+              >
+                {scenarioButtonLabel(
+                  s.label,
+                  s.id,
+                  activeMainScenarioId,
+                  completedScenarios,
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* key: přepnutí scénáře i režimu bezpečně remountuje přehrávač —
+              krok 0, žádný starý timeout ani visibility listener, žádný
+              ghost krok. V DOM je vždy právě jeden player. */}
+          <SeriesParallelScenarioPlayer
+            key={`main:${activeMainScenarioId}`}
+            scenarioId={activeMainScenarioId}
+            calmMode={calmMode}
+            onScenarioCompleted={handleScenarioCompleted}
+          />
+
+          <p className="series-parallel-demo-progress">
+            Dokončená zapojení: {completedScenarios.size} ze{' '}
+            {SCENARIO_META.length}.
+          </p>
+
+          {/* MVP-11N: nepovinný poruchový režim se nabízí až po hlavním 2/2 */}
+          {allCompleted && (
+            <div className="series-parallel-demo-fault-entry">
+              <button
+                ref={faultEntryRef}
+                type="button"
+                className="btn btn--secondary"
+                onClick={() => setMode('fault')}
+              >
+                Vyzkoušet poruchu žárovky (nepovinné)
+              </button>
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="series-parallel-demo-fault-wrap">
+          {/* Inline sekce (žádný dialog ani focus trap); nadpis přebírá
+              focus po vstupu do režimu */}
+          <h4
+            className="series-parallel-demo-fault-title"
+            tabIndex={-1}
+            ref={faultHeadingRef}
+          >
+            Porucha žárovky (nepovinná ukázka)
+          </h4>
+          <p className="series-parallel-demo-fault-intro">
+            Co se stane, když se uvnitř žárovky přeruší vlákno? Porovnej
+            poruchu v sériovém a v paralelním zapojení. Přepnutím situace se
+            její průchod vrátí na začátek — hotové situace zůstávají hotové.
+            Hlavní úkol už máš splněný, tato část ho nemění.
+          </p>
+
+          <div
+            className="circuit-diagram__controls series-parallel-demo-fault-scenarios"
+            role="group"
+            aria-label="Výběr poruchové situace"
+          >
+            {FAULT_SCENARIO_META.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                className={`btn btn--secondary${
+                  activeFaultScenarioId === s.id ? ' btn--active' : ''
+                }`}
+                aria-pressed={activeFaultScenarioId === s.id}
+                onClick={() => setActiveFaultScenarioId(s.id)}
+              >
+                {faultScenarioButtonLabel(
+                  s.label,
+                  s.id,
+                  startedFaultScenarios,
+                  faultCompletedScenarios,
+                )}
+              </button>
+            ))}
+          </div>
+
+          <SeriesParallelScenarioPlayer
+            key={`fault:${activeFaultScenarioId}`}
+            scenarioId={activeFaultScenarioId}
+            calmMode={calmMode}
+            onScenarioCompleted={handleScenarioCompleted}
+            onScenarioStarted={handleScenarioStarted}
+          />
+
+          {/* Informativní přehled (ne živý region, nic se neukládá) */}
+          <p className="series-parallel-demo-fault-progress">
+            Poruchové situace (nepovinné): {faultCompletedScenarios.size} ze{' '}
+            {FAULT_SCENARIO_META.length} hotovo.
+          </p>
+
+          <p className="series-parallel-demo-fault-note">{FAULT_SAFETY_NOTE}</p>
+
+          <div className="series-parallel-demo-fault-back">
+            <button
+              type="button"
+              className="btn btn--secondary"
+              onClick={() => setMode('main')}
+            >
+              Zpět na zapojení
+            </button>
+          </div>
+        </div>
       )}
 
-      {/* Statický pokyn (obsah se po načtení nemění) → běžný text, ne živý
-          region, aby jediným měnícím se hlášením zůstal stav kroku. */}
-      <p className="series-parallel-demo-switch-hint">
-        Přepnutím zapojení se jeho průchod vrátí na začátek — hotová zapojení
-        zůstávají hotová.
-      </p>
-
-      <div
-        className="circuit-diagram__controls series-parallel-demo-scenarios"
-        role="group"
-        aria-label="Výběr zapojení"
-      >
-        {SCENARIO_META.map((s) => (
-          <button
-            key={s.id}
-            type="button"
-            className={`btn btn--secondary${
-              activeScenarioId === s.id ? ' btn--active' : ''
-            }`}
-            aria-pressed={activeScenarioId === s.id}
-            onClick={() => setActiveScenarioId(s.id)}
-          >
-            {scenarioButtonLabel(
-              s.label,
-              s.id,
-              activeScenarioId,
-              completedScenarios,
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* key: přepnutí scénáře bezpečně remountuje přehrávač — krok 0, žádný
-          starý timeout ani visibility listener, žádný ghost krok. */}
-      <SeriesParallelScenarioPlayer
-        key={activeScenarioId}
-        scenarioId={activeScenarioId}
-        calmMode={calmMode}
-        onScenarioCompleted={handleScenarioCompleted}
-      />
-
-      <p className="series-parallel-demo-progress">
-        Dokončená zapojení: {completedScenarios.size} ze {SCENARIO_META.length}.
-      </p>
       <p className="series-parallel-demo-note">{FLOW_NOTE}</p>
       <p className="series-parallel-demo-note">{BRIGHTNESS_NOTE}</p>
       <p className="series-parallel-demo-note">{CONVENTIONAL_NOTE}</p>
