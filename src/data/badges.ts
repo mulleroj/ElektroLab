@@ -14,6 +14,12 @@ export const badges: Badge[] = [
     icon: '🧱',
   },
   {
+    id: 'znalec-naboje',
+    title: 'Znalec náboje',
+    description: 'Rozumíš elektrickému náboji, volným elektronům a směru proudu v kovu.',
+    icon: '➖',
+  },
+  {
     id: 'znalec-velicin',
     title: 'Znalec veličin',
     description: 'Rozlišuješ napětí, proud a odpor.',
