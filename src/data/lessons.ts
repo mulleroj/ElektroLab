@@ -46,10 +46,10 @@ export const lessons: MicroLesson[] = [
           { id: 'keramika', label: 'Keramika' },
         ],
         definitions: [
-          { id: 'vodic-med', label: 'Vodič — vede proud velmi dobře' },
-          { id: 'vodic-hlinik', label: 'Vodič — lehčí kov, také vede' },
-          { id: 'izolant-pvc', label: 'Izolant — plast za běžných podmínek' },
-          { id: 'izolant-keramika', label: 'Izolant — keramika za běžných podmínek' },
+          { id: 'vodic-med', label: 'Běžně používaný kov s velmi dobrou elektrickou vodivostí' },
+          { id: 'vodic-hlinik', label: 'Lehký kov používaný jako vodič v některých vedeních' },
+          { id: 'izolant-pvc', label: 'Ohebný plast používaný jako elektrická izolace' },
+          { id: 'izolant-keramika', label: 'Tvrdý nekovový materiál používaný jako izolant i při vyšších teplotách' },
         ],
         correctPairs: {
           med: 'vodic-med',
