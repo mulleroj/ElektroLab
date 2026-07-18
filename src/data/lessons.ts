@@ -261,6 +261,92 @@ export const lessons: MicroLesson[] = [
     mvpAvailable: true,
   },
   {
+    id: 'elektricky-vykon-a-energie',
+    subjectId: 'zaklady',
+    topicId: 'stejnosmerny-proud',
+    title: 'Elektrický výkon a energie',
+    year: 1,
+    durationMinutes: 9,
+    difficulty: 'základní',
+    goal:
+      'Žák vysvětlí elektrický výkon a energii, použije vztahy P = U · I a E = P · t a rozliší jednotky W, kW, Wh a kWh.',
+    hook:
+      'Na štítku LED svítidla čteš 9 W, u rychlovarné konvice 2000 W. Oba spotřebiče mohou jít do stejné zásuvky 230 V — proč mají tak rozdílný příkon?',
+    explanation:
+      '**Elektrický výkon** říká, jak rychle spotřebič používá elektrickou energii. Základní vztah je **P = U · I**: výkon P ve wattech (W) je součin napětí U ve voltech (V) a proudu I v ampérech (A). Příklad: 12 V · 2 A = 24 W. Při stejném napětí odebírá spotřebič s vyšším výkonem větší proud — obvod je víc zatížený.\n\n**Elektrická energie** říká, kolik energie spotřebič spotřeboval za určitou dobu. Základní vztah je **E = P · t**. Jednotky energie jsou watthodina (Wh) a kilowatthodina (kWh). Příklad: 100 W po dobu 2 hodin = 200 Wh = 0,2 kWh. Výkon tedy popisuje rychlost spotřeby, energie celkové množství za čas.',
+    safetyNote:
+      'Údaje na štítku spotřebiče se čtou, neodhadují. Vysoký příkon znamená při stejném napětí vyšší proud. Skutečné připojování a posuzování elektrické instalace patří pod dohled učitele nebo kvalifikované osoby. Tato lekce je školní model — nestačí jediný výpočet výkonu k rozhodnutí o bezpečném připojení.',
+    memorySentence:
+      'Výkon určuje, jak rychle se energie spotřebovává; vypočítáme ho jako napětí krát proud.',
+    typicalMistake:
+      'Žáci zaměňují watt (W) a kilowatthodinu (kWh). Watt a kilowatt jsou jednotky výkonu. Watthodina a kilowatthodina jsou jednotky energie. Watt není totéž co kilowatthodina — výkon popisuje rychlost spotřeby, energie celkové množství za určitý čas.',
+    teacherTip:
+      'Nech žáky porovnat údaje na štítcích dvou bezpečně odpojených spotřebičů (například nabíječka a konvice). Před výpočtem vždy napište veličiny a jednotky. Zdůrazni rozdíl W × Wh — častá chyba u začátečníků. Nepracuj na živém zařízení.',
+    activity: {
+      formulaSelect: {
+        type: 'formula-select',
+        instruction:
+          'Přečti si příklad a vyber správný vztah pro výpočet hledané veličiny.',
+        example:
+          'Spotřebič pracuje při napětí 12 V a odebírá proud 2 A. Chceme zjistit jeho výkon.',
+        question: 'Který vztah použijeme pro výpočet výkonu?',
+        options: [
+          { id: 'a', text: 'P = U · I' },
+          { id: 'b', text: 'E = P · t' },
+          { id: 'c', text: 'R = U / I' },
+          { id: 'd', text: 'I = U / R' },
+        ],
+        correctOptionId: 'a',
+        successExplanation:
+          'Správně! Výkon spočítáš jako P = U · I. Dosadíme: P = 12 · 2 = 24 W. Vztah E = P · t slouží k energii a R = U / I k odporu.',
+      },
+    },
+    quiz: [
+      {
+        id: 'q1',
+        text: 'Co popisuje elektrický výkon?',
+        options: [
+          { id: 'a', text: 'Jak rychle spotřebič používá elektrickou energii' },
+          { id: 'b', text: 'Kolik energie spotřeboval za určitou dobu' },
+          { id: 'c', text: 'Odpor vodiče v ohmech' },
+          { id: 'd', text: 'Barvu izolace kabelu' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'Výkon popisuje rychlost spotřeby energie. Celkové množství energie za čas popisuje elektrická energie (Wh, kWh).',
+      },
+      {
+        id: 'q2',
+        text: 'Jaký je správný vztah pro výpočet elektrického výkonu?',
+        options: [
+          { id: 'a', text: 'P = U · I' },
+          { id: 'b', text: 'P = U / I' },
+          { id: 'c', text: 'P = E · t' },
+          { id: 'd', text: 'P = R · I' },
+        ],
+        correctOptionId: 'a',
+        explanation: 'Základní vztah pro výkon je P = U · I (napětí krát proud).',
+      },
+      {
+        id: 'q3',
+        text: 'Spotřebič pracuje při napětí 12 V a odebírá proud 2 A. Jaký má výkon?',
+        options: [
+          { id: 'a', text: '24 W' },
+          { id: 'b', text: '6 W' },
+          { id: 'c', text: '14 W' },
+          { id: 'd', text: '24 kWh' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'P = U · I = 12 · 2 = 24 W. Dělení 12 / 2 = 6 by bylo chybné. Jednotka kWh patří k energii, ne k výkonu.',
+      },
+    ],
+    activityXp: 20,
+    quizXp: 15,
+    badgeId: 'vykon-pod-kontrolou',
+    mvpAvailable: true,
+  },
+  {
     id: 'seriove-paralelni',
     subjectId: 'zaklady',
     topicId: 'stejnosmerny-proud',
