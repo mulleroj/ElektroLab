@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import type { MicroLesson, ProgressState, LessonStep } from '../types';
+import type { MicroLesson, ProgressState, LessonStep, QuizScore } from '../types';
 import { getNextStepAfterIntro } from '../types';
 import { SafetyNote } from './SafetyNote';
 import { InteractiveDemoRenderer } from './InteractiveDemoRenderer';
 import { ActivityRenderer } from './ActivityRenderer';
 import { Quiz } from './Quiz';
 import { getLessonProgress } from '../lib/progress';
+import type { QuizCompletionResult } from '../lib/progress';
+import { isValidQuizScore } from '../lib/quizScore';
 import { getBadgeById } from '../data/badges';
 import { getSubjectById } from '../data/subjects';
 import { getTopicById } from '../data/topics';
@@ -16,7 +18,7 @@ interface LessonPageProps {
   calmMode: boolean;
   projectorMode: boolean;
   onActivityComplete: () => void;
-  onQuizComplete: () => void;
+  onQuizComplete: (correct: number, total: number) => QuizCompletionResult;
 }
 
 const stepLabels: Record<LessonStep, string> = {
@@ -47,21 +49,25 @@ export function LessonPage({
   const topic = getTopicById(lesson.topicId);
 
   const [step, setStep] = useState<LessonStep>(() => getInitialStep(lessonProgress));
+  // Výsledek právě dokončeného mini testu — jen lokální stav komponenty,
+  // takže se zobrazí i v projektorovém režimu, kde se nic neukládá.
+  const [quizResult, setQuizResult] = useState<QuizScore | null>(null);
+  // Co bylo právě teď skutečně uděleno — dodává produkční logika pokroku,
+  // ne domněnka „uživatel právě dokončil quiz, tedy dostal odměny".
+  const [quizOutcome, setQuizOutcome] = useState<QuizCompletionResult | null>(null);
 
   const handleActivityComplete = () => {
     onActivityComplete();
     setStep('quiz');
   };
 
-  const handleQuizComplete = () => {
-    onQuizComplete();
+  const handleQuizComplete = (correct: number, total: number) => {
+    setQuizResult({ correct, total });
+    setQuizOutcome(onQuizComplete(correct, total));
     setStep('complete');
   };
 
   const badge = lesson.badgeId ? getBadgeById(lesson.badgeId) : undefined;
-  const earnedBadge = lesson.badgeId
-    ? progress.earnedBadges.includes(lesson.badgeId)
-    : false;
 
   const hasDemo = Boolean(lesson.interactiveDemo);
   const stepOrder: LessonStep[] = hasDemo
@@ -204,16 +210,31 @@ export function LessonPage({
         <article className="lesson-complete">
           <h2>🎉 Lekce dokončena!</h2>
           <p className="lesson-complete__memory">„{lesson.memorySentence}"</p>
+          {quizResult && (
+            <p className="lesson-complete__quiz-score">
+              Výsledek mini testu: {quizResult.correct}/{quizResult.total}
+            </p>
+          )}
           <div className="lesson-complete__rewards">
             {projectorMode ? (
               <p>
                 Režim na projektor — pokrok a XP se neukládají. Žáci si lekci projdou
                 sami ve svém zařízení.
               </p>
+            ) : quizOutcome && quizOutcome.xpAwarded > 0 ? (
+              <p>Za mini test získáváš {quizOutcome.xpAwarded} XP.</p>
             ) : (
-              <p>Získáváš celkem {lesson.activityXp + lesson.quizXp} XP za tuto lekci.</p>
+              <>
+                <p>{badge ? 'XP a odznak za tuto lekci už máš.' : 'XP za tuto lekci už máš.'}</p>
+                {isValidQuizScore(lessonProgress.bestQuizScore) && (
+                  <p className="lesson-complete__best-score">
+                    Nejlepší uložený výsledek: {lessonProgress.bestQuizScore.correct}/
+                    {lessonProgress.bestQuizScore.total}
+                  </p>
+                )}
+              </>
             )}
-            {badge && earnedBadge && (
+            {badge && quizOutcome?.lessonBadgeAwarded && (
               <div className="badge-earned">
                 <span className="badge-earned__icon" aria-hidden="true">
                   {badge.icon}

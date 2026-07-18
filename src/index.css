@@ -4694,3 +4694,65 @@ input:focus-visible {
     font-size: 18px;
   }
 }
+
+/* ===== MVP-12A: skóre mini testu a reset pokroku ===== */
+
+.lesson-complete__quiz-score {
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+}
+
+.lesson-card__quiz-score {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-success);
+}
+
+.reset-progress {
+  margin-top: 2rem;
+  padding: 1.25rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.reset-progress h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+}
+
+.reset-progress p {
+  margin: 0 0 0.75rem;
+}
+
+.reset-progress .reset-progress__status {
+  min-height: 1.25rem;
+  margin: 0.75rem 0 0;
+  font-weight: 600;
+  color: var(--color-success);
+}
+
+.reset-progress__dialog {
+  max-width: 480px;
+}
+
+.reset-progress__list {
+  margin: 0 0 0.75rem;
+  padding-left: 1.25rem;
+}
+
+.reset-progress__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.btn--danger {
+  background: var(--color-error);
+  color: #fff;
+}
+
+.btn--danger:hover:not(:disabled) {
+  background: #991b1b;
+}

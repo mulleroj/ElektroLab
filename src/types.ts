@@ -314,10 +314,18 @@ export interface Badge {
   icon: string;
 }
 
+/** Skóre mini testu nezávislé na budoucím počtu otázek. */
+export interface QuizScore {
+  correct: number;
+  total: number;
+}
+
 export interface LessonProgress {
   activityCompleted: boolean;
   quizCompleted: boolean;
   completedAt?: string;
+  /** Nejlepší dosažené skóre mini testu; starší záznamy ho nemají. */
+  bestQuizScore?: QuizScore;
 }
 
 export interface ProgressState {
