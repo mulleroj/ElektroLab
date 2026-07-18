@@ -13,7 +13,7 @@ interface HomePageProps {
   onResetProgress: () => void;
 }
 
-const RECOMMENDED_FIRST_LESSON_ID = 'co-je-obvod';
+const RECOMMENDED_FIRST_LESSON_ID = 'vodice-a-izolanty';
 
 function getLastOpenedLesson() {
   try {

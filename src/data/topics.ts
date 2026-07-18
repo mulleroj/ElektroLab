@@ -16,8 +16,8 @@ export const topics: Topic[] = [
     title: 'Stavba látek',
     description: 'Vlastnosti látek a vodivost.',
     year: 1,
-    estimatedMinutes: 30,
-    mvpAvailable: false,
+    estimatedMinutes: 10,
+    mvpAvailable: true,
   },
   {
     id: 'stejnosmerny-proud',

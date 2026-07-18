@@ -8,6 +8,12 @@ export const badges: Badge[] = [
     icon: '🔌',
   },
   {
+    id: 'znalec-materialu',
+    title: 'Znalec materiálů',
+    description: 'Rozlišuješ vodiče a izolanty a rozumíš roli izolace.',
+    icon: '🧱',
+  },
+  {
     id: 'znalec-velicin',
     title: 'Znalec veličin',
     description: 'Rozlišuješ napětí, proud a odpor.',
