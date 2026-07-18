@@ -9,7 +9,105 @@ const SAFETY_NOTE =
   'Tato lekce je školní simulace. Ve skutečné elektrické instalaci se nesmí pracovat pod napětím bez odborného dohledu a dodržení bezpečnostních pravidel.';
 
 export const lessons: MicroLesson[] = [
-  // Základy elektrotechniky — MVP-1
+  // Základy elektrotechniky — materiály před obvodem a veličinami
+  {
+    id: 'vodice-a-izolanty',
+    subjectId: 'zaklady',
+    topicId: 'stavba-latek',
+    title: 'Vodiče a izolanty',
+    year: 1,
+    durationMinutes: 8,
+    difficulty: 'základní',
+    goal:
+      'Žák rozliší elektrický vodič a izolant, uvede běžné materiály a vysvětlí, proč má vodič izolaci a proč izolant není absolutně bezpečný za všech podmínek.',
+    hook:
+      'Proč je uvnitř kabelu kov, ale zvenku plast? A proč smíme držet nepoškozený izolovaný vodič za plášť, ale nesmíme se dotýkat odkrytého kovového jádra? (Jde o úvahu — ne o pokus na živém zařízení.)',
+    explanation:
+      '**Elektrický vodič** je materiál, kterým elektrický proud prochází snadno. Běžně se používá **měď** (vede velmi dobře) a **hliník** (je lehčí a také vede dobře). Ocel nebo železo vedou také, ale obvykle hůře než měď. Zajímavý nekovový vodič je grafit. Materiály nevedou „stejně dobře“ — vodivost se liší. Materiál vodiče se nevybírá jen podle vodivosti, ale i podle hmotnosti, ceny, mechanických vlastností a způsobu použití. **Elektrický izolant** je materiál, kterým za běžných podmínek proud prochází velmi obtížně — například PVC, guma, sklo, keramika nebo suchý vzduch. V kabelu kovové jádro vede proud a izolace odděluje vodivou část od člověka i od okolních vodivých částí. Poškozená izolace už nemusí chránit. Samotná barva nebo vzhled materiálu nestačí k posouzení bezpečnosti.',
+    safetyNote:
+      'Bezpečnost vodiče nikdy neposuzujeme jen podle vzhledu. Poškozené izolace se nedotýkáme. Na živém zařízení se neprovádí pokusy. Skutečný stav vodiče a izolace posuzuje učitel nebo kvalifikovaná osoba vhodným postupem. Plastový povrch automaticky neznamená, že je zařízení bezpečné.',
+    memorySentence:
+      'Vodič vede proud, izolant odděluje vodivé části — ale ochrana závisí i na stavu a podmínkách.',
+    typicalMistake:
+      'Žáci si myslí, že izolant proud nikdy nevede. Izolant neznamená, že materiál nemůže nikdy vést proud. Vlhkost, nečistoty, poškození nebo vysoké napětí mohou jeho izolační schopnost zhoršit.',
+    teacherTip:
+      'Přines pouze odpojené vzorky kabelů. Ukaž kovové jádro a vrstvy izolace. Nech žáky roztřídit kartičky s názvy materiálů. Porovnej neporušenou a mechanicky poškozenou izolaci jen na odpojeném vzorku. Nepracuj pod napětím a neměř živý obvod.',
+    activity: {
+      termMatching: {
+        type: 'term-matching',
+        instruction:
+          'Klikni na materiál vlevo a pak na správnou kategorii vpravo. Spáruj všechny čtyři dvojice.',
+        leftTitle: 'Materiál',
+        rightTitle: 'Kategorie',
+        terms: [
+          { id: 'med', label: 'Měď' },
+          { id: 'hlinik', label: 'Hliník' },
+          { id: 'pvc', label: 'PVC' },
+          { id: 'keramika', label: 'Keramika' },
+        ],
+        definitions: [
+          { id: 'vodic-med', label: 'Běžně používaný kov s velmi dobrou elektrickou vodivostí' },
+          { id: 'vodic-hlinik', label: 'Lehký kov používaný jako vodič v některých vedeních' },
+          { id: 'izolant-pvc', label: 'Ohebný plast používaný jako elektrická izolace' },
+          { id: 'izolant-keramika', label: 'Tvrdý nekovový materiál používaný jako izolant i při vyšších teplotách' },
+        ],
+        correctPairs: {
+          med: 'vodic-med',
+          hlinik: 'vodic-hlinik',
+          pvc: 'izolant-pvc',
+          keramika: 'izolant-keramika',
+        },
+      },
+    },
+    quiz: [
+      {
+        id: 'q1',
+        text: 'Který materiál se běžně používá jako dobrý elektrický vodič?',
+        options: [
+          { id: 'a', text: 'Měď' },
+          { id: 'b', text: 'PVC' },
+          { id: 'c', text: 'Keramika' },
+          { id: 'd', text: 'Guma' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'Měď vede elektrický proud velmi dobře a běžně se používá v elektrických vodičích. PVC, keramika a guma jsou izolanty za běžných podmínek.',
+      },
+      {
+        id: 'q2',
+        text: 'Proč je kovové jádro vodiče zakryto izolací?',
+        options: [
+          {
+            id: 'a',
+            text: 'Aby izolace oddělila vodivou část od člověka a okolních vodivých částí',
+          },
+          { id: 'b', text: 'Aby izolace zvýšila proud v obvodu' },
+          { id: 'c', text: 'Aby se kovové jádro snáze ohnulo' },
+          { id: 'd', text: 'Aby se kabel lépe nabíjel' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'Izolace odděluje vodivé jádro od člověka i od okolních vodivých částí. Nezvyšuje proud.',
+      },
+      {
+        id: 'q3',
+        text: 'Co může zhoršit izolační schopnost materiálu?',
+        options: [
+          { id: 'a', text: 'Vlhkost, nečistoty nebo poškození' },
+          { id: 'b', text: 'To, že je materiál barevný' },
+          { id: 'c', text: 'To, že je kabel krátký' },
+          { id: 'd', text: 'Nic — izolant je vždy absolutně bezpečný' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'Izolant není absolutně nevodivý za všech podmínek. Vlhkost, nečistoty nebo poškození mohou izolační schopnost zhoršit.',
+      },
+    ],
+    activityXp: 20,
+    quizXp: 15,
+    badgeId: 'znalec-materialu',
+    mvpAvailable: true,
+  },
   {
     id: 'co-je-obvod',
     subjectId: 'zaklady',

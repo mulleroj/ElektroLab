@@ -47,7 +47,10 @@ import {
   LAST_LESSON_KEY,
 } from '../src/lib/progress';
 import { migrateProgressLessonReferences } from '../src/lib/lessonIdMigration';
-import { getMvpLessonsBySubject } from '../src/data/lessons';
+import { getMvpLessonsBySubject, getLessonById } from '../src/data/lessons';
+import { getTopicById, getTopicsBySubject } from '../src/data/topics';
+import { getBadgeById } from '../src/data/badges';
+import { getLessonActivity } from '../src/types';
 import type { ProgressState } from '../src/types';
 
 const PROGRESS_KEY = 'elektrolab-progress';
@@ -660,6 +663,84 @@ test('dokončení všech lekcí Základů udělí předmětový odznak zakladni-
   const result = completeLessonFully(last.id, last.badgeId);
   assert.deepEqual(result.subjectBadgeIdsAwarded, ['zakladni-elev']);
   assert.equal(result.state.earnedBadges.includes('zakladni-elev'), true);
+});
+
+test('téma stavba-latek je aktivní a obsahuje lekci Vodiče a izolanty', () => {
+  const topic = getTopicById('stavba-latek');
+  assert.ok(topic);
+  assert.equal(topic.mvpAvailable, true);
+  assert.equal(topic.subjectId, 'zaklady');
+  assert.equal(topic.year, 1);
+  const lesson = getLessonById('vodice-a-izolanty');
+  assert.ok(lesson);
+  assert.equal(lesson.topicId, 'stavba-latek');
+  assert.equal(lesson.subjectId, 'zaklady');
+  assert.equal(lesson.year, 1);
+  assert.equal(lesson.mvpAvailable, true);
+  assert.equal(lesson.quiz.length, 3);
+  const activity = getLessonActivity(lesson);
+  assert.ok(activity);
+  assert.equal(activity.type, 'term-matching');
+  assert.ok(getBadgeById('znalec-materialu'));
+  assert.equal(lesson.badgeId, 'znalec-materialu');
+});
+
+test('lekce Vodiče a izolanty je první MVP lekcí Základů před obvodem', () => {
+  const order = getMvpLessonsBySubject('zaklady', 1).map((l) => l.id);
+  assert.equal(order[0], 'vodice-a-izolanty');
+  assert.equal(order[1], 'co-je-obvod');
+  const topics = getTopicsBySubject('zaklady', 1).filter((t) => t.mvpAvailable);
+  assert.equal(topics[0].id, 'stavba-latek');
+});
+
+test('zakladni-elev se neudělí bez lekce Vodiče a izolanty', () => {
+  const lessons = getMvpLessonsBySubject('zaklady', 1);
+  const withoutNew = lessons.filter((l) => l.id !== 'vodice-a-izolanty');
+  assert.ok(withoutNew.length === lessons.length - 1);
+  for (const l of withoutNew) {
+    const partial = completeLessonFully(l.id, l.badgeId);
+    assert.deepEqual(partial.subjectBadgeIdsAwarded, []);
+  }
+  assert.equal(loadProgress().earnedBadges.includes('zakladni-elev'), false);
+  const result = completeLessonFully('vodice-a-izolanty', 'znalec-materialu');
+  assert.deepEqual(result.subjectBadgeIdsAwarded, ['zakladni-elev']);
+});
+
+test('dříve uložený zakladni-elev se po přidání nové lekce nemaže', () => {
+  const oldLessons = getMvpLessonsBySubject('zaklady', 1).filter(
+    (l) => l.id !== 'vodice-a-izolanty',
+  );
+  const lessonsState: ProgressState['lessons'] = {};
+  for (const l of oldLessons) {
+    lessonsState[l.id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  const seeded: ProgressState = {
+    totalXp: oldLessons.length * 35,
+    earnedBadges: ['zakladni-elev', 'prvni-zapojeni'],
+    lessons: lessonsState,
+    calmMode: false,
+  };
+  saveProgress(seeded);
+  const loaded = loadProgress();
+  assert.equal(loaded.earnedBadges.includes('zakladni-elev'), true);
+  assert.equal(isLessonComplete(loaded, 'vodice-a-izolanty'), false);
+  const afterOther = completeActivity(loaded, 'vodice-a-izolanty', 20);
+  assert.equal(afterOther.earnedBadges.includes('zakladni-elev'), true);
+  const retry = applyQuizCompletion(afterOther, {
+    lessonId: 'co-je-obvod',
+    xp: 15,
+    badgeId: 'prvni-zapojeni',
+    correct: 2,
+    total: 3,
+    projectorMode: false,
+  });
+  assert.equal(retry.state.earnedBadges.includes('zakladni-elev'), true);
+  assert.deepEqual(retry.subjectBadgeIdsAwarded, []);
 });
 
 test('lekce bez lekčního odznaku vrátí přesné XP a lessonBadgeAwarded: false', () => {
