@@ -109,6 +109,116 @@ export const lessons: MicroLesson[] = [
     mvpAvailable: true,
   },
   {
+    id: 'elektricky-naboj-a-volne-elektrony',
+    subjectId: 'zaklady',
+    topicId: 'stavba-latek',
+    title: 'Elektrický náboj a volné elektrony',
+    year: 1,
+    durationMinutes: 9,
+    difficulty: 'základní',
+    goal:
+      'Žák vysvětlí elektrický náboj a základní částice, popíše volné elektrony v kovu a rozliší dohodnutý směr proudu od pohybu elektronů v jednoduchém stejnosměrném kovovém obvodu.',
+    hook:
+      'Když rozsvítíme žárovku, musí elektrony nejprve urazit celou cestu od baterie až k žárovce? A proč se účinek projeví hned, i když samotné elektrony se v kovu pohybují poměrně pomalu?',
+    explanation:
+      '**Elektrický náboj** je vlastnost částic a těles. Může být kladný nebo záporný. Stejné náboje se odpuzují, opačné se přitahují. Běžné těleso může být elektricky neutrální, když se kladné a záporné náboje vyrovnávají. Ve zjednodušeném modelu atomu jsou **protony** (kladný náboj) a **neutrony** (bez elektrického náboje) v jádře a **elektrony** (záporný náboj) se nacházejí v prostoru kolem jádra. V kovu nejsou všechny elektrony pevně vázány k jednomu atomu — některé se mohou pohybovat strukturou kovu. Nazýváme je **volné** nebo vodivostní elektrony; proto kovy dobře vedou proud. **Elektrický proud v kovovém vodiči** je usměrněný pohyb těchto volných elektronů. Bez zdroje se pohybují neuspořádaně; po uzavření obvodu zdroj vytvoří elektrické pole a jejich pohyb získá společný směr. Elektrony jsou ve vodiči už předem — necestují všechny „jako kuličky v prázdné trubce“ od baterie ke spotřebiči. **Dohodnutý (konvenční) směr proudu** se ve schématech značí od kladného pólu k zápornému. Elektrony v kovu se pohybují opačně, od záporného pólu ke kladnému. Tato dohoda vznikla dříve, než byla známá podstata pohybu elektronů. Ve vodiči se elektrony pohybují opačně než šipka dohodnutého směru proudu — oba popisy se vztahují ke stejnému elektrickému ději. Tento model platí pro kovové vodiče v jednoduchém stejnosměrném obvodu, ne jako univerzální vysvětlení proudu ve všech materiálech.',
+    safetyNote:
+      'Pohyb elektronů nelze bezpečně ověřovat dotykem. Proud lidským tělem je nebezpečný. Školní ukázky se provádějí pouze na bezpečném školním zdroji určeném pro výuku a pod vedením učitele. Síťové napětí se pro demonstraci této lekce nepoužívá. Nízké napětí není automaticky bezpečné za všech podmínek.',
+    memorySentence:
+      'V kovu vytváří proud usměrněný pohyb volných elektronů, které se pohybují opačně než dohodnutý směr proudu.',
+    typicalMistake:
+      'Žáci si často myslí, že elektrony čekají v baterii a po zapnutí všechny vyrazí vodičem ke spotřebiči. Ve skutečnosti jsou elektrony už v celém kovovém vodiči — zdroj vytvoří elektrické pole, které usměrní jejich pohyb. Druhá častá chyba: že směr proudu musí být stejný jako pohyb elektronů. Ve schématech používáme dohodnutý směr od plusu k minusu, ale elektrony v kovu se pohybují opačně.',
+    teacherTip:
+      'Bezpečná demonstrace: dlouhá řada kuliček nebo žáků představuje elektrony už přítomné ve vodiči. Mírný posun první části řady vyvolá pohyb celé řady — ukazuje, že částice jsou ve vodiči už předem. Jde jen o zjednodušený model. Alternativa: kartičky proton, neutron, elektron a spojování s nábojem a umístěním. Nepoužívej živý elektrický obvod ani dotykové zkoušení vodivosti.',
+    activity: {
+      termMatching: {
+        type: 'term-matching',
+        instruction:
+          'Klikni na pojem vlevo a pak na správný význam vpravo. Spáruj všechny čtyři dvojice.',
+        leftTitle: 'Pojem',
+        rightTitle: 'Význam',
+        terms: [
+          { id: 'elektron', label: 'Elektron' },
+          { id: 'proton', label: 'Proton' },
+          { id: 'neutron', label: 'Neutron' },
+          { id: 'proud-kov', label: 'Elektrický proud v kovu' },
+        ],
+        definitions: [
+          {
+            id: 'def-elektron',
+            label: 'Záporně nabitá částice nacházející se mimo atomové jádro',
+          },
+          {
+            id: 'def-proton',
+            label: 'Kladně nabitá částice nacházející se v atomovém jádře',
+          },
+          {
+            id: 'def-neutron',
+            label: 'Částice bez elektrického náboje nacházející se v atomovém jádře',
+          },
+          {
+            id: 'def-proud',
+            label: 'Usměrněný pohyb volných elektronů',
+          },
+        ],
+        correctPairs: {
+          elektron: 'def-elektron',
+          proton: 'def-proton',
+          neutron: 'def-neutron',
+          'proud-kov': 'def-proud',
+        },
+      },
+    },
+    quiz: [
+      {
+        id: 'q1',
+        text: 'Která částice má záporný elektrický náboj?',
+        options: [
+          { id: 'a', text: 'Elektron' },
+          { id: 'b', text: 'Proton' },
+          { id: 'c', text: 'Neutron' },
+          { id: 'd', text: 'Atomové jádro' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'Elektron má záporný náboj. Proton je kladný, neutron je elektricky neutrální a jádro obsahuje protony a neutrony.',
+      },
+      {
+        id: 'q2',
+        text: 'Proč kovový vodič vede elektrický proud lépe než izolant?',
+        options: [
+          {
+            id: 'a',
+            text: 'Protože obsahuje volné elektrony, které se mohou pohybovat jeho strukturou',
+          },
+          { id: 'b', text: 'Protože všechny jeho atomy mají kladný náboj' },
+          { id: 'c', text: 'Protože v něm nejsou žádné elektrony' },
+          { id: 'd', text: 'Protože se jeho protony volně pohybují mezi atomy' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'V kovu jsou některé elektrony volné (vodivostní) a mohou se pohybovat strukturou kovu. Při působení elektrického pole získá jejich pohyb společný směr — právě to umožňuje vedení proudu v kovovém vodiči. Neznamená to, že všechny elektrony jsou volné, ani že stejný mechanismus platí ve všech materiálech.',
+      },
+      {
+        id: 'q3',
+        text: 'Jaký je vztah mezi dohodnutým směrem proudu a pohybem elektronů v jednoduchém stejnosměrném kovovém obvodu?',
+        options: [
+          { id: 'a', text: 'Elektrony se pohybují opačně než dohodnutý směr proudu' },
+          { id: 'b', text: 'Elektrony se pohybují stejným směrem jako dohodnutý proud' },
+          { id: 'c', text: 'Elektrony se v kovovém vodiči vůbec nepohybují' },
+          { id: 'd', text: 'Dohodnutý směr proudu se v elektrotechnice nepoužívá' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'Dohodnutý směr proudu jde od plusu k minusu. Elektrony v kovu se pohybují opačně. Oba popisy popisují stejný děj — konvenční směr není „chyba“, ale dohoda používaná ve schématech.',
+      },
+    ],
+    activityXp: 20,
+    quizXp: 15,
+    badgeId: 'znalec-naboje',
+    mvpAvailable: true,
+  },
+  {
     id: 'co-je-obvod',
     subjectId: 'zaklady',
     topicId: 'stejnosmerny-proud',
