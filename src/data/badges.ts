@@ -26,6 +26,12 @@ export const badges: Badge[] = [
     icon: '⚡',
   },
   {
+    id: 'prekladac-jednotek',
+    title: 'Překladač jednotek',
+    description: 'Umíš převádět mA ↔ A a kΩ ↔ Ω a víš, že předpona mění zápis, ne hodnotu.',
+    icon: '🔢',
+  },
+  {
     id: 'znalec-odporu',
     title: 'Znalec odporu',
     description: 'Víš, proč má vodič odpor a co odpor ovlivňuje.',

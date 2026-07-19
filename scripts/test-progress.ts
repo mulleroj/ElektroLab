@@ -925,6 +925,92 @@ test('lekce bez lekčního odznaku vrátí přesné XP a lessonBadgeAwarded: fal
   assert.deepEqual(result.state.earnedBadges, []);
 });
 
+test('lekce Jednotky a převody je ve veliciny a má term-matching bez dema', () => {
+  const lesson = getLessonById('jednotky-a-prevody');
+  assert.ok(lesson);
+  assert.equal(lesson.topicId, 'veliciny');
+  assert.equal(lesson.subjectId, 'zaklady');
+  assert.equal(lesson.year, 1);
+  assert.equal(lesson.mvpAvailable, true);
+  assert.equal(lesson.quiz.length, 3);
+  assert.equal(lesson.interactiveDemo, undefined);
+  const activity = getLessonActivity(lesson);
+  assert.ok(activity);
+  assert.equal(activity.type, 'term-matching');
+  assert.equal(lesson.badgeId, 'prekladac-jednotek');
+  assert.ok(getBadgeById('prekladac-jednotek'));
+});
+
+test('pořadí Základů: napětí, jednotky, odpor vodiče, Ohmův zákon', () => {
+  const order = getMvpLessonsBySubject('zaklady', 1).map((l) => l.id);
+  const napeti = order.indexOf('napeti-proud-odpor');
+  const units = order.indexOf('jednotky-a-prevody');
+  const odpor = order.indexOf('proc-ma-vodic-elektricky-odpor');
+  const ohm = order.indexOf('ohmuv-zakon');
+  assert.ok(napeti >= 0 && units >= 0 && odpor >= 0 && ohm >= 0);
+  assert.equal(units, napeti + 1);
+  assert.equal(odpor, units + 1);
+  assert.equal(ohm, odpor + 1);
+});
+
+test('zakladni-elev se neudělí bez lekce Jednotky a převody', () => {
+  const lessons = getMvpLessonsBySubject('zaklady', 1);
+  const withoutUnits = lessons.filter((l) => l.id !== 'jednotky-a-prevody');
+  assert.equal(withoutUnits.length, lessons.length - 1);
+  assert.equal(withoutUnits.length, 10);
+  for (const l of withoutUnits) {
+    const partial = completeLessonFully(l.id, l.badgeId);
+    assert.deepEqual(partial.subjectBadgeIdsAwarded, []);
+  }
+  assert.equal(loadProgress().earnedBadges.includes('zakladni-elev'), false);
+  const result = completeLessonFully('jednotky-a-prevody', 'prekladac-jednotek');
+  assert.deepEqual(result.subjectBadgeIdsAwarded, ['zakladni-elev']);
+});
+
+test('dříve uložený zakladni-elev se po přidání lekce o jednotkách nemaže', () => {
+  const allLessons = getMvpLessonsBySubject('zaklady', 1);
+  const oldLessons = allLessons.filter((l) => l.id !== 'jednotky-a-prevody');
+  assert.equal(oldLessons.length, 10);
+  assert.equal(allLessons.length, 11);
+  const lessonsState: ProgressState['lessons'] = {};
+  for (const l of oldLessons) {
+    lessonsState[l.id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  const seeded: ProgressState = {
+    totalXp: oldLessons.length * 35,
+    earnedBadges: ['zakladni-elev', 'znalec-velicin'],
+    lessons: lessonsState,
+    calmMode: false,
+  };
+  saveProgress(seeded);
+  const loaded = loadProgress();
+  assert.equal(loaded.earnedBadges.includes('zakladni-elev'), true);
+  assert.equal(isLessonComplete(loaded, 'jednotky-a-prevody'), false);
+  const { completed, total } = getSubjectProgress(
+    loaded,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 10);
+  assert.equal(total, 11);
+  const afterOther = completeActivity(loaded, 'jednotky-a-prevody', 20);
+  assert.equal(afterOther.earnedBadges.includes('zakladni-elev'), true);
+  const retry = applyQuizCompletion(afterOther, {
+    lessonId: 'napeti-proud-odpor',
+    xp: 15,
+    badgeId: 'znalec-velicin',
+    correct: 2,
+    total: 3,
+    projectorMode: false,
+  });
+  assert.equal(retry.state.earnedBadges.includes('zakladni-elev'), true);
+  assert.deepEqual(retry.subjectBadgeIdsAwarded, []);
+});
+
 test('lekce Zkrat, přetížení a jištění je ve stejnosmerny-proud a má scenario-choice', () => {
   const lesson = getLessonById('zkrat-pretizeni-a-jisteni');
   assert.ok(lesson);

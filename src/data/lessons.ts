@@ -389,6 +389,101 @@ export const lessons: MicroLesson[] = [
     mvpAvailable: true,
   },
   {
+    id: 'jednotky-a-prevody',
+    subjectId: 'zaklady',
+    topicId: 'veliciny',
+    title: 'Jednotky a převody elektrických veličin',
+    year: 1,
+    durationMinutes: 10,
+    difficulty: 'základní',
+    goal:
+      'Žák rozpozná jednotky V, A a Ω, převádí mA ↔ A a kΩ ↔ Ω a chápe, že předpona mění zápis hodnoty, nikoli její skutečnou velikost.',
+    hook:
+      'Na štítku je 500 mA a v příkladu počítáš s 0,5 A. Jsou to dvě různé věci, nebo jen jiný zápis stejného proudu?',
+    explanation:
+      'Číslo samo o sobě nestačí. Údaj **2 A** není totéž jako samotné číslo 2 — bez jednotky může být hodnota nejednoznačná. Při výpočtu musí být veličiny zapsané ve vzájemně vhodných jednotkách.\n\nZákladní jednotky: napětí ve **voltech (V)**, proud v **ampérech (A)**, odpor v **ohmech (Ω)**. Předpona **mili** znamená jednu tisícinu, předpona **kilo** znamená tisíc. Převod nemění skutečnou fyzikální hodnotu — mění jen způsob zápisu. Proto **500 mA** a **0,5 A** označují stejný proud a **2 kΩ** a **2000 Ω** stejný odpor.\n\n**Proud:** 1 A = 1000 mA a 1 mA = 0,001 A. Z ampérů na miliampéry násobíme 1000, z miliampérů na ampéry dělíme 1000. Příklady: 500 mA = 0,5 A; 750 mA = 0,75 A; 0,2 A = 200 mA. Stejně funguje mili u napětí: 250 mV = 0,25 V.\n\n**Odpor:** 1 kΩ = 1000 Ω a 1 Ω = 0,001 kΩ. Z kiloohmů na ohmy násobíme 1000, z ohmů na kiloohmy dělíme 1000. Příklady: 2 kΩ = 2000 Ω; 4,7 kΩ = 4700 Ω; 2200 Ω = 2,2 kΩ. Před Ohmovým zákonem hodnoty převádíme do vhodného tvaru — nesmícháme mA s A ani kΩ s Ω bez převodu.',
+    safetyNote:
+      'Jednotky a převody se učíme na zadaných hodnotách a bezpečných modelech. Podle samotného čísla nebo jednotky nelze rozhodnout, zda je zařízení bezpečné. Žák nemá měřit živé síťové zařízení jen kvůli procvičení převodů. Skutečný rozsah měřidla a způsob připojení se volí podle návodu a pod dohledem učitele. Tato lekce neučí volbu jištění ani práci na elektrické instalaci.',
+    memorySentence:
+      'Předpona změní zápis jednotky, ne skutečnou hodnotu veličiny.',
+    typicalMistake:
+      'Žáci často převádí opačným směrem, nebo při výpočtu jednotku úplně vynechají. Další chyba: myslí si, že 1 kΩ = 100 Ω. Také porovnávají jen čísla — například že 500 mA je větší než 1 A, protože 500 je větší než 1. Ve skutečnosti 500 mA = 0,5 A, tedy méně než 1 A. Hodnoty s různými předponami se před výpočtem musí převést.',
+    teacherTip:
+      'Nech žáky přiřadit kartičky 500 mA ↔ 0,5 A a 2 kΩ ↔ 2000 Ω. Zdůrazni, že převod nemění hodnotu, jen zápis. Počítej jen s papírem nebo bezpečným modelem — neměř síťové zařízení kvůli převodům.',
+    activity: {
+      termMatching: {
+        type: 'term-matching',
+        instruction:
+          'Klikni na hodnotu vlevo a pak na stejnou hodnotu zapsanou jinak vpravo. Spáruj všechny čtyři dvojice.',
+        leftTitle: 'Zápis',
+        rightTitle: 'Stejná hodnota',
+        terms: [
+          { id: 'ma500', label: '500 mA' },
+          { id: 'kohm2', label: '2 kΩ' },
+          { id: 'a02', label: '0,2 A' },
+          { id: 'ohm4700', label: '4700 Ω' },
+        ],
+        definitions: [
+          { id: 'eq-05a', label: '0,5 A' },
+          { id: 'eq-2000ohm', label: '2000 Ω' },
+          { id: 'eq-200ma', label: '200 mA' },
+          { id: 'eq-47kohm', label: '4,7 kΩ' },
+        ],
+        correctPairs: {
+          ma500: 'eq-05a',
+          kohm2: 'eq-2000ohm',
+          a02: 'eq-200ma',
+          ohm4700: 'eq-47kohm',
+        },
+      },
+    },
+    quiz: [
+      {
+        id: 'q1',
+        text: 'Kolik ampérů je 750 mA?',
+        options: [
+          { id: 'a', text: '0,75 A' },
+          { id: 'b', text: '7,5 A' },
+          { id: 'c', text: '750 A' },
+          { id: 'd', text: '0,075 A' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'Z miliampérů na ampéry dělíme 1000: 750 mA = 750 / 1000 = 0,75 A. Převod nemění proud, jen jeho zápis.',
+      },
+      {
+        id: 'q2',
+        text: 'Kolik ohmů je 4,7 kΩ?',
+        options: [
+          { id: 'a', text: '4700 Ω' },
+          { id: 'b', text: '470 Ω' },
+          { id: 'c', text: '47 Ω' },
+          { id: 'd', text: '4,7 Ω' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'Z kiloohmů na ohmy násobíme 1000: 4,7 kΩ = 4,7 · 1000 = 4700 Ω. Neplatí, že 1 kΩ = 100 Ω.',
+      },
+      {
+        id: 'q3',
+        text: 'Co znamená převod 500 mA na 0,5 A?',
+        options: [
+          { id: 'a', text: 'Jde o stejný proud zapsaný jinými jednotkami.' },
+          { id: 'b', text: 'Proud se převodem zmenší na polovinu.' },
+          { id: 'c', text: 'Proud se převodem zvětší tisíckrát.' },
+          { id: 'd', text: 'Jednotku můžeme při výpočtu vynechat.' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'Předpona mění zápis, ne skutečnou hodnotu. 500 mA a 0,5 A označují stejný proud. Jednotku při výpočtu nevynecháváme.',
+      },
+    ],
+    activityXp: 20,
+    quizXp: 15,
+    badgeId: 'prekladac-jednotek',
+    mvpAvailable: true,
+  },
+  {
     id: 'proc-ma-vodic-elektricky-odpor',
     subjectId: 'zaklady',
     topicId: 'stejnosmerny-proud',
