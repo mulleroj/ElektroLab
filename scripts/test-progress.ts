@@ -720,7 +720,6 @@ test('zakladni-elev se neudělí bez lekce Elektrický náboj a volné elektrony
   const lessons = getMvpLessonsBySubject('zaklady', 1);
   const withoutCharge = lessons.filter((l) => l.id !== 'elektricky-naboj-a-volne-elektrony');
   assert.equal(withoutCharge.length, lessons.length - 1);
-  assert.equal(withoutCharge.length, 7);
   for (const l of withoutCharge) {
     const partial = completeLessonFully(l.id, l.badgeId);
     assert.deepEqual(partial.subjectBadgeIdsAwarded, []);
@@ -734,10 +733,11 @@ test('zakladni-elev se neudělí bez lekce Elektrický náboj a volné elektrony
 });
 
 test('dříve uložený zakladni-elev se po přidání lekce o náboji nemaže', () => {
-  const oldLessons = getMvpLessonsBySubject('zaklady', 1).filter(
+  const allLessons = getMvpLessonsBySubject('zaklady', 1);
+  const oldLessons = allLessons.filter(
     (l) => l.id !== 'elektricky-naboj-a-volne-elektrony',
   );
-  assert.equal(oldLessons.length, 7);
+  assert.equal(oldLessons.length, allLessons.length - 1);
   const lessonsState: ProgressState['lessons'] = {};
   for (const l of oldLessons) {
     lessonsState[l.id] = {
@@ -759,16 +759,100 @@ test('dříve uložený zakladni-elev se po přidání lekce o náboji nemaže',
   assert.equal(isLessonComplete(loaded, 'elektricky-naboj-a-volne-elektrony'), false);
   const { completed, total } = getSubjectProgress(
     loaded,
-    getMvpLessonsBySubject('zaklady', 1).map((l) => l.id),
+    allLessons.map((l) => l.id),
   );
-  assert.equal(completed, 7);
-  assert.equal(total, 8);
+  assert.equal(completed, oldLessons.length);
+  assert.equal(total, allLessons.length);
   const afterOther = completeActivity(loaded, 'elektricky-naboj-a-volne-elektrony', 20);
   assert.equal(afterOther.earnedBadges.includes('zakladni-elev'), true);
   const retry = applyQuizCompletion(afterOther, {
     lessonId: 'vodice-a-izolanty',
     xp: 15,
     badgeId: 'znalec-materialu',
+    correct: 2,
+    total: 3,
+    projectorMode: false,
+  });
+  assert.equal(retry.state.earnedBadges.includes('zakladni-elev'), true);
+  assert.deepEqual(retry.subjectBadgeIdsAwarded, []);
+});
+
+test('lekce Proč má vodič odpor je ve stejnosmerny-proud a má tři otázky', () => {
+  const lesson = getLessonById('proc-ma-vodic-elektricky-odpor');
+  assert.ok(lesson);
+  assert.equal(lesson.topicId, 'stejnosmerny-proud');
+  assert.equal(lesson.subjectId, 'zaklady');
+  assert.equal(lesson.year, 1);
+  assert.equal(lesson.mvpAvailable, true);
+  assert.equal(lesson.quiz.length, 3);
+  const activity = getLessonActivity(lesson);
+  assert.ok(activity);
+  assert.equal(activity.type, 'measurement-judgment');
+  assert.equal(lesson.badgeId, 'znalec-odporu');
+  assert.ok(getBadgeById('znalec-odporu'));
+});
+
+test('pořadí: napětí-proud-odpor, odpor vodiče, Ohmův zákon', () => {
+  const order = getMvpLessonsBySubject('zaklady', 1)
+    .filter((l) => l.topicId === 'stejnosmerny-proud')
+    .map((l) => l.id);
+  const napeti = order.indexOf('napeti-proud-odpor');
+  const odpor = order.indexOf('proc-ma-vodic-elektricky-odpor');
+  const ohm = order.indexOf('ohmuv-zakon');
+  assert.ok(napeti >= 0 && odpor >= 0 && ohm >= 0);
+  assert.equal(odpor, napeti + 1);
+  assert.equal(ohm, odpor + 1);
+});
+
+test('zakladni-elev se neudělí bez lekce Proč má vodič elektrický odpor', () => {
+  const lessons = getMvpLessonsBySubject('zaklady', 1);
+  const withoutResistance = lessons.filter((l) => l.id !== 'proc-ma-vodic-elektricky-odpor');
+  assert.equal(withoutResistance.length, lessons.length - 1);
+  assert.equal(withoutResistance.length, 8);
+  for (const l of withoutResistance) {
+    const partial = completeLessonFully(l.id, l.badgeId);
+    assert.deepEqual(partial.subjectBadgeIdsAwarded, []);
+  }
+  assert.equal(loadProgress().earnedBadges.includes('zakladni-elev'), false);
+  const result = completeLessonFully('proc-ma-vodic-elektricky-odpor', 'znalec-odporu');
+  assert.deepEqual(result.subjectBadgeIdsAwarded, ['zakladni-elev']);
+});
+
+test('dříve uložený zakladni-elev se po přidání lekce o odporu nemaže', () => {
+  const allLessons = getMvpLessonsBySubject('zaklady', 1);
+  const oldLessons = allLessons.filter((l) => l.id !== 'proc-ma-vodic-elektricky-odpor');
+  assert.equal(oldLessons.length, 8);
+  const lessonsState: ProgressState['lessons'] = {};
+  for (const l of oldLessons) {
+    lessonsState[l.id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  const seeded: ProgressState = {
+    totalXp: oldLessons.length * 35,
+    earnedBadges: ['zakladni-elev', 'znalec-velicin'],
+    lessons: lessonsState,
+    calmMode: false,
+  };
+  saveProgress(seeded);
+  const loaded = loadProgress();
+  assert.equal(loaded.earnedBadges.includes('zakladni-elev'), true);
+  assert.equal(isLessonComplete(loaded, 'proc-ma-vodic-elektricky-odpor'), false);
+  const { completed, total } = getSubjectProgress(
+    loaded,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 8);
+  assert.equal(total, 9);
+  const afterOther = completeActivity(loaded, 'proc-ma-vodic-elektricky-odpor', 20);
+  assert.equal(afterOther.earnedBadges.includes('zakladni-elev'), true);
+  const retry = applyQuizCompletion(afterOther, {
+    lessonId: 'napeti-proud-odpor',
+    xp: 15,
+    badgeId: 'znalec-velicin',
     correct: 2,
     total: 3,
     projectorMode: false,
