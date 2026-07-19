@@ -44,6 +44,12 @@ export const badges: Badge[] = [
     icon: '💡',
   },
   {
+    id: 'strazce-obvodu',
+    title: 'Strážce obvodu',
+    description: 'Rozlišuješ přetížení a zkrat a víš, k čemu slouží pojistka a jistič.',
+    icon: '🛡️',
+  },
+  {
     id: 'seriove-paralelne',
     title: 'Sériově i paralelně',
     description: 'Rozlišíš sériové a paralelní zapojení.',
