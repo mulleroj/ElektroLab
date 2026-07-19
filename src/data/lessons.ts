@@ -668,6 +668,119 @@ export const lessons: MicroLesson[] = [
     mvpAvailable: true,
   },
   {
+    id: 'zkrat-pretizeni-a-jisteni',
+    subjectId: 'zaklady',
+    topicId: 'stejnosmerny-proud',
+    title: 'Zkrat, přetížení a jištění',
+    year: 1,
+    durationMinutes: 10,
+    difficulty: 'základní',
+    goal:
+      'Žák vysvětlí nadproud, rozliší přetížení a zkrat, uvede úlohu pojistky a jističe a chápe, že ochrana před nadproudem neznamená ochranu před každým úrazem elektrickým proudem.',
+    hook:
+      'Proč někdy jistič vypne až po připojení více spotřebičů, ale při zkratu může vypnout téměř okamžitě?',
+    explanation:
+      '**Nadproud** je proud větší, než pro jaký je vedení nebo zařízení za daných podmínek určeno. Může vzniknout například přetížením nebo zkratem. Příliš velký proud může vodiče nebezpečně zahřívat. Dlouhodobé nebo velmi silné zahřívání může poškodit izolaci a způsobit požár — konkrétní bezpečné hodnoty z této lekce neurčíš a neplatí, že každý nadproud automaticky způsobí požár.\n\n**Přetížení** nastane, když obvod zůstává jinak elektricky zapojen obvyklým způsobem, ale odebírá větší proud, než pro jaký je navržen. Příčinou může být například příliš mnoho nebo příliš výkonných spotřebičů na jednom obvodu. Přetížení může trvat určitou dobu a způsobovat zahřívání. Nejde o přímé spojení vodičů s rozdílným potenciálem. Příklad: na jeden nevhodně zatížený přívod je připojeno více výkonných spotřebičů a celkový proud překročí dovolenou hodnotu.\n\n**Zkrat** je nechtěné vodivé spojení mezi místy s rozdílným elektrickým potenciálem. Vznikne cesta s velmi malým odporem, takže při stejném napětí může protékat velmi velký proud. Proud není doslova nekonečný — omezují ho zdroj, vodiče a další impedance obvodu. Zkrat může způsobit velmi rychlé zahřívání, poškození nebo elektrický oblouk; běžný spotřebič může být zkratovou cestou z velké části obejit. Jednoduše: při zkratu vznikne nežádoucí cesta s velmi malým odporem, proto může proud prudce vzrůst. Odpor při zkratu není vždy přesně nula.\n\n**Rozdíl:** při přetížení je obvod zapojen obvyklým způsobem, ale odběr je příliš velký a zahřívání se může rozvíjet postupně. Při zkratu vznikne nechtěná cesta s velmi malým odporem, proud může vzrůst velmi rychle a ochrana musí obvod bezpečně odpojit. Přetížení nemusí být vždy pomalé a zkrat nemusí být vždy okamžitě odpojený — záleží na podmínkách.\n\n**Pojistka** obsahuje tavný prvek. Při příliš velkém proudu se zahřeje a přeruší obvod. Po vybavení se nenahrazuje drátem, nepřemosťuje a neopravuje doma — nahrazuje se pouze správným typem a hodnotou podle dokumentace nebo rozhodnutí kvalifikované osoby.\n\n**Jistič** při nadproudu automaticky rozpojí obvod. Může reagovat na přetížení i zkrat. Po bezpečném odstranění příčiny může být znovu zapnut. Opakované zapínání bez zjištění příčiny je nebezpečné — samotné zapnutí není oprava. Jistič nechrání před každým úrazem elektrickým proudem a po zkratu se nesmí vždy ihned znovu zapnout.\n\n**Hranice ochrany:** pojistka a jistič chrání především vedení a zařízení před následky nadproudu. Sami o sobě nezajišťují ochranu před každým nebezpečným dotykem nebo každým úrazem elektrickým proudem. Jiné prvky (například proudový chránič) mají další úlohy — jejich podrobná funkce není součástí této lekce. Žádné ochranné zařízení neslibuje absolutní bezpečnost.',
+    safetyNote:
+      'Zkrat ani přetížení se nesmějí záměrně vytvářet. Vodiče se nespojují „na zkoušku“. Pojistka se nikdy nenahrazuje drátem a ochranné prvky se nepřemosťují. Opakovaně vybavující jistič se bez odstranění příčiny znovu nezapíná. Poškozené kabely a spotřebiče se nepoužívají. Na síťovém zařízení pracuje pouze oprávněná nebo kvalifikovaná osoba podle příslušných pravidel. Žák závadu oznámí učiteli nebo odpovědné osobě.',
+    memorySentence:
+      'Přetížení je příliš velký odběr; zkrat vytváří nechtěnou cestu s velmi malým odporem. Jistič nebo pojistka při nadproudu obvod odpojí.',
+    typicalMistake:
+      'Žáci si myslí, že přetížení a zkrat jsou totéž. Při přetížení obvod odebírá příliš velký proud v jinak obvyklém zapojení; při zkratu vznikne nechtěná cesta s velmi malým odporem. Druhá chyba: jistič vypnul, takže stačí znovu zapnout a závada je opravena. Vybavení je varování — před opětovným provozem je nutné zjistit a bezpečně odstranit příčinu. Třetí chyba: jistič chrání člověka před každým úrazem. Jistič chrání především vedení a zařízení před nadproudem; ochrana osob vyžaduje více správně navržených opatření.',
+    teacherTip:
+      'Bezpečná demonstrace bez napětí: kartičky „běžný provoz“, „přetížení“, „zkrat“ a „nebezpečný postup“ — žáci přiřazují popis situace ke kategorii a vysvětlí rozdíl. Nebo model: úzký průchod = omezená proudová zatížitelnost, příliš mnoho figurek = přetížení, zvláštní nežádoucí spojka = zkratová cesta. Výslovně uveď, že jde pouze o model, nikoli doslovný pohyb proudu. Nepoužívej živý obvod, síťové napětí, zahřívání vodiče, tavné pojistky v provozu, skutečný zkrat ani přetěžování prodlužovacího kabelu.',
+    activity: {
+      scenarioChoice: {
+        type: 'scenario-choice',
+        instruction:
+          'U každé situace rozhodni, o jaký stav jde. Všechny čtyři musí být správně.',
+        options: [
+          { id: 'bezny', label: 'Běžný provoz' },
+          { id: 'pretizeni', label: 'Přetížení' },
+          { id: 'zkrat', label: 'Zkrat' },
+          { id: 'nebezpecny', label: 'Nebezpečný postup' },
+        ],
+        successMessage:
+          'Výborně! Umíš rozpoznat běžný provoz, přetížení, zkrat i nebezpečný postup.',
+        scenarios: [
+          {
+            id: 's1',
+            text: 'K jednomu správně navrženému obvodu je připojen spotřebič, pro který je obvod určen. Vedení se neobvykle nezahřívá a ochranný prvek nevybavuje.',
+            correctOptionId: 'bezny',
+            explanation:
+              'Jde o běžný provoz v rámci určeného zatížení. To ale neznamená absolutní záruku bezpečnosti celé instalace.',
+          },
+          {
+            id: 's2',
+            text: 'K jednomu přívodu je současně připojeno více výkonných spotřebičů a celkový odběr překročí hodnotu, pro kterou je obvod určen.',
+            correctOptionId: 'pretizeni',
+            explanation:
+              'Obvod je jinak zapojen obvyklým způsobem, ale odebírá příliš velký proud — to je přetížení, ne zkrat.',
+          },
+          {
+            id: 's3',
+            text: 'Po poškození izolace vznikne nechtěné vodivé spojení mezi vodiči s rozdílným potenciálem a proud prudce vzroste.',
+            correctOptionId: 'zkrat',
+            explanation:
+              'Nechtěné spojení rozdílných potenciálů vytvoří cestu s velmi malým odporem — to je zkrat.',
+          },
+          {
+            id: 's4',
+            text: 'Jistič opakovaně vypíná a někdo jej bez zjištění příčiny stále znovu zapíná.',
+            correctOptionId: 'nebezpecny',
+            explanation:
+              'Opakované zapínání bez odstranění příčiny je nebezpečný postup, nikoli oprava závady.',
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        id: 'q1',
+        text: 'Proč může při zkratu protékat velmi velký proud?',
+        options: [
+          { id: 'a', text: 'Protože vznikne nechtěná cesta s velmi malým odporem.' },
+          { id: 'b', text: 'Protože zkrat zvětší odpor obvodu na maximum.' },
+          { id: 'c', text: 'Protože proud vzniká i bez zdroje napětí.' },
+          { id: 'd', text: 'Protože se v místě zkratu začnou vyrábět elektrony.' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'Při zkratu vznikne cesta s velmi malým odporem, proto může proud prudce vzrůst. Proud není doslova nekonečný — jeho velikost omezují vlastnosti zdroje, vodičů a obvodu.',
+      },
+      {
+        id: 'q2',
+        text: 'Jaký je hlavní úkol jističe nebo pojistky?',
+        options: [
+          { id: 'a', text: 'Přerušit obvod při nebezpečném nadproudu a chránit vedení a zařízení.' },
+          { id: 'b', text: 'Zaručit ochranu před každým úrazem elektrickým proudem.' },
+          { id: 'c', text: 'Zvýšit výkon připojeného spotřebiče při provozu.' },
+          { id: 'd', text: 'Samy odstranit příčinu závady v instalaci.' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'Pojistka a jistič chrání především vedení a zařízení před následky nadproudu. Neodstraní příčinu a samy nezajišťují ochranu před každým úrazem.',
+      },
+      {
+        id: 'q3',
+        text: 'Které tvrzení správně rozlišuje přetížení a zkrat?',
+        options: [
+          { id: 'a', text: 'Přetížení je příliš velký odběr v obvyklém zapojení; zkrat vytváří nechtěnou cestu s velmi malým odporem.' },
+          { id: 'b', text: 'Přetížení i zkrat jsou totéž — vždy jen větší počet spotřebičů.' },
+          { id: 'c', text: 'Zkrat znamená, že obvod odebírá málo proudu při vysokém odporu.' },
+          { id: 'd', text: 'Přetížení vzniká jen tehdy, když jsou vodiče přímo zkratované.' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'Přetížení = příliš velký odběr v jinak obvyklém zapojení. Zkrat = nechtěná cesta s velmi malým odporem mezi rozdílnými potenciály.',
+      },
+    ],
+    activityXp: 20,
+    quizXp: 15,
+    badgeId: 'strazce-obvodu',
+    mvpAvailable: true,
+  },
+  {
     id: 'seriove-paralelni',
     subjectId: 'zaklady',
     topicId: 'stejnosmerny-proud',

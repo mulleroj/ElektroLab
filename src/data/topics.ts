@@ -25,7 +25,7 @@ export const topics: Topic[] = [
     title: 'Stejnosměrný proud',
     description: 'Jak teče proud v uzavřeném obvodu a co ovlivňuje jeho velikost.',
     year: 1,
-    estimatedMinutes: 50,
+    estimatedMinutes: 60,
     mvpAvailable: true,
   },
   {
