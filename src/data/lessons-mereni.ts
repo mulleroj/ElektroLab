@@ -5,6 +5,114 @@ const MERENI_SAFETY =
 
 export const mereniLessons: MicroLesson[] = [
   {
+    id: 'od-vypoctu-k-mereni',
+    subjectId: 'mereni',
+    topicId: 'metody-mereni',
+    title: 'Od výpočtu k měření: U, I a R',
+    year: 1,
+    durationMinutes: 10,
+    difficulty: 'základní',
+    goal:
+      'Žák rozliší výpočet a měření U, I a R, zná základní zapojení voltmetru a ampérmetru, ví, že odpor se měří jen v odpojeném beznapěťovém obvodu, a umí použít Ohmův zákon na jednoduchou dvojici hodnot.',
+    hook:
+      'Z Ohmova zákona umíš spočítat R. Ale kdy máš hodnotu spočítat a kdy ji změřit — a proč se obě čísla někdy mírně liší?',
+    explanation:
+      '**Výpočet** používá známé hodnoty a vztahy — například Ohmův zákon. **Měření** používá měřicí přístroj. Obě metody se mohou vzájemně kontrolovat. Vypočtená a změřená hodnota nemusí být naprosto stejná: malý rozdíl může vzniknout tolerancí součástek, přesností měřidla, odporem vodičů a kontaktů nebo podmínkami měření. Malý rozdíl sám o sobě nemusí znamenat chybu. Velkou nebo neočekávanou odchylku ale neignoruj — nejdřív ji bezpečně prověř.\n\n**Napětí:** voltmetr se připojuje **paralelně** mezi dva body nebo ke svorkám měřeného prvku. Měří rozdíl potenciálů mezi těmito body. Kvůli připojení voltmetru se běžná proudová cesta nerozpojuje.\n\n**Proud:** ampérmetr se zapojuje **sériově** do proudové cesty — proud musí měřidlem procházet. Paralelní připojení ampérmetru ke zdroji nebo spotřebiči je chybný a nebezpečný postup. Takové zapojení se neprovádí.\n\n**Odpor:** měří se pouze v **odpojeném** obvodu a až po ověření **beznapěťového** stavu. Ohmmetr ani režim odporu multimetru se nepřipojuje k živému obvodu — přítomné napětí může zkreslit výsledek a poškodit měřidlo. V zapojeném obvodu mohou výsledek ovlivnit i další vodivé cesty.\n\n**Před připojením** zvol správnou měřenou veličinu. Správné zdířky a rozsah se volí podle návodu a pokynu učitele. Není-li hodnota známa, postupuj podle bezpečného školního postupu a návodu přístroje.\n\n**Příklad:** na bezpečném modelu je U = 6 V a I = 0,03 A. Pak R = U / I = 6 / 0,03 = **200 Ω**. Skutečné měření může ukázat hodnotu blízkou 200 Ω — například 205 Ω. Mírná odchylka sama o sobě nemusí znamenat chybu.',
+    safetyNote:
+      'Praktické měření provádí žák pouze na schváleném bezpečném školním nízkonapěťovém modelu a vždy pod dohledem učitele. Síťová instalace není určena k žákovskému procvičování. Odpor se měří pouze po odpojení a ověření beznapěťového stavu. Ampérmetr se nikdy nepřipojuje paralelně ke zdroji. Závadu, poškozený vodič nebo nejasný stav žák nezkoumá pokusem, ale hlásí učiteli. Tato lekce není návodem k práci na živém zařízení.',
+    memorySentence:
+      'Napětí měříme paralelně, proud sériově a odpor jen v odpojeném obvodu.',
+    typicalMistake:
+      'Žáci zapojí voltmetr sériově nebo ampérmetr paralelně. Další chyba je měřit odpor v obvodu pod napětím. Někteří očekávají, že výpočet a měření musí být vždy naprosto totožné, nebo naopak každý malý rozdíl považují za fatální chybu. Také mění funkci či zdířky měřidla bez kontroly a při výpočtu smíchají mA s A.',
+    teacherTip:
+      'Navazuje na Ohmův zákon ze Základů. Zdůrazni most výpočet ↔ měření na bezpečném modelu 6 V / 0,03 A → 200 Ω. Nežádej měření na síti. Podrobnosti voltmetru, ampérmetru a rozsahu nech navazujícím lekcím.',
+    activity: {
+      measurementJudgment: {
+        type: 'measurement-judgment',
+        instruction:
+          'U každé situace rozhodni, jestli je postup nebo úsudek v pořádku, nebo chybný. Všechny čtyři situace musí být správně.',
+        correctLabel: 'Postup nebo úsudek je v pořádku',
+        wrongLabel: 'Postup nebo úsudek je chybný',
+        successMessage:
+          'Výborně! Rozlišuješ bezpečné měření U, I a R a umíš posoudit malou odchylku výpočtu a měření.',
+        scenarios: [
+          {
+            id: 's1',
+            text: 'Na bezpečném nízkonapěťovém modelu je voltmetr připojen ke dvěma svorkám spotřebiče.',
+            correct: 'correct',
+            explanation:
+              'Správný princip měření napětí — voltmetr je připojen paralelně ke spotřebiči.',
+          },
+          {
+            id: 's2',
+            text: 'Návrh počítá s paralelním připojením ampérmetru přímo ke zdroji na bezpečném modelu.',
+            correct: 'wrong',
+            explanation:
+              'Nebezpečný a chybný postup — ampérmetr se takto nepřipojuje. Takové zapojení se neprovádí.',
+          },
+          {
+            id: 's3',
+            text: 'Žák chce měřit odpor prvku v odpojeném modelu po ověření beznapěťového stavu.',
+            correct: 'correct',
+            explanation:
+              'Správná základní podmínka měření odporu — odpojený a ověřeně beznapěťový obvod.',
+          },
+          {
+            id: 's4',
+            text: 'Výpočet z U = 6 V a I = 0,03 A dal R = 200 Ω. Měření na bezpečném modelu ukázalo 205 Ω.',
+            correct: 'correct',
+            explanation:
+              'Malá odchylka může být přijatelná — ber ji v kontextu tolerance součástek a přesnosti měření. Velkou odchylku bys bezpečně prověřil.',
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        id: 'q1',
+        text: 'Co musí platit před měřením odporu?',
+        options: [
+          { id: 'a', text: 'Obvod je odpojený a je ověřeno, že není pod napětím.' },
+          { id: 'b', text: 'Obvod musí zůstat pod provozním napětím zdroje.' },
+          { id: 'c', text: 'Stačí zapnout režim odporu a měřit v zapojeném obvodu.' },
+          { id: 'd', text: 'Odpor se měří jen při maximálním proudu obvodu.' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'Odpor se měří jen v odpojeném obvodu po ověření beznapěťového stavu. Na živý obvod se režim odporu nepřipojuje.',
+      },
+      {
+        id: 'q2',
+        text: 'Proč se vypočtená a změřená hodnota mohou mírně lišit?',
+        options: [
+          { id: 'a', text: 'Kvůli toleranci součástek, přesnosti měřidla a podmínkám měření.' },
+          { id: 'b', text: 'Protože Ohmův zákon při měření neplatí.' },
+          { id: 'c', text: 'Protože měřidlo vždy ukazuje náhodné číslo.' },
+          { id: 'd', text: 'Protože každou odchylku lze bez kontroly ignorovat.' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'Malý rozdíl může vzniknout tolerancí, přesností přístroje nebo podmínkami měření. Neznamená to, že zákon neplatí, ani že odchylku smíš vždy ignorovat.',
+      },
+      {
+        id: 'q3',
+        text: 'Na bezpečném modelu je U = 6 V a I = 0,03 A. Jaký je odpor?',
+        options: [
+          { id: 'a', text: '200 Ω' },
+          { id: 'b', text: '20 Ω' },
+          { id: 'c', text: '0,005 Ω' },
+          { id: 'd', text: '180 Ω' },
+        ],
+        correctOptionId: 'a',
+        explanation: 'R = U / I = 6 / 0,03 = 200 Ω. Proud je už v ampérech, převod není potřeba.',
+      },
+    ],
+    activityXp: 20,
+    quizXp: 15,
+    badgeId: 'merici-detektiv',
+    mvpAvailable: true,
+  },
+  {
     id: 'voltmetr-zapojeni',
     subjectId: 'mereni',
     topicId: 'metody-mereni',

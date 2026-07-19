@@ -80,6 +80,13 @@ export const badges: Badge[] = [
     icon: '🎖️',
   },
   {
+    id: 'merici-detektiv',
+    title: 'Měřicí detektiv',
+    description:
+      'Rozlišíš výpočet a měření U, I a R a znáš základní bezpečná pravidla zapojení měřidel.',
+    icon: '🕵️‍♂️',
+  },
+  {
     id: 'voltmetr-zvladnut',
     title: 'Voltmetr zvládnut',
     description: 'Víš, že voltmetr patří paralelně.',

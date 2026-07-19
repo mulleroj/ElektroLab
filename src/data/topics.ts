@@ -97,7 +97,7 @@ export const topics: Topic[] = [
     title: 'Způsoby a metody měření elektrických veličin',
     description: 'Jak správně měřit napětí a proud — voltmetr, ampérmetr a bezpečné postupy.',
     year: 1,
-    estimatedMinutes: 30,
+    estimatedMinutes: 40,
     mvpAvailable: true,
   },
   {
