@@ -2,15 +2,6 @@ import type { Topic } from '../types';
 
 export const topics: Topic[] = [
   {
-    id: 'veliciny',
-    subjectId: 'zaklady',
-    title: 'Veličiny a jednotky',
-    description: 'Základní elektrické veličiny a jejich jednotky.',
-    year: 1,
-    estimatedMinutes: 35,
-    mvpAvailable: false,
-  },
-  {
     id: 'stavba-latek',
     subjectId: 'zaklady',
     title: 'Stavba látek',
@@ -26,6 +17,15 @@ export const topics: Topic[] = [
     description: 'Jak teče proud v uzavřeném obvodu a co ovlivňuje jeho velikost.',
     year: 1,
     estimatedMinutes: 60,
+    mvpAvailable: true,
+  },
+  {
+    id: 'veliciny',
+    subjectId: 'zaklady',
+    title: 'Veličiny a jednotky',
+    description: 'Základní elektrické veličiny a jejich jednotky.',
+    year: 1,
+    estimatedMinutes: 10,
     mvpAvailable: true,
   },
   {
