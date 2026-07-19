@@ -462,20 +462,26 @@ export const lessons: MicroLesson[] = [
         ],
         correctOptionId: 'a',
         explanation:
-          'Odpor říká, jak moc prvek nebo vodič omezuje proud. Nevyjadřuje spotřebu náboje ani barvu izolace.',
+          'Odpor říká, jak moc prvek nebo vodič omezuje proud. Při daném napětí platí, že větší odpor znamená menší proud. Nevyjadřuje spotřebu náboje ani barvu izolace.',
       },
       {
         id: 'q2',
-        text: 'Máme dva měděné vodiče stejné délky a teploty. Který má menší elektrický odpor?',
+        text: 'Který z těchto vodičů bude mít při stejné teplotě nejmenší elektrický odpor?',
         options: [
-          { id: 'a', text: 'Vodič s větším průřezem' },
-          { id: 'b', text: 'Vodič s menším průřezem' },
-          { id: 'c', text: 'Oba mají vždy stejný odpor' },
-          { id: 'd', text: 'Ten, který má barevnější izolaci' },
+          { id: 'a', text: 'Krátký měděný vodič s větším průřezem' },
+          { id: 'b', text: 'Dlouhý měděný vodič s menším průřezem' },
+          {
+            id: 'c',
+            text: 'Dlouhý vodič z hůře vodivého materiálu s menším průřezem',
+          },
+          {
+            id: 'd',
+            text: 'Krátký vodič z hůře vodivého materiálu s menším průřezem',
+          },
         ],
         correctOptionId: 'a',
         explanation:
-          'Při stejném materiálu, délce a teplotě má vodič s větším průřezem menší odpor. Průřez je plocha řezu vodičem.',
+          'Při stejné teplotě má menší odpor vodič z lépe vodivého materiálu, s kratší délkou a větším průřezem. Měď je v tomto porovnání lépe vodivá než materiál v ostatních možnostech.',
       },
       {
         id: 'q3',
