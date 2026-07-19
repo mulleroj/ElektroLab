@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { MicroLesson, ProgressState, LessonStep, QuizScore } from '../types';
 import { getNextStepAfterIntro } from '../types';
 import { SafetyNote } from './SafetyNote';
+import { LessonRichText } from './LessonRichText';
 import { InteractiveDemoRenderer } from './InteractiveDemoRenderer';
 import { ActivityRenderer } from './ActivityRenderer';
 import { Quiz } from './Quiz';
@@ -170,12 +171,12 @@ export function LessonPage({
             </div>
             <div className="lesson-intro__section">
               <h2>Vysvětlení</h2>
-              <p>{lesson.explanation}</p>
+              <LessonRichText text={lesson.explanation} />
             </div>
             {lesson.typicalMistake && (
               <div className="lesson-intro__section lesson-intro__mistake">
                 <h2>Typická chyba</h2>
-                <p>{lesson.typicalMistake}</p>
+                <LessonRichText text={lesson.typicalMistake} />
               </div>
             )}
             <blockquote className="memory-sentence">

@@ -538,9 +538,22 @@ input:focus-visible {
   color: #92400e;
 }
 
-.safety-note p {
+.safety-note .lesson-rich-text p {
   margin: 0;
   font-size: 0.9375rem;
+}
+
+.safety-note .lesson-rich-text p + p {
+  margin-top: 0.5rem;
+}
+
+/* Omezené formátování výkladových textů lekce (odstavce + tučné) */
+.lesson-rich-text p {
+  margin: 0 0 0.75rem;
+}
+
+.lesson-rich-text p:last-child {
+  margin-bottom: 0;
 }
 
 /* Lesson page */
