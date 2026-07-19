@@ -26,6 +26,12 @@ export const badges: Badge[] = [
     icon: '⚡',
   },
   {
+    id: 'znalec-odporu',
+    title: 'Znalec odporu',
+    description: 'Víš, proč má vodič odpor a co odpor ovlivňuje.',
+    icon: '🌡️',
+  },
+  {
     id: 'ohmuv-pomocnik',
     title: 'Ohmův pomocník',
     description: 'Rozumíš vztahu U = R · I.',

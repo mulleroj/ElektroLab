@@ -389,6 +389,114 @@ export const lessons: MicroLesson[] = [
     mvpAvailable: true,
   },
   {
+    id: 'proc-ma-vodic-elektricky-odpor',
+    subjectId: 'zaklady',
+    topicId: 'stejnosmerny-proud',
+    title: 'Proč má vodič elektrický odpor',
+    year: 1,
+    durationMinutes: 9,
+    difficulty: 'základní',
+    goal:
+      'Žák vysvětlí elektrický odpor vodiče, uvede vliv materiálu, délky, průřezu a teploty u kovového vodiče a spojí odpor se zahříváním vodiče.',
+    hook:
+      'Proč má i měděný vodič určitý odpor, když je měď dobrý elektrický vodič? A proč se dlouhý a tenký vodič zahřívá snáze než krátký vodič s větším průřezem ze stejného materiálu? (Jde o modelovou úvahu — ne o přetěžování kabelu.)',
+    explanation:
+      '**Elektrický odpor** vyjadřuje, jak moc prvek nebo vodič omezuje elektrický proud. Značí se **R**, základní jednotka je ohm (**Ω**). Dobrý vodič má malý odpor, nikoli nulový. Izolant má za běžných podmínek odpor velmi velký. Proud se ve spotřebiči ani vodiči neztrácí — odpor ovlivňuje, jak velký proud bude při daném napětí obvodem procházet. Ve **zjednodušeném modelu** se volné elektrony v kovu pohybují jeho strukturou. Při usměrněném pohybu jsou ovlivňovány atomy materiálu, nečistotami a nepravidelnostmi, takže pohyb není bez překážek. Část elektrické energie se mění na vnitřní energii materiálu a vodič se může zahřívat. Odpor vodiče závisí zejména na **materiálu**, **délce**, **průřezu** (ploše řezu vodičem) a **teplotě**. Při stejném materiálu, průřezu a teplotě má delší vodič větší odpor. Při stejném materiálu, délce a teplotě má vodič s větším průřezem menší odpor. U kovových vodičů za běžných podmínek se při zvýšení teploty odpor obvykle zvětšuje — toto pravidlo neplatí univerzálně pro všechny materiály. Zahřívání může být užitečné (topné těleso) nebo nežádoucí (přetížené vedení). Samotný výpočet odporu nestačí k posouzení bezpečnosti instalace.',
+    safetyNote:
+      'Odpor vodiče se nezkouší úmyslným přetěžováním ani zkratem. Poškozený nebo neobvykle teplý kabel se nepoužívá. Síťová instalace se neposuzuje jen podle jednoduchého modelu odporu. Skutečné měření a posouzení provádí učitel nebo kvalifikovaná osoba vhodným měřicím přístrojem a bezpečným postupem. Vodiče za provozu se nedotýkáme kvůli zjištění teploty.',
+    memorySentence:
+      'Odpor vodiče závisí na materiálu, délce, průřezu a teplotě — delší vodič odpor zvětšuje, větší průřez ho zmenšuje.',
+    typicalMistake:
+      'Žáci si myslí, že odpor „spotřebuje“ část proudu. Proud se ve vodiči nespotřebovává — odpor ovlivňuje velikost proudu při daném napětí a elektrická energie se může měnit na teplo. Druhá chyba: že vodič s větším průřezem má větší odpor, protože obsahuje více materiálu. Při stejné délce a materiálu má vodič s větším průřezem menší odpor.',
+    teacherTip:
+      'Připrav odpojené vzorky vodičů různé délky a průřezu a nech žáky jen vizuálně porovnat. Provázkem znázorni delší cestu; jednou úzkou a několika paralelními cestami význam většího průřezu. Zdůrazni, že jde o model. Měření jen na bezpečném školním zařízení podle návodu a pod dohledem — bez síťového napětí.',
+    activity: {
+      measurementJudgment: {
+        type: 'measurement-judgment',
+        instruction:
+          'U každé situace rozhodni, jestli se elektrický odpor vodiče zvětší, nebo zmenší. Ostatní podmínky zůstávají stejné, jak je uvedeno.',
+        correctLabel: 'Odpor se zvětší',
+        wrongLabel: 'Odpor se zmenší',
+        successMessage: 'Výborně! Správně jsi posoudil, jak se mění odpor vodiče.',
+        scenarios: [
+          {
+            id: 's1',
+            text: 'Vodič ze stejného materiálu, se stejným průřezem a při stejné teplotě prodloužíme.',
+            correct: 'correct',
+            explanation:
+              'Delší vodič má při stejném materiálu, průřezu a teplotě větší elektrický odpor.',
+          },
+          {
+            id: 's2',
+            text: 'Vodič ze stejného materiálu a stejné délky nahradíme při stejné teplotě vodičem s větším průřezem.',
+            correct: 'wrong',
+            explanation:
+              'Větší průřez znamená při stejné délce, materiálu a teplotě menší elektrický odpor.',
+          },
+          {
+            id: 's3',
+            text: 'Kovový vodič za běžných podmínek zahřejeme (materiál, délka i průřez zůstávají stejné).',
+            correct: 'correct',
+            explanation:
+              'U kovových vodičů se při zvýšení teploty odpor obvykle zvětšuje. Nejde o pravidlo pro všechny materiály.',
+          },
+          {
+            id: 's4',
+            text: 'Stejně dlouhý a stejně silný (stejný průřez) vodič nahradíme při stejné teplotě materiálem s horší elektrickou vodivostí.',
+            correct: 'correct',
+            explanation:
+              'Materiál s horší vodivostí má při stejné délce, průřezu a teplotě větší elektrický odpor.',
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        id: 'q1',
+        text: 'Co vyjadřuje elektrický odpor?',
+        options: [
+          { id: 'a', text: 'Jak moc prvek nebo vodič omezuje elektrický proud' },
+          { id: 'b', text: 'Kolik nových elektronů prvek vytváří' },
+          { id: 'c', text: 'Kolik elektrického náboje prvek spotřebuje' },
+          { id: 'd', text: 'Jakou barvu má izolace kabelu' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'Odpor říká, jak moc prvek nebo vodič omezuje proud. Nevyjadřuje spotřebu náboje ani barvu izolace.',
+      },
+      {
+        id: 'q2',
+        text: 'Máme dva měděné vodiče stejné délky a teploty. Který má menší elektrický odpor?',
+        options: [
+          { id: 'a', text: 'Vodič s větším průřezem' },
+          { id: 'b', text: 'Vodič s menším průřezem' },
+          { id: 'c', text: 'Oba mají vždy stejný odpor' },
+          { id: 'd', text: 'Ten, který má barevnější izolaci' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'Při stejném materiálu, délce a teplotě má vodič s větším průřezem menší odpor. Průřez je plocha řezu vodičem.',
+      },
+      {
+        id: 'q3',
+        text: 'Proč se může vodič při průchodu elektrického proudu zahřívat?',
+        options: [
+          { id: 'a', text: 'Kvůli odporu se část elektrické energie mění na teplo' },
+          { id: 'b', text: 'Protože elektrony ve vodiči hoří' },
+          { id: 'c', text: 'Protože se proud ve vodiči spotřebuje' },
+          { id: 'd', text: 'Protože vodič vytváří nový elektrický náboj' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'Kvůli elektrickému odporu se část elektrické energie mění na teplo. Proud se nespotřebovává a elektrony nehoří.',
+      },
+    ],
+    activityXp: 20,
+    quizXp: 15,
+    badgeId: 'znalec-odporu',
+    mvpAvailable: true,
+  },
+  {
     id: 'ohmuv-zakon',
     subjectId: 'zaklady',
     topicId: 'stejnosmerny-proud',
