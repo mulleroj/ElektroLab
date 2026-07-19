@@ -185,16 +185,19 @@ export const lessons: MicroLesson[] = [
       },
       {
         id: 'q2',
-        text: 'Co v kovovém vodiči vytváří elektrický proud?',
+        text: 'Proč kovový vodič vede elektrický proud lépe než izolant?',
         options: [
-          { id: 'a', text: 'Usměrněný pohyb volných elektronů' },
-          { id: 'b', text: 'Pohyb protonů z jádra atomu do spotřebiče' },
-          { id: 'c', text: 'Neuspořádaný pohyb všech atomů vodiče' },
-          { id: 'd', text: 'Přenos barvy izolace podél kabelu' },
+          {
+            id: 'a',
+            text: 'Protože obsahuje volné elektrony, které se mohou pohybovat jeho strukturou',
+          },
+          { id: 'b', text: 'Protože všechny jeho atomy mají kladný náboj' },
+          { id: 'c', text: 'Protože v něm nejsou žádné elektrony' },
+          { id: 'd', text: 'Protože se jeho protony volně pohybují mezi atomy' },
         ],
         correctOptionId: 'a',
         explanation:
-          'V kovovém vodiči je elektrický proud usměrněný pohyb volných elektronů. Protony zůstávají v jádrech atomů.',
+          'V kovu jsou některé elektrony volné (vodivostní) a mohou se pohybovat strukturou kovu. Při působení elektrického pole získá jejich pohyb společný směr — právě to umožňuje vedení proudu v kovovém vodiči. Neznamená to, že všechny elektrony jsou volné, ani že stejný mechanismus platí ve všech materiálech.',
       },
       {
         id: 'q3',
