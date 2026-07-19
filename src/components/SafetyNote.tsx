@@ -1,3 +1,5 @@
+import { LessonRichText } from './LessonRichText';
+
 interface SafetyNoteProps {
   text: string;
 }
@@ -11,7 +13,7 @@ export function SafetyNote({ text }: SafetyNoteProps) {
         </span>
         <strong>Bezpečnostní poznámka</strong>
       </div>
-      <p>{text}</p>
+      <LessonRichText text={text} />
     </aside>
   );
 }
