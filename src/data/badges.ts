@@ -117,6 +117,12 @@ export const badges: Badge[] = [
     icon: '🛑',
   },
   {
+    id: 'vodicovy-strazce',
+    title: 'Vodičový strážce',
+    description: 'Rozlišíš PE, N a PEN podle funkce a víš, že barva sama nestačí.',
+    icon: '🧵',
+  },
+  {
     id: 'chranic-pochopen',
     title: 'Chránič pochopen',
     description: 'Rozumíš tomu, že proudový chránič porovnává proud tam a zpět.',

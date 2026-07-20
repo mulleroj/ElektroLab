@@ -105,9 +105,9 @@ export const topics: Topic[] = [
     subjectId: 'rozvody',
     title: 'Elektrický silnoproudý rozvod v obytných budovách',
     description:
-      'Co v domovním rozvodu chrání vedení a co chrání člověka — jistič a proudový chránič.',
+      'Domovní rozvod: vodiče PE, N a PEN, jistič a proudový chránič — kdo chrání vedení a kdo člověka.',
     year: 2,
-    estimatedMinutes: 25,
+    estimatedMinutes: 36,
     mvpAvailable: true,
   },
   {

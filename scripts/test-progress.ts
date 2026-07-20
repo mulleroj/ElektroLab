@@ -1295,6 +1295,203 @@ test('výklad Zkrat, přetížení a jištění nemá auditované duplicity a z�
   }
 });
 
+test('lekce PE, N a PEN je v rozvod-obytne-budovy a má scenario-choice bez dema', () => {
+  const lesson = getLessonById('pe-n-pen');
+  assert.ok(lesson);
+  assert.equal(lesson.subjectId, 'rozvody');
+  assert.equal(lesson.year, 2);
+  assert.equal(lesson.topicId, 'rozvod-obytne-budovy');
+  assert.equal(lesson.durationMinutes, 10);
+  assert.equal(lesson.mvpAvailable, true);
+  assert.equal(lesson.quiz.length, 3);
+  assert.equal(lesson.interactiveDemo, undefined);
+  const activity = getLessonActivity(lesson);
+  assert.ok(activity);
+  assert.equal(activity.type, 'scenario-choice');
+  assert.equal(activity.scenarios.length, 4);
+  assert.equal(lesson.badgeId, 'vodicovy-strazce');
+  assert.ok(getBadgeById('vodicovy-strazce'));
+});
+
+test('pořadí Rozvodů: jistič, PE-N-PEN, chránič, porovnání', () => {
+  const order = getMvpLessonsBySubject('rozvody').map((l) => l.id);
+  assert.deepEqual(order, [
+    'co-dela-jistic',
+    'pe-n-pen',
+    'co-dela-chranic',
+    'jistic-vs-chranic',
+  ]);
+  assert.equal(order.indexOf('pe-n-pen'), order.indexOf('co-dela-jistic') + 1);
+  assert.equal(order.indexOf('co-dela-chranic'), order.indexOf('pe-n-pen') + 1);
+  assert.equal(order.indexOf('jistic-vs-chranic'), order.indexOf('co-dela-chranic') + 1);
+});
+
+test('výklad PE, N a PEN zachovává odborné a bezpečnostní jádro', () => {
+  const lesson = getLessonById('pe-n-pen');
+  assert.ok(lesson);
+  const text = [
+    lesson.explanation,
+    lesson.safetyNote,
+    lesson.typicalMistake,
+    lesson.memorySentence,
+  ].join('\n');
+  assert.ok(text.includes('PE') || text.includes('ochranný vodič'));
+  assert.ok(text.includes('N') || text.includes('střední vodič'));
+  assert.ok(text.includes('PEN'));
+  assert.ok(text.includes('pracovní'));
+  assert.ok(text.includes('ochrann'));
+  assert.ok(/kombinuj|spojen/i.test(text));
+  assert.ok(/přerušen/i.test(text));
+  assert.ok(/automaticky bezpečný|nepotvrzuje bezpečnost|není.*bezpečný/i.test(text));
+  assert.ok(/barva/i.test(text));
+  assert.ok(/síťov/i.test(text) || /síťové instalaci/i.test(text));
+  assert.ok(/nemanipuluj|nemanipuluje|podle barvy/i.test(text));
+  assert.ok(/oprávněná osoba/i.test(text));
+});
+
+test('starý progress Rozvodů bez předmětového odznaku: 3/4 a doporučí pe-n-pen', () => {
+  const allLessons = getMvpLessonsBySubject('rozvody');
+  assert.equal(allLessons.length, 4);
+  const originalIds = ['co-dela-jistic', 'co-dela-chranic', 'jistic-vs-chranic'];
+  const lessonsState: ProgressState['lessons'] = {};
+  for (const id of originalIds) {
+    lessonsState[id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  const seeded: ProgressState = {
+    totalXp: 35 * 3,
+    earnedBadges: ['hlidac-jistice', 'chranic-pochopen', 'rozvodovy-detektiv'],
+    lessons: lessonsState,
+    calmMode: false,
+  };
+  saveProgress(seeded);
+  const loaded = loadProgress();
+  for (const id of originalIds) {
+    assert.equal(isLessonComplete(loaded, id), true);
+  }
+  assert.equal(isLessonComplete(loaded, 'pe-n-pen'), false);
+  assert.equal(loaded.totalXp, 105);
+  assert.deepEqual(loaded.earnedBadges, [
+    'hlidac-jistice',
+    'chranic-pochopen',
+    'rozvodovy-detektiv',
+  ]);
+  assert.equal(loaded.earnedBadges.includes('bezpecny-rozvodar'), false);
+
+  const { completed, total } = getSubjectProgress(
+    loaded,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 3);
+  assert.equal(total, 4);
+
+  const next = allLessons.find((l) => !isLessonComplete(loaded, l.id));
+  assert.ok(next);
+  assert.equal(next.id, 'pe-n-pen');
+});
+
+test('dokončení pe-n-pen udělí vodicovy-strazce a bezpecny-rozvodar jednou', () => {
+  const allLessons = getMvpLessonsBySubject('rozvody');
+  assert.equal(allLessons.length, 4);
+  const originalIds = ['co-dela-jistic', 'co-dela-chranic', 'jistic-vs-chranic'];
+  const lessonsState: ProgressState['lessons'] = {};
+  for (const id of originalIds) {
+    lessonsState[id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  saveProgress({
+    totalXp: 105,
+    earnedBadges: ['hlidac-jistice', 'chranic-pochopen', 'rozvodovy-detektiv'],
+    lessons: lessonsState,
+    calmMode: false,
+  });
+
+  const result = completeLessonFully('pe-n-pen', 'vodicovy-strazce');
+  assert.equal(result.lessonBadgeAwarded, true);
+  assert.ok(result.state.earnedBadges.includes('vodicovy-strazce'));
+  assert.deepEqual(result.subjectBadgeIdsAwarded, ['bezpecny-rozvodar']);
+  assert.equal(result.state.earnedBadges.includes('bezpecny-rozvodar'), true);
+
+  const { completed, total } = getSubjectProgress(
+    result.state,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 4);
+  assert.equal(total, 4);
+
+  const retry = applyQuizCompletion(loadProgress(), {
+    lessonId: 'pe-n-pen',
+    xp: 15,
+    badgeId: 'vodicovy-strazce',
+    correct: 3,
+    total: 3,
+    projectorMode: false,
+  });
+  assert.equal(retry.xpAwarded, 0);
+  assert.equal(retry.lessonBadgeAwarded, false);
+  assert.deepEqual(retry.subjectBadgeIdsAwarded, []);
+  assert.equal(
+    retry.state.earnedBadges.filter((b) => b === 'vodicovy-strazce').length,
+    1,
+  );
+  assert.equal(
+    retry.state.earnedBadges.filter((b) => b === 'bezpecny-rozvodar').length,
+    1,
+  );
+});
+
+test('dříve uložený bezpecny-rozvodar se po přidání pe-n-pen nemaže', () => {
+  const allLessons = getMvpLessonsBySubject('rozvody');
+  assert.equal(allLessons.length, 4);
+  const originalIds = ['co-dela-jistic', 'co-dela-chranic', 'jistic-vs-chranic'];
+  const lessonsState: ProgressState['lessons'] = {};
+  for (const id of originalIds) {
+    lessonsState[id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  saveProgress({
+    totalXp: 105,
+    earnedBadges: [
+      'hlidac-jistice',
+      'chranic-pochopen',
+      'rozvodovy-detektiv',
+      'bezpecny-rozvodar',
+    ],
+    lessons: lessonsState,
+    calmMode: false,
+  });
+  const loaded = loadProgress();
+  assert.equal(loaded.earnedBadges.includes('bezpecny-rozvodar'), true);
+  assert.equal(isLessonComplete(loaded, 'pe-n-pen'), false);
+
+  const { completed, total } = getSubjectProgress(
+    loaded,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 3);
+  assert.equal(total, 4);
+
+  const afterNew = completeLessonFully('pe-n-pen', 'vodicovy-strazce');
+  assert.deepEqual(afterNew.subjectBadgeIdsAwarded, []);
+  assert.equal(
+    afterNew.state.earnedBadges.filter((b) => b === 'bezpecny-rozvodar').length,
+    1,
+  );
+  assert.equal(afterNew.state.earnedBadges.includes('vodicovy-strazce'), true);
+});
+
 console.log('');
 console.log(`Passed: ${passed}`);
 console.log(`Failed: ${failures.length}`);
