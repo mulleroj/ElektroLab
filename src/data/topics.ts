@@ -245,6 +245,16 @@ export const topics: Topic[] = [
     estimatedMinutes: 10,
     mvpAvailable: true,
   },
+  {
+    id: 'bezpecne-chovani-v-dilne',
+    subjectId: 'bezpecnost',
+    title: 'Bezpečné chování v dílně',
+    description:
+      'Rozhodování v dílně: kdy práci nezahájit, poškozené zařízení nepoužít a nebezpečný stav oznámit.',
+    year: 1,
+    estimatedMinutes: 30,
+    mvpAvailable: true,
+  },
 ];
 
 export function getTopicsBySubject(subjectId: string, year?: number): Topic[] {

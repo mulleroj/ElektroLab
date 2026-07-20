@@ -231,6 +231,30 @@ export const badges: Badge[] = [
     description: 'Dokončil jsi všechny dostupné mikrolekce o strojích a přístrojích.',
     icon: '⚙️',
   },
+  {
+    id: 'dilenska-rozvaha',
+    title: 'Dílenská rozvaha',
+    description: 'Při nejistotě zastavíš a oznámíš to — spěch ani tlak tě nevyprovokují.',
+    icon: '🛑',
+  },
+  {
+    id: 'lovec-poskozeni',
+    title: 'Lovec poškození',
+    description: 'Poškozené zařízení nepoužiješ a závadu oznámíš učiteli.',
+    icon: '🔍',
+  },
+  {
+    id: 'strazce-poradku',
+    title: 'Strážce pořádku',
+    description: 'Mokro, nepořádek ani improvizaci nepřehlédneš — zastavíš a oznámíš.',
+    icon: '🧹',
+  },
+  {
+    id: 'strazce-dilny',
+    title: 'Strážce dílny',
+    description: 'Dokončil jsi všechny dostupné mikrolekce o bezpečném chování v dílně.',
+    icon: '🛡️',
+  },
 ];
 
 export function getBadgeById(id: string): Badge | undefined {
