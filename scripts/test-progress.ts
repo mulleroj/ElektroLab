@@ -640,15 +640,15 @@ test('retry lekce po udělení předmětového odznaku vrátí prázdné subject
   );
 });
 
-test('lekce o výkonu je hned po Ohmově zákonu a před jištěním', () => {
+test('lekce o výkonu je hned po sériovém zapojení a před jištěním', () => {
   const order = getMvpLessonsBySubject('zaklady', 1)
     .filter((l) => l.topicId === 'stejnosmerny-proud')
     .map((l) => l.id);
-  const ohm = order.indexOf('ohmuv-zakon');
+  const series = order.indexOf('seriove-paralelni');
   const power = order.indexOf('elektricky-vykon-a-energie');
   const protection = order.indexOf('zkrat-pretizeni-a-jisteni');
-  assert.ok(ohm >= 0 && power >= 0 && protection >= 0);
-  assert.equal(power, ohm + 1);
+  assert.ok(series >= 0 && power >= 0 && protection >= 0);
+  assert.equal(power, series + 1);
   assert.equal(protection, power + 1);
 });
 
@@ -1026,16 +1026,16 @@ test('lekce Zkrat, přetížení a jištění je ve stejnosmerny-proud a má sce
   assert.ok(getBadgeById('strazce-obvodu'));
 });
 
-test('pořadí: výkon, zkrat-přetížení-jištění, sériové zapojení', () => {
+test('pořadí: sériové zapojení, výkon, zkrat-přetížení-jištění', () => {
   const order = getMvpLessonsBySubject('zaklady', 1)
     .filter((l) => l.topicId === 'stejnosmerny-proud')
     .map((l) => l.id);
+  const series = order.indexOf('seriove-paralelni');
   const power = order.indexOf('elektricky-vykon-a-energie');
   const protection = order.indexOf('zkrat-pretizeni-a-jisteni');
-  const series = order.indexOf('seriove-paralelni');
-  assert.ok(power >= 0 && protection >= 0 && series >= 0);
+  assert.ok(series >= 0 && power >= 0 && protection >= 0);
+  assert.equal(power, series + 1);
   assert.equal(protection, power + 1);
-  assert.equal(series, protection + 1);
 });
 
 test('zakladni-elev se neudělí bez lekce Zkrat, přetížení a jištění', () => {
@@ -1184,6 +1184,65 @@ test('dříve uložený merici-elev se po přidání lekce Od výpočtu k měře
   });
   assert.equal(retry.state.earnedBadges.includes('merici-elev'), true);
   assert.deepEqual(retry.subjectBadgeIdsAwarded, []);
+});
+
+test('pořadí Základů: Ohm, sériové-paralelní, výkon, zkrat-jištění', () => {
+  const order = getMvpLessonsBySubject('zaklady', 1).map((l) => l.id);
+  const ohm = order.indexOf('ohmuv-zakon');
+  const series = order.indexOf('seriove-paralelni');
+  const power = order.indexOf('elektricky-vykon-a-energie');
+  const protection = order.indexOf('zkrat-pretizeni-a-jisteni');
+  assert.ok(ohm >= 0 && series >= 0 && power >= 0 && protection >= 0);
+  assert.equal(series, ohm + 1);
+  assert.equal(power, series + 1);
+  assert.equal(protection, power + 1);
+});
+
+test('starý progress: dokončený výkon a jištění bez sériového → doporučí seriove-paralelni', () => {
+  const allLessons = getMvpLessonsBySubject('zaklady', 1);
+  assert.equal(allLessons.length, 11);
+  const completedIds = allLessons
+    .map((l) => l.id)
+    .filter((id) => id !== 'seriove-paralelni');
+  // Explicitně: výkon a jištění hotové, série ne — podle původního pořadí
+  assert.ok(completedIds.includes('elektricky-vykon-a-energie'));
+  assert.ok(completedIds.includes('zkrat-pretizeni-a-jisteni'));
+  assert.equal(completedIds.includes('seriove-paralelni'), false);
+
+  const lessonsState: ProgressState['lessons'] = {};
+  for (const id of completedIds) {
+    lessonsState[id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  const seeded: ProgressState = {
+    totalXp: completedIds.length * 35,
+    earnedBadges: ['vykon-pod-kontrolou', 'strazce-obvodu'],
+    lessons: lessonsState,
+    calmMode: false,
+  };
+  saveProgress(seeded);
+  const loaded = loadProgress();
+  assert.equal(isLessonComplete(loaded, 'elektricky-vykon-a-energie'), true);
+  assert.equal(isLessonComplete(loaded, 'zkrat-pretizeni-a-jisteni'), true);
+  assert.equal(isLessonComplete(loaded, 'seriove-paralelni'), false);
+  assert.equal(loaded.totalXp, completedIds.length * 35);
+  assert.deepEqual(loaded.earnedBadges, ['vykon-pod-kontrolou', 'strazce-obvodu']);
+  assert.equal(loaded.earnedBadges.includes('zakladni-elev'), false);
+
+  const next = allLessons.find((l) => !isLessonComplete(loaded, l.id));
+  assert.ok(next);
+  assert.equal(next.id, 'seriove-paralelni');
+
+  const { completed, total } = getSubjectProgress(
+    loaded,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 10);
+  assert.equal(total, 11);
 });
 
 console.log('');
