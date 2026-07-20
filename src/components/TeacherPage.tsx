@@ -55,8 +55,13 @@ function getDefaultTeacherTip(lesson: MicroLesson): string {
   return `Krátká aktivita (~${lesson.durationMinutes} min) pro ${lesson.year}. ročník — vhodná jako opakování nebo rychlá aktivita do hodiny.`;
 }
 
-/** Doporučené rychlé lekce do hodiny (~10 minut). */
+/** Doporučené rychlé lekce do hodiny (~10 minut). Kurátorovaný stabilní výběr; pořadí je záměrné. */
 const QUICK_LESSONS: { id: string; studentTries: string }[] = [
+  {
+    id: 'pred-praci-zastav-a-oznam',
+    studentTries:
+      'Projde čtyři situace a rozhodne, kdy pokračovat, zastavit, nepoužít nebo odstoupit.',
+  },
   {
     id: 'co-je-obvod',
     studentTries: 'Sepne a rozpojí obvod a seřadí prvky tak, jak jimi teče proud.',
