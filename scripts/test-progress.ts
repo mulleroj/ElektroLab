@@ -1113,6 +1113,7 @@ test('lekce Od výpočtu k měření je v metody-mereni a má measurement-judgme
 test('pořadí Měření: přehled před voltmetrem, původní čtyři beze změny', () => {
   const order = getMvpLessonsBySubject('mereni', 1).map((l) => l.id);
   assert.deepEqual(order, [
+    'vypnute-odpojeno-bez-napeti',
     'od-vypoctu-k-mereni',
     'voltmetr-zapojeni',
     'ampermetr-zapojeni',
@@ -1121,7 +1122,7 @@ test('pořadí Měření: přehled před voltmetrem, původní čtyři beze změ
   ]);
   const bridge = order.indexOf('od-vypoctu-k-mereni');
   const volt = order.indexOf('voltmetr-zapojeni');
-  assert.equal(bridge, 0);
+  assert.equal(bridge, 1);
   assert.equal(volt, bridge + 1);
   assert.equal(order.indexOf('ampermetr-zapojeni'), volt + 1);
   assert.equal(order.indexOf('mereni-spatne-zapojeni'), volt + 2);
@@ -1132,7 +1133,7 @@ test('merici-elev se neudělí bez lekce Od výpočtu k měření', () => {
   const lessons = getMvpLessonsBySubject('mereni', 1);
   const withoutBridge = lessons.filter((l) => l.id !== 'od-vypoctu-k-mereni');
   assert.equal(withoutBridge.length, lessons.length - 1);
-  assert.equal(withoutBridge.length, 4);
+  assert.equal(withoutBridge.length, 5);
   for (const l of withoutBridge) {
     const partial = completeLessonFully(l.id, l.badgeId);
     assert.deepEqual(partial.subjectBadgeIdsAwarded, []);
@@ -1145,8 +1146,8 @@ test('merici-elev se neudělí bez lekce Od výpočtu k měření', () => {
 test('dříve uložený merici-elev se po přidání lekce Od výpočtu k měření nemaže', () => {
   const allLessons = getMvpLessonsBySubject('mereni', 1);
   const oldLessons = allLessons.filter((l) => l.id !== 'od-vypoctu-k-mereni');
-  assert.equal(oldLessons.length, 4);
-  assert.equal(allLessons.length, 5);
+  assert.equal(oldLessons.length, 5);
+  assert.equal(allLessons.length, 6);
   const lessonsState: ProgressState['lessons'] = {};
   for (const l of oldLessons) {
     lessonsState[l.id] = {
@@ -1170,8 +1171,8 @@ test('dříve uložený merici-elev se po přidání lekce Od výpočtu k měře
     loaded,
     allLessons.map((l) => l.id),
   );
-  assert.equal(completed, 4);
-  assert.equal(total, 5);
+  assert.equal(completed, 5);
+  assert.equal(total, 6);
   const afterOther = completeActivity(loaded, 'od-vypoctu-k-mereni', 20);
   assert.equal(afterOther.earnedBadges.includes('merici-elev'), true);
   const retry = applyQuizCompletion(afterOther, {
@@ -1490,6 +1491,255 @@ test('dříve uložený bezpecny-rozvodar se po přidání pe-n-pen nemaže', ()
     1,
   );
   assert.equal(afterNew.state.earnedBadges.includes('vodicovy-strazce'), true);
+});
+
+test('lekce Vypnuté není totéž co bez napětí je v metody-mereni a má scenario-choice bez dema', () => {
+  const lesson = getLessonById('vypnute-odpojeno-bez-napeti');
+  assert.ok(lesson);
+  assert.equal(lesson.subjectId, 'mereni');
+  assert.equal(lesson.year, 1);
+  assert.equal(lesson.topicId, 'metody-mereni');
+  assert.equal(lesson.durationMinutes, 10);
+  assert.equal(lesson.mvpAvailable, true);
+  assert.equal(lesson.quiz.length, 3);
+  assert.equal(lesson.interactiveDemo, undefined);
+  const activity = getLessonActivity(lesson);
+  assert.ok(activity);
+  assert.equal(activity.type, 'scenario-choice');
+  assert.equal(activity.scenarios.length, 4);
+  assert.equal(lesson.badgeId, 'tri-stavy-napeti');
+  assert.ok(getBadgeById('tri-stavy-napeti'));
+});
+
+test('pořadí Měření po přidání lekce o stavech napětí', () => {
+  const order = getMvpLessonsBySubject('mereni', 1).map((l) => l.id);
+  assert.deepEqual(order, [
+    'vypnute-odpojeno-bez-napeti',
+    'od-vypoctu-k-mereni',
+    'voltmetr-zapojeni',
+    'ampermetr-zapojeni',
+    'mereni-spatne-zapojeni',
+    'vyber-rozsahu',
+  ]);
+  const originalFive = [
+    'od-vypoctu-k-mereni',
+    'voltmetr-zapojeni',
+    'ampermetr-zapojeni',
+    'mereni-spatne-zapojeni',
+    'vyber-rozsahu',
+  ];
+  assert.deepEqual(
+    order.filter((id) => originalFive.includes(id)),
+    originalFive,
+  );
+});
+
+test('výklad Vypnuté / odpojené / bez napětí zachovává odborné a bezpečnostní jádro', () => {
+  const lesson = getLessonById('vypnute-odpojeno-bez-napeti');
+  assert.ok(lesson);
+  const text = [
+    lesson.explanation,
+    lesson.safetyNote,
+    lesson.typicalMistake,
+    lesson.memorySentence,
+    lesson.goal,
+    lesson.hook,
+  ].join('\n');
+  assert.ok(/vypnut/i.test(text));
+  assert.ok(/odpojen/i.test(text));
+  assert.ok(/ověřeně bez napětí|beznapěť/i.test(text));
+  assert.ok(/vypínač|jistič/i.test(text));
+  assert.ok(/není důkaz|nepotvrzuje|nejsou důkazem/i.test(text));
+  assert.ok(/kontrolka|nefunkčnost/i.test(text));
+  assert.ok(/více zdroj|další zdroj|druhý zdroj/i.test(text));
+  assert.ok(/uložená energie|akumulátor|kondenzátor/i.test(text));
+  assert.ok(/síťov/i.test(text));
+  assert.ok(/multimetr/i.test(text));
+  assert.ok(/zkoušečk/i.test(text));
+  assert.ok(/oprávněná osoba/i.test(text));
+  assert.ok(/informuje učitele|předám učiteli|informovat učitele/i.test(text));
+  assert.equal(/LOTO|fotovolta|\bUPS\b|zkratuj kondenzátor/i.test(text), false);
+});
+
+test('starý progress Měření bez předmětového odznaku: 5/6 a doporučí vypnute-odpojeno-bez-napeti', () => {
+  const allLessons = getMvpLessonsBySubject('mereni', 1);
+  assert.equal(allLessons.length, 6);
+  const originalIds = [
+    'od-vypoctu-k-mereni',
+    'voltmetr-zapojeni',
+    'ampermetr-zapojeni',
+    'mereni-spatne-zapojeni',
+    'vyber-rozsahu',
+  ];
+  const originalBadges = [
+    'merici-detektiv',
+    'voltmetr-zvladnut',
+    'ampermetr-zvladnut',
+    'merak-nespalen',
+    'spravny-rozsah',
+  ];
+  const lessonsState: ProgressState['lessons'] = {};
+  for (const id of originalIds) {
+    lessonsState[id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  const seeded: ProgressState = {
+    totalXp: 35 * 5,
+    earnedBadges: [...originalBadges],
+    lessons: lessonsState,
+    calmMode: false,
+  };
+  saveProgress(seeded);
+  const loaded = loadProgress();
+  for (const id of originalIds) {
+    assert.equal(isLessonComplete(loaded, id), true);
+  }
+  assert.equal(isLessonComplete(loaded, 'vypnute-odpojeno-bez-napeti'), false);
+  assert.equal(loaded.totalXp, 175);
+  assert.deepEqual(loaded.earnedBadges, originalBadges);
+  assert.equal(loaded.earnedBadges.includes('merici-elev'), false);
+
+  const { completed, total } = getSubjectProgress(
+    loaded,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 5);
+  assert.equal(total, 6);
+
+  const next = allLessons.find((l) => !isLessonComplete(loaded, l.id));
+  assert.ok(next);
+  assert.equal(next.id, 'vypnute-odpojeno-bez-napeti');
+});
+
+test('dokončení vypnute-odpojeno-bez-napeti udělí tri-stavy-napeti a merici-elev jednou', () => {
+  const allLessons = getMvpLessonsBySubject('mereni', 1);
+  assert.equal(allLessons.length, 6);
+  const originalIds = [
+    'od-vypoctu-k-mereni',
+    'voltmetr-zapojeni',
+    'ampermetr-zapojeni',
+    'mereni-spatne-zapojeni',
+    'vyber-rozsahu',
+  ];
+  const originalBadges = [
+    'merici-detektiv',
+    'voltmetr-zvladnut',
+    'ampermetr-zvladnut',
+    'merak-nespalen',
+    'spravny-rozsah',
+  ];
+  const lessonsState: ProgressState['lessons'] = {};
+  for (const id of originalIds) {
+    lessonsState[id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  saveProgress({
+    totalXp: 175,
+    earnedBadges: [...originalBadges],
+    lessons: lessonsState,
+    calmMode: false,
+  });
+
+  const beforeXp = loadProgress().totalXp;
+  const result = completeLessonFully('vypnute-odpojeno-bez-napeti', 'tri-stavy-napeti');
+  assert.equal(result.lessonBadgeAwarded, true);
+  assert.ok(result.state.earnedBadges.includes('tri-stavy-napeti'));
+  assert.deepEqual(result.subjectBadgeIdsAwarded, ['merici-elev']);
+  assert.equal(result.state.earnedBadges.includes('merici-elev'), true);
+  assert.equal(result.state.totalXp, beforeXp + 35);
+
+  const { completed, total } = getSubjectProgress(
+    result.state,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 6);
+  assert.equal(total, 6);
+
+  const best = result.state.lessons['vypnute-odpojeno-bez-napeti']?.bestQuizScore;
+  assert.deepEqual(best, { correct: 3, total: 3 });
+
+  const retry = applyQuizCompletion(loadProgress(), {
+    lessonId: 'vypnute-odpojeno-bez-napeti',
+    xp: 15,
+    badgeId: 'tri-stavy-napeti',
+    correct: 2,
+    total: 3,
+    projectorMode: false,
+  });
+  assert.equal(retry.xpAwarded, 0);
+  assert.equal(retry.lessonBadgeAwarded, false);
+  assert.deepEqual(retry.subjectBadgeIdsAwarded, []);
+  assert.equal(
+    retry.state.earnedBadges.filter((b) => b === 'tri-stavy-napeti').length,
+    1,
+  );
+  assert.equal(
+    retry.state.earnedBadges.filter((b) => b === 'merici-elev').length,
+    1,
+  );
+  assert.deepEqual(
+    retry.state.lessons['vypnute-odpojeno-bez-napeti']?.bestQuizScore,
+    { correct: 3, total: 3 },
+  );
+});
+
+test('dříve uložený merici-elev se po přidání vypnute-odpojeno-bez-napeti nemaže', () => {
+  const allLessons = getMvpLessonsBySubject('mereni', 1);
+  assert.equal(allLessons.length, 6);
+  const originalIds = [
+    'od-vypoctu-k-mereni',
+    'voltmetr-zapojeni',
+    'ampermetr-zapojeni',
+    'mereni-spatne-zapojeni',
+    'vyber-rozsahu',
+  ];
+  const lessonsState: ProgressState['lessons'] = {};
+  for (const id of originalIds) {
+    lessonsState[id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  saveProgress({
+    totalXp: 175,
+    earnedBadges: [
+      'merici-detektiv',
+      'voltmetr-zvladnut',
+      'ampermetr-zvladnut',
+      'merak-nespalen',
+      'spravny-rozsah',
+      'merici-elev',
+    ],
+    lessons: lessonsState,
+    calmMode: false,
+  });
+  const loaded = loadProgress();
+  assert.equal(loaded.earnedBadges.includes('merici-elev'), true);
+  assert.equal(isLessonComplete(loaded, 'vypnute-odpojeno-bez-napeti'), false);
+
+  const { completed, total } = getSubjectProgress(
+    loaded,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 5);
+  assert.equal(total, 6);
+
+  const afterNew = completeLessonFully('vypnute-odpojeno-bez-napeti', 'tri-stavy-napeti');
+  assert.deepEqual(afterNew.subjectBadgeIdsAwarded, []);
+  assert.equal(
+    afterNew.state.earnedBadges.filter((b) => b === 'merici-elev').length,
+    1,
+  );
 });
 
 console.log('');

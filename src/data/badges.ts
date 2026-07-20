@@ -80,6 +80,13 @@ export const badges: Badge[] = [
     icon: '🎖️',
   },
   {
+    id: 'tri-stavy-napeti',
+    title: 'Tři stavy napětí',
+    description:
+      'Rozlišíš vypnuté, odpojené a ověřeně bez napětí a víš, kdy nejasný stav předat učiteli.',
+    icon: '⛔',
+  },
+  {
     id: 'merici-detektiv',
     title: 'Měřicí detektiv',
     description:
