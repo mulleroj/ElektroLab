@@ -16,4 +16,5 @@ export const SUBJECT_BADGES: SubjectBadgeRule[] = [
   { subjectId: 'elektronika', badgeId: 'elektronicky-elev' },
   { subjectId: 'automatizace', badgeId: 'automatizacni-elev' },
   { subjectId: 'stroje', badgeId: 'strojarsky-elev' },
+  { subjectId: 'bezpecnost', year: 1, badgeId: 'strazce-dilny' },
 ];

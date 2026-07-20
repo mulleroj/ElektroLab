@@ -47,9 +47,10 @@ import {
   LAST_LESSON_KEY,
 } from '../src/lib/progress';
 import { migrateProgressLessonReferences } from '../src/lib/lessonIdMigration';
-import { getMvpLessonsBySubject, getLessonById } from '../src/data/lessons';
-import { getTopicById, getTopicsBySubject } from '../src/data/topics';
+import { getMvpLessonsBySubject, getLessonById, getLessonsByTopic } from '../src/data/lessons';
+import { getTopicById, getTopicsBySubject, topics } from '../src/data/topics';
 import { getBadgeById } from '../src/data/badges';
+import { subjects } from '../src/data/subjects';
 import { getLessonActivity } from '../src/types';
 import type { ProgressState } from '../src/types';
 
@@ -1740,6 +1741,204 @@ test('dříve uložený merici-elev se po přidání vypnute-odpojeno-bez-napeti
     afterNew.state.earnedBadges.filter((b) => b === 'merici-elev').length,
     1,
   );
+});
+
+test('předmět Bezpečnost je aktivní a ročníky zůstávají', () => {
+  const subject = subjects.find((s) => s.id === 'bezpecnost');
+  assert.ok(subject);
+  assert.equal(subject.mvpAvailable, true);
+  assert.deepEqual(subject.years, [1, 2, 3]);
+  assert.equal(subjects.filter((s) => s.mvpAvailable).length, 7);
+  assert.equal(subjects.length, 8);
+});
+
+test('téma Bezpečné chování v dílně je aktivní a má 30 minut', () => {
+  const topic = getTopicById('bezpecne-chovani-v-dilne');
+  assert.ok(topic);
+  assert.equal(topic.subjectId, 'bezpecnost');
+  assert.equal(topic.year, 1);
+  assert.equal(topic.mvpAvailable, true);
+  assert.equal(topic.estimatedMinutes, 30);
+  const lessons = getLessonsByTopic('bezpecne-chovani-v-dilne');
+  assert.equal(lessons.length, 3);
+  assert.equal(
+    lessons.reduce((sum, l) => sum + l.durationMinutes, 0),
+    30,
+  );
+  assert.equal(topics.length, 28);
+  assert.equal(topics.filter((t) => t.mvpAvailable).length, 19);
+  assert.equal(getTopicsBySubject('bezpecnost', 2).filter((t) => t.mvpAvailable).length, 0);
+  assert.equal(getTopicsBySubject('bezpecnost', 3).filter((t) => t.mvpAvailable).length, 0);
+});
+
+test('pořadí lekcí Bezpečnosti a registrace scenario-choice bez dema', () => {
+  const order = getMvpLessonsBySubject('bezpecnost', 1).map((l) => l.id);
+  assert.deepEqual(order, [
+    'pred-praci-zastav-a-oznam',
+    'poskozeny-pristroj-a-kabel',
+    'mokro-neporadek-improvizace',
+  ]);
+  const expectedBadges = [
+    'dilenska-rozvaha',
+    'lovec-poskozeni',
+    'strazce-poradku',
+  ];
+  for (let i = 0; i < order.length; i++) {
+    const lesson = getLessonById(order[i]);
+    assert.ok(lesson);
+    assert.equal(lesson.durationMinutes, 10);
+    assert.equal(lesson.interactiveDemo, undefined);
+    assert.equal(lesson.quiz.length, 3);
+    assert.equal(lesson.badgeId, expectedBadges[i]);
+    assert.ok(getBadgeById(expectedBadges[i]));
+    const activity = getLessonActivity(lesson);
+    assert.ok(activity);
+    assert.equal(activity.type, 'scenario-choice');
+    assert.equal(activity.scenarios.length, 4);
+  }
+  assert.ok(getBadgeById('strazce-dilny'));
+});
+
+test('výklad Bezpečnosti zachovává rozhodovací a bezpečnostní jádro', () => {
+  const lessons = [
+    getLessonById('pred-praci-zastav-a-oznam'),
+    getLessonById('poskozeny-pristroj-a-kabel'),
+    getLessonById('mokro-neporadek-improvizace'),
+  ];
+  assert.ok(lessons.every(Boolean));
+  const text = lessons
+    .flatMap((l) => [
+      l!.explanation,
+      l!.safetyNote,
+      l!.typicalMistake,
+      l!.memorySentence,
+      l!.goal,
+      l!.hook,
+      l!.teacherTip,
+    ])
+    .join('\n');
+  assert.ok(/zastav/i.test(text));
+  assert.ok(/informuje učitele|oznám|oznam/i.test(text));
+  assert.ok(/poškozen/i.test(text));
+  assert.ok(/improviz/i.test(text));
+  assert.ok(/pásk/i.test(text));
+  assert.ok(/mokro|mokré/i.test(text));
+  assert.ok(/síťov/i.test(text));
+  assert.ok(/multimetr|zkoušečk/i.test(text));
+  assert.ok(/hrdinsk/i.test(text));
+  assert.ok(/školní pravidla|pokyn.*učitel/i.test(text));
+  assert.equal(
+    /resuscit|AED|hasic|hašen|LOTO|vybij kondenzátor|první pomoc jako postup/i.test(text),
+    false,
+  );
+  assert.equal(/pod napětím bez/i.test(text) || /práci pod napětím/i.test(text), true);
+});
+
+test('nový progress Bezpečnosti: 0/3 a doporučí první lekci', () => {
+  const allLessons = getMvpLessonsBySubject('bezpecnost', 1);
+  assert.equal(allLessons.length, 3);
+  const loaded = loadProgress();
+  const { completed, total } = getSubjectProgress(
+    loaded,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 0);
+  assert.equal(total, 3);
+  const next = allLessons.find((l) => !isLessonComplete(loaded, l.id));
+  assert.ok(next);
+  assert.equal(next.id, 'pred-praci-zastav-a-oznam');
+  assert.equal(loaded.earnedBadges.includes('strazce-dilny'), false);
+});
+
+test('částečný progress Bezpečnosti 2/3 neudělí strazce-dilny', () => {
+  const allLessons = getMvpLessonsBySubject('bezpecnost', 1);
+  assert.equal(allLessons.length, 3);
+  const firstTwo = allLessons.slice(0, 2);
+  for (const l of firstTwo) {
+    completeLessonFully(l.id, l.badgeId);
+  }
+  const loaded = loadProgress();
+  const { completed, total } = getSubjectProgress(
+    loaded,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 2);
+  assert.equal(total, 3);
+  assert.equal(loaded.earnedBadges.includes('strazce-dilny'), false);
+  assert.equal(loaded.earnedBadges.includes('dilenska-rozvaha'), true);
+  assert.equal(loaded.earnedBadges.includes('lovec-poskozeni'), true);
+  assert.equal(loaded.totalXp, 70);
+  const next = allLessons.find((l) => !isLessonComplete(loaded, l.id));
+  assert.ok(next);
+  assert.equal(next.id, 'mokro-neporadek-improvizace');
+});
+
+test('dokončení 3/3 Bezpečnosti udělí lekční odznaky a strazce-dilny jednou', () => {
+  const allLessons = getMvpLessonsBySubject('bezpecnost', 1);
+  assert.equal(allLessons.length, 3);
+  for (const l of allLessons.slice(0, 2)) {
+    completeLessonFully(l.id, l.badgeId);
+  }
+  const before = loadProgress();
+  assert.equal(before.earnedBadges.includes('strazce-dilny'), false);
+  const result = completeLessonFully('mokro-neporadek-improvizace', 'strazce-poradku');
+  assert.equal(result.lessonBadgeAwarded, true);
+  assert.deepEqual(result.subjectBadgeIdsAwarded, ['strazce-dilny']);
+  assert.equal(result.state.earnedBadges.includes('strazce-dilny'), true);
+  assert.equal(result.state.totalXp, 105);
+
+  const { completed, total } = getSubjectProgress(
+    result.state,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 3);
+  assert.equal(total, 3);
+
+  for (const badge of ['dilenska-rozvaha', 'lovec-poskozeni', 'strazce-poradku', 'strazce-dilny']) {
+    assert.equal(result.state.earnedBadges.filter((b) => b === badge).length, 1);
+  }
+
+  const retry = applyQuizCompletion(loadProgress(), {
+    lessonId: 'mokro-neporadek-improvizace',
+    xp: 15,
+    badgeId: 'strazce-poradku',
+    correct: 2,
+    total: 3,
+    projectorMode: false,
+  });
+  assert.equal(retry.xpAwarded, 0);
+  assert.equal(retry.lessonBadgeAwarded, false);
+  assert.deepEqual(retry.subjectBadgeIdsAwarded, []);
+  assert.deepEqual(
+    retry.state.lessons['mokro-neporadek-improvizace']?.bestQuizScore,
+    { correct: 3, total: 3 },
+  );
+});
+
+test('projektorový režim u Bezpečnosti nic nepersistuje', () => {
+  saveProgress({
+    totalXp: 0,
+    earnedBadges: [],
+    lessons: {},
+    calmMode: false,
+  });
+  const empty = loadProgress();
+  const result = applyQuizCompletion(empty, {
+    lessonId: 'pred-praci-zastav-a-oznam',
+    xp: 15,
+    badgeId: 'dilenska-rozvaha',
+    correct: 3,
+    total: 3,
+    projectorMode: true,
+  });
+  assert.equal(result.xpAwarded, 0);
+  assert.equal(result.lessonBadgeAwarded, false);
+  assert.deepEqual(result.subjectBadgeIdsAwarded, []);
+  assert.equal(result.state.totalXp, 0);
+  assert.equal(result.state.earnedBadges.includes('dilenska-rozvaha'), false);
+  assert.equal(result.state.earnedBadges.includes('strazce-dilny'), false);
+  assert.equal(isLessonComplete(result.state, 'pred-praci-zastav-a-oznam'), false);
+  assert.equal(Object.keys(result.state.lessons).length, 0);
 });
 
 console.log('');

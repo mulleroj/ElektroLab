@@ -63,7 +63,7 @@ export const subjects: Subject[] = [
     description: 'Praktické chyby a bezpečnostní pravidla z dílny.',
     icon: '🛡️',
     years: [1, 2, 3],
-    mvpAvailable: false,
+    mvpAvailable: true,
   },
   {
     id: 'zkouska',
