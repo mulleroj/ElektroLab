@@ -1094,6 +1094,98 @@ test('dříve uložený zakladni-elev se po přidání lekce o jištění nemaž
   assert.deepEqual(retry.subjectBadgeIdsAwarded, []);
 });
 
+test('lekce Od výpočtu k měření je v metody-mereni a má measurement-judgment bez dema', () => {
+  const lesson = getLessonById('od-vypoctu-k-mereni');
+  assert.ok(lesson);
+  assert.equal(lesson.topicId, 'metody-mereni');
+  assert.equal(lesson.subjectId, 'mereni');
+  assert.equal(lesson.year, 1);
+  assert.equal(lesson.mvpAvailable, true);
+  assert.equal(lesson.quiz.length, 3);
+  assert.equal(lesson.interactiveDemo, undefined);
+  const activity = getLessonActivity(lesson);
+  assert.ok(activity);
+  assert.equal(activity.type, 'measurement-judgment');
+  assert.equal(lesson.badgeId, 'merici-detektiv');
+  assert.ok(getBadgeById('merici-detektiv'));
+});
+
+test('pořadí Měření: přehled před voltmetrem, původní čtyři beze změny', () => {
+  const order = getMvpLessonsBySubject('mereni', 1).map((l) => l.id);
+  assert.deepEqual(order, [
+    'od-vypoctu-k-mereni',
+    'voltmetr-zapojeni',
+    'ampermetr-zapojeni',
+    'mereni-spatne-zapojeni',
+    'vyber-rozsahu',
+  ]);
+  const bridge = order.indexOf('od-vypoctu-k-mereni');
+  const volt = order.indexOf('voltmetr-zapojeni');
+  assert.equal(bridge, 0);
+  assert.equal(volt, bridge + 1);
+  assert.equal(order.indexOf('ampermetr-zapojeni'), volt + 1);
+  assert.equal(order.indexOf('mereni-spatne-zapojeni'), volt + 2);
+  assert.equal(order.indexOf('vyber-rozsahu'), volt + 3);
+});
+
+test('merici-elev se neudělí bez lekce Od výpočtu k měření', () => {
+  const lessons = getMvpLessonsBySubject('mereni', 1);
+  const withoutBridge = lessons.filter((l) => l.id !== 'od-vypoctu-k-mereni');
+  assert.equal(withoutBridge.length, lessons.length - 1);
+  assert.equal(withoutBridge.length, 4);
+  for (const l of withoutBridge) {
+    const partial = completeLessonFully(l.id, l.badgeId);
+    assert.deepEqual(partial.subjectBadgeIdsAwarded, []);
+  }
+  assert.equal(loadProgress().earnedBadges.includes('merici-elev'), false);
+  const result = completeLessonFully('od-vypoctu-k-mereni', 'merici-detektiv');
+  assert.deepEqual(result.subjectBadgeIdsAwarded, ['merici-elev']);
+});
+
+test('dříve uložený merici-elev se po přidání lekce Od výpočtu k měření nemaže', () => {
+  const allLessons = getMvpLessonsBySubject('mereni', 1);
+  const oldLessons = allLessons.filter((l) => l.id !== 'od-vypoctu-k-mereni');
+  assert.equal(oldLessons.length, 4);
+  assert.equal(allLessons.length, 5);
+  const lessonsState: ProgressState['lessons'] = {};
+  for (const l of oldLessons) {
+    lessonsState[l.id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  const seeded: ProgressState = {
+    totalXp: oldLessons.length * 35,
+    earnedBadges: ['merici-elev', 'voltmetr-zvladnut'],
+    lessons: lessonsState,
+    calmMode: false,
+  };
+  saveProgress(seeded);
+  const loaded = loadProgress();
+  assert.equal(loaded.earnedBadges.includes('merici-elev'), true);
+  assert.equal(isLessonComplete(loaded, 'od-vypoctu-k-mereni'), false);
+  const { completed, total } = getSubjectProgress(
+    loaded,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 4);
+  assert.equal(total, 5);
+  const afterOther = completeActivity(loaded, 'od-vypoctu-k-mereni', 20);
+  assert.equal(afterOther.earnedBadges.includes('merici-elev'), true);
+  const retry = applyQuizCompletion(afterOther, {
+    lessonId: 'voltmetr-zapojeni',
+    xp: 15,
+    badgeId: 'voltmetr-zvladnut',
+    correct: 2,
+    total: 3,
+    projectorMode: false,
+  });
+  assert.equal(retry.state.earnedBadges.includes('merici-elev'), true);
+  assert.deepEqual(retry.subjectBadgeIdsAwarded, []);
+});
+
 console.log('');
 console.log(`Passed: ${passed}`);
 console.log(`Failed: ${failures.length}`);
