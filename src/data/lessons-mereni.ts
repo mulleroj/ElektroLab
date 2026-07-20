@@ -5,6 +5,155 @@ const MERENI_SAFETY =
 
 export const mereniLessons: MicroLesson[] = [
   {
+    id: 'vypnute-odpojeno-bez-napeti',
+    subjectId: 'mereni',
+    topicId: 'metody-mereni',
+    title: 'Vypnuté není totéž co bez napětí',
+    year: 1,
+    durationMinutes: 10,
+    difficulty: 'základní',
+    goal:
+      'Žák rozliší stavy vypnuté, odpojené a ověřeně bez napětí, pochopí, že vypínač, jistič ani kontrolka nejsou důkazem bezpečnosti, zná riziko více zdrojů a uložené energie a ví, že skutečný stav instalace ověřuje oprávněná osoba.',
+    hook:
+      'Zařízení nesvítí a vypínač je v poloze vypnuto. Znamená to automaticky, že je elektricky bezpečné — odpojené a bez napětí? Proč nestačí jen „nefunguje“ a „je vypnuté“?',
+    explanation:
+      '**Tři různé stavy:** Slova vypnuté, odpojené a ověřeně bez napětí neznamenají totéž. Každé označuje jiný stupeň informace o stavu zařízení nebo obvodu. Zařízení, které nefunguje, nemusí být bezpečné. Nepřítomnost viditelné činnosti není důkazem nepřítomnosti napětí. V této lekci jde o bezpečnostní úsudek, ne o pracovní návod k zásahu do instalace.\n\n**Vypnuté:** Vypnutý může být ovládací nebo ochranný prvek — například vypínač nebo jistič. Zařízení pak může přestat svítit, běžet nebo pracovat. Vypnutý vypínač ale nepotvrzuje odpojení od všech zdrojů. Vypnutý jistič nepotvrzuje, že v každé části zařízení nebo instalace není napětí. Kontrolka, displej ani nefunkčnost zařízení nejsou důkazem bezpečného stavu. Vypnutí má svůj význam, samo o sobě však není dostatečným důkazem beznapěťového stavu.\n\n**Odpojené:** Odpojené znamená oddělené od konkrétního známého zdroje nebo zdrojů. Musí být jasné, od čeho bylo zařízení odpojeno. Odpojení od jednoho zdroje nemusí vyloučit další zdroj — například hlavní přívod a současně akumulátor. Odpojení není totéž jako odborně ověřená nepřítomnost napětí. Samotné tvrzení „je to odpojené“ bez jasného kontextu nestačí. Tato lekce neučí postup odpojování.\n\n**Ověřeně bez napětí:** Nepřítomnost napětí není pouze předpoklad ani vizuální odhad. Skutečný stav musí být potvrzen vhodným odborným postupem. U skutečné instalace ověření provádí oprávněná osoba. Žák stav síťové instalace sám neověřuje multimetrem ani zkoušečkou. V této lekci se učíš význam pojmu, nikoli praktický postup. Ani označení ověřeně bez napětí není povolením žáka k zásahu do instalace.\n\n**Více zdrojů a opětovné připojení:** Zařízení nebo obvod může mít více než jeden zdroj. Vypnutí nebo odpojení jednoho zdroje nemusí odstranit všechny zdroje energie — například druhý přívod nebo akumulátor. Může dojít také k neočekávanému opětovnému připojení. Při nejasném stavu žák nepokračuje a informuje učitele.\n\n**Uložená energie:** Některé součásti mohou uchovat energii i po odpojení zdroje — například akumulátor nebo kondenzátor. Zařízení proto nemusí být automaticky bezpečné ihned po odpojení. Konkrétní postupy vybíjení nebo zajištění nejsou součástí této lekce.\n\n**Školní model a skutečná instalace:** Ve škole se princip procvičuje na schématu, kartičkách nebo schváleném bezpečném modelu. Žák neotevírá zásuvku, rozvaděč, svorkovnici ani elektrické zařízení. Žák nepoužívá multimetr ani zkoušečku k ověřování síťové instalace. Skutečnou instalaci ověřuje oprávněná osoba vhodnými postupy. Při nejasném stavu žák zastaví a informuje učitele. Lekce není návodem k práci pod napětím ani k zajišťování skutečného pracoviště.',
+    safetyNote:
+      'Výuka probíhá pouze na schématu nebo schváleném bezpečném školním modelu. Žák nepracuje na síťové instalaci, neotevírá zásuvku, rozvaděč, svorkovnici ani elektrické zařízení a nemanipuluje s vodiči ani ochrannými prvky. Vypnutý vypínač nebo jistič není důkazem beznapěťového stavu. Nefunkčnost zařízení ani zhasnutá kontrolka nejsou důkazem bezpečnosti. Může existovat více zdrojů nebo uložená energie. Žák nepoužívá multimetr ani zkoušečku k ověřování síťové instalace. Při nejasném stavu žák zastaví a informuje učitele. Skutečný stav ověřuje pouze oprávněná osoba vhodnými postupy. Lekce není návodem k práci pod napětím ani k zajišťování skutečného pracoviště.',
+    memorySentence:
+      'Vypnuté ještě nemusí být odpojené a odpojené ještě nemusí být ověřeně bez napětí. Nejasný stav předám učiteli.',
+    typicalMistake:
+      'Když je vypínač nebo jistič vypnutý, není tam napětí — vypnutí je jiný stav než odpojení a odpojení je jiný stav než ověřená nepřítomnost napětí. Když zařízení nefunguje nebo nesvítí kontrolka, je bezpečné — kontrolka a nefunkčnost nejsou důkazem. Odpojené automaticky znamená ověřeně bez napětí — nemusí. Stačí si skutečnou instalaci zkusit multimetrem nebo zkoušečkou — skutečnou instalaci ověřuje pouze oprávněná osoba; při nejasném stavu žák zastaví a informuje učitele.',
+    teacherTip:
+      'Bezpečná výuka: tři kartičky Vypnuté / Odpojené / Ověřeně bez napětí, papírové scénáře, schéma se dvěma zdroji, symbol akumulátoru nebo uložené energie, magnetické symboly na tabuli, zcela bezpečný odpojený školní model bez přístupu k síti. Neotevírej skutečnou instalaci, nepřepínej jistič jako žákovský experiment, nevytahuj pojistky, nenech žáky používat zkoušečku ani multimetr na síti, nevybíjej kondenzátory, nevytvářej poruchový stav, nepracuj pod napětím a nesimuluj odborné zajištění pracoviště.',
+    activity: {
+      scenarioChoice: {
+        type: 'scenario-choice',
+        instruction:
+          'U každé situace rozhodni, který stav nejlépe popisuje popisovaný případ — nebo že je třeba zastavit a předat oprávněné osobě. Všechny čtyři situace musí být správně.',
+        options: [
+          { id: 'vypnute', label: 'Vypnuté' },
+          { id: 'odpojeno', label: 'Odpojené' },
+          { id: 'overene-bez-napeti', label: 'Ověřeně bez napětí' },
+          { id: 'zastavit', label: 'Zastavit a předat oprávněné osobě' },
+        ],
+        successMessage:
+          'Výborně! Rozlišuješ vypnuté, odpojené a ověřeně bez napětí a víš, kdy zastavit.',
+        scenarios: [
+          {
+            id: 's1',
+            text: 'Zařízení je stále připojeno ke zdroji. Jeho ovládací vypínač je v poloze vypnuto a zařízení právě nepracuje.',
+            correctOptionId: 'vypnute',
+            explanation:
+              'Zařízení může být vypnuté, ale není tím potvrzeno odpojení ani beznapěťový stav.',
+          },
+          {
+            id: 's2',
+            text: 'Bezpečný školní model byl oddělen od svého jednoznačně uvedeného zdroje. Zatím ale nebyla potvrzena nepřítomnost napětí jako samostatný stav.',
+            correctOptionId: 'odpojeno',
+            explanation:
+              'Odpojení od zdroje není totéž jako ověření nepřítomnosti napětí. Žák stav sám prakticky neověřuje — pouze klasifikuje popis.',
+          },
+          {
+            id: 's3',
+            text: 'Na schématu nebo školním modelu je výslovně uvedeno: model byl odpojen a odpovědná osoba vhodným postupem potvrdila nepřítomnost napětí. Žák pouze klasifikuje popsaný stav.',
+            correctOptionId: 'overene-bez-napeti',
+            explanation:
+              'Správně jsi rozpoznal popsaný stav ověřeně bez napětí. Žák neprovádí ověřování skutečné síťové instalace.',
+          },
+          {
+            id: 's4',
+            text: 'Zařízení má hlavní přívod a současně další možný zdroj nebo uloženou energii. Jeden vypínač je vypnutý. Není jasné, zda byly vyloučeny všechny zdroje.',
+            correctOptionId: 'zastavit',
+            explanation:
+              'Nepokračuj, nemanipuluj a neověřuj síť multimetrem ani zkoušečkou. Informuj učitele nebo odpovědnou osobu.',
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        id: 'q1',
+        text: 'Vypínač na zařízení je v poloze vypnuto a zařízení nepracuje. Co z toho bezpečně plyne?',
+        options: [
+          {
+            id: 'a',
+            text: 'Je ověřeně bez napětí, protože nefungující zařízení a vypnutý vypínač vždy znamenají bezpečný stav.',
+          },
+          {
+            id: 'b',
+            text: 'Je automaticky odpojeno od všech zdrojů i od uložené energie.',
+          },
+          {
+            id: 'c',
+            text: 'Ovládací prvek je vypnutý — to neznamená automatické odpojení od všech zdrojů.',
+          },
+          {
+            id: 'd',
+            text: 'Zhasnutá kontrolka potvrzuje odpojení i nepřítomnost napětí.',
+          },
+        ],
+        correctOptionId: 'c',
+        explanation:
+          'Vypnutý ovládací prvek neznamená automatické odpojení od všech zdrojů. Kontrolka ani nefunkčnost nejsou důkazem bezpečného stavu.',
+      },
+      {
+        id: 'q2',
+        text: 'Bezpečný školní model byl oddělen od jednoho známého zdroje. Co to znamená?',
+        options: [
+          {
+            id: 'a',
+            text: 'Odpojení od známého zdroje není totéž jako potvrzená nepřítomnost napětí.',
+          },
+          {
+            id: 'b',
+            text: 'Odpojení vždy automaticky znamená, že je vše bezpečné a připravené k zásahu.',
+          },
+          {
+            id: 'c',
+            text: 'Vytažení jedné zástrčky vylučuje každý možný zdroj včetně uložené energie.',
+          },
+          {
+            id: 'd',
+            text: 'Stačí pohled na zařízení nebo kontrolku a stav je potvrzený.',
+          },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'Odpojení od známého zdroje není totéž jako ověřeně bez napětí. Mohou existovat jiné zdroje nebo uložená energie.',
+      },
+      {
+        id: 'q3',
+        text: 'Zařízení má možný druhý zdroj nebo uloženou energii a není jisté, zda je ověřeně bez napětí. Co je správný úsudek žáka?',
+        options: [
+          {
+            id: 'a',
+            text: 'Otevřít zařízení a podívat se, kde je druhý zdroj nebo uložená energie.',
+          },
+          {
+            id: 'b',
+            text: 'Přepnout jistič a zkusit, jestli se stav tím vyjasní.',
+          },
+          {
+            id: 'c',
+            text: 'Zastavit, nemanipulovat a informovat učitele.',
+          },
+          {
+            id: 'd',
+            text: 'Proměřit síťovou instalaci žákovským multimetrem nebo zkoušečkou.',
+          },
+        ],
+        correctOptionId: 'c',
+        explanation:
+          'Při nejasném stavu žák nepokračuje, nemanipuluje a skutečnou instalaci neověřuje. Informuje učitele nebo odpovědnou osobu.',
+      },
+    ],
+    activityXp: 20,
+    quizXp: 15,
+    badgeId: 'tri-stavy-napeti',
+    mvpAvailable: true,
+  },
+  {
     id: 'od-vypoctu-k-mereni',
     subjectId: 'mereni',
     topicId: 'metody-mereni',
