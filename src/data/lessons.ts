@@ -5,6 +5,7 @@ import { elektronikaLessons } from './lessons-elektronika';
 import { automatizaceLessons } from './lessons-automatizace';
 import { strojeLessons } from './lessons-stroje';
 import { bezpecnostLessons } from './lessons-bezpecnost';
+import { stridavyProudLessons } from './lessons-stridavy-proud';
 
 const SAFETY_NOTE =
   'Tato lekce je školní simulace. Ve skutečné elektrické instalaci se nesmí pracovat pod napětím bez odborného dohledu a dodržení bezpečnostních pravidel.';
@@ -1065,6 +1066,7 @@ export const lessons: MicroLesson[] = [
     badgeId: 'ctenar-znaciek',
     mvpAvailable: true,
   },
+  ...stridavyProudLessons,
   ...mereniLessons,
   ...rozvodyLessons,
   ...elektronikaLessons,

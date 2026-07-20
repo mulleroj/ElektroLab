@@ -77,10 +77,11 @@ export const topics: Topic[] = [
     id: 'stridavy-proud',
     subjectId: 'zaklady',
     title: 'Střídavý proud',
-    description: 'Střídavé napětí a proud v praxi.',
+    description:
+      'Základní rozdíl stejnosměrného a střídavého průběhu, perioda a frekvence.',
     year: 1,
-    estimatedMinutes: 45,
-    mvpAvailable: false,
+    estimatedMinutes: 20,
+    mvpAvailable: true,
   },
   {
     id: 'trojfazovy-proud',
