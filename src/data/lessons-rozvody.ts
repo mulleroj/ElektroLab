@@ -112,6 +112,119 @@ export const rozvodyLessons: MicroLesson[] = [
     mvpAvailable: true,
   },
   {
+    id: 'pe-n-pen',
+    subjectId: 'rozvody',
+    topicId: 'rozvod-obytne-budovy',
+    title: 'PE, N a PEN — kdo má jakou úlohu',
+    year: 2,
+    durationMinutes: 10,
+    difficulty: 'základní',
+    goal:
+      'Žák rozliší PE, N a PEN podle funkce, přiřadí pracovní a ochrannou úlohu, vysvětlí význam spojitosti ochranné cesty a chápe, že barva sama není důkazem funkce ani bezpečného stavu.',
+    hook:
+      'Proč může spotřebič zdánlivě fungovat, i když ochranná cesta není v pořádku? Který vodič potřebuje běžná funkce zařízení, který slouží ochraně — a který vodič obě úlohy kombinuje?',
+    explanation:
+      '**Dvě různé funkce:** Některé vodiče jsou součástí běžné pracovní proudové cesty. Jiné mají ochrannou funkci. Pracovní a ochranná funkce nejsou totéž. Zařízení může zdánlivě fungovat, i když ochranná funkce není v pořádku — funkčnost sama nepotvrzuje bezpečnost.\n\n**N — střední vodič:** Střední vodič N se v běžném provozu účastní pracovní proudové cesty a proud se jím může vracet ke zdroji. N není ochranný vodič a nelze ho považovat za automaticky bezpečný. Označení ani předpokládaná funkce neznamenají, že se jej lze dotýkat nebo s ním manipulovat.\n\n**PE — ochranný vodič:** Ochranný vodič PE spojuje přístupné vodivé části s ochrannou soustavou. V běžném správném provozu není určen jako vodič pracovního proudu spotřebiče. Při poruše může vytvořit ochrannou cestu pro poruchový proud a tím pomoci působení ochranných prvků. Odpojení nebo přerušení PE může odstranit ochranu, i když zařízení zdánlivě dál funguje. PE se nesmí používat jako náhrada pracovního vodiče — a samotný PE nezabrání každému úrazu.\n\n**PEN — spojené funkce:** Kombinovaný ochranný a střední vodič PEN v jednom vodiči spojuje ochrannou i střední funkci. Nejde jen o jiný název pro PE ani o „dva vodiče slepené dohromady“. Jeho správná spojitost je bezpečnostně kritická. V určeném místě může být podle návrhu instalace rozdělen na samostatný PE a N — podmínky a provedení rozdělení patří do pozdějšího učiva a nejsou předmětem praktické práce žáka.\n\n**Proč je přerušení nebezpečné:** Přerušením PE se může ztratit ochranná cesta. Přerušením PEN se současně naruší pracovní i ochranná funkce. Podle konkrétního zapojení mohou vzniknout nebezpečné potenciály na přístupných vodivých částech. Nemusí jít jen o závadu, při které spotřebič „přestane fungovat“ — závada ochrany může zůstat na první pohled skrytá.\n\n**Barvy a označení:** Ve schématu nebo na bezpečném školním modelu bývá PE označen zelenožlutě a N světle modře; ostatní barvy mohou označovat pracovní nebo fázové vodiče podle zapojení. Barva sama ale není důkazem skutečné funkce ani beznapěťového stavu. Starší, poškozená, přeznačená nebo chybně provedená instalace nemusí odpovídat očekávání. Žádného vodiče se nelze bezpečně dotýkat pouze na základě jeho barvy.\n\n**Schéma není skutečná instalace:** Na schématu nebo školním modelu se žák učí funkce vodičů. Skutečná instalace se neposuzuje pouze pohledem. Žák neotevírá zásuvku, rozvaděč ani svorkovnici a neurčuje vodiče multimetrem ani zkoušečkou. Ověřování skutečné instalace patří pouze oprávněné osobě a vhodným pracovním postupům. Tato lekce není návodem k zásahu do instalace.',
+    safetyNote:
+      'Výuka probíhá pouze na schématu nebo bezpečném odpojeném školním modelu. Žák neotevírá zásuvky, rozvaděče ani svorkovnice, nepracuje na síťové instalaci a nemanipuluje s vodičem podle barvy. Barva není důkazem funkce ani beznapěťového stavu a vypnutý vypínač není ověření beznapěťového stavu. Žák nepoužívá zkoušečku ani multimetr k určování síťových vodičů. Nejasné, poškozené nebo neobvyklé označení hlásí učiteli. Skutečnou instalaci ověřuje pouze oprávněná osoba vhodnými postupy. Lekce není návodem k práci pod napětím ani k zásahu do instalace.',
+    memorySentence:
+      'N má pracovní funkci, PE ochrannou, PEN obě spojené — barva sama nepotvrzuje bezpečnost.',
+    typicalMistake:
+      'Žáci si myslí, že N a PE jsou totéž. N má pracovní funkci, PE ochrannou; PEN kombinuje obě funkce, ale není libovolnou náhradou dvou vodičů. Druhá chyba: podle barvy vždy bezpečně poznám funkci vodiče — barva sama nepotvrzuje funkci ani bezpečný stav. Třetí chyba: když spotřebič funguje, ochranný vodič není potřeba. Funkčnost zařízení nepotvrzuje funkčnost ochrany.',
+    teacherTip:
+      'Bezpečná výuka: vytištěné jednoduché schéma, kartičky PE / N / PEN / pracovní funkce / ochranná funkce, magnetické symboly na tabuli nebo zcela odpojený školní model. Barvy používej jen jako podpůrné označení, ne jako jediný klíč. Neotevírej skutečnou instalaci, nepracuj na živém zařízení, nenech žáky hledat vodiče zkoušečkou, nepřerušuj PE, N ani PEN, nevytvářej poruchový stav a nezasahuj do rozvaděče ani zásuvky.',
+    activity: {
+      scenarioChoice: {
+        type: 'scenario-choice',
+        instruction:
+          'U každé situace na jednoduchém schématu nebo v popisu rozhodni, o jaký vodič jde — nebo že to podle barvy bezpečně určit nelze. Všechny čtyři musí být správně.',
+        options: [
+          { id: 'pe', label: 'PE' },
+          { id: 'n', label: 'N' },
+          { id: 'pen', label: 'PEN' },
+          { id: 'nelze-barva', label: 'Nelze bezpečně určit pouze podle barvy' },
+        ],
+        successMessage:
+          'Výborně! Rozlišuješ PE, N a PEN podle funkce a víš, kdy barva sama nestačí.',
+        scenarios: [
+          {
+            id: 's1',
+            text: 'Na jednoduchém schématu vodič patří do běžné pracovní proudové cesty, vede proud ze spotřebiče zpět ke zdroji a nemá ochrannou funkci PE.',
+            correctOptionId: 'n',
+            explanation:
+              'To je střední vodič N — účastní se pracovní proudové cesty. N není ochranný vodič a nelze ho považovat za automaticky bezpečný.',
+          },
+          {
+            id: 's2',
+            text: 'Na jednoduchém schématu vodič spojuje přístupnou vodivou část zařízení s ochrannou soustavou. V běžném provozu není určen jako vodič pracovního proudu spotřebiče; při poruše může vést poruchový proud.',
+            correctOptionId: 'pe',
+            explanation:
+              'To je ochranný vodič PE. V běžném provozu není pracovní cestou spotřebiče, ale při poruše může vést poruchový proud — neříkáme, že proud nikdy nevede.',
+          },
+          {
+            id: 's3',
+            text: 'Na jednoduchém schématu jeden vodič plní ochrannou i střední funkci. Jeho přerušení může současně narušit obě funkce.',
+            correctOptionId: 'pen',
+            explanation:
+              'To je PEN — kombinovaný ochranný a střední vodič. Nejde jen o jiný název pro PE.',
+          },
+          {
+            id: 's4',
+            text: 'V neznámé skutečné instalaci je vidět vodič určité barvy. Žák má rozhodnout, zda je bezpečný a jakou má skutečnou funkci.',
+            correctOptionId: 'nelze-barva',
+            explanation:
+              'Pouze podle barvy to bezpečně určit nelze. S vodičem nemanipuluj, instalaci neotvírej, situaci oznam učiteli nebo odpovědné osobě — funkci a stav ověřuje oprávněná osoba.',
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        id: 'q1',
+        text: 'Čím se liší střední vodič N a ochranný vodič PE?',
+        options: [
+          { id: 'a', text: 'N patří do pracovní proudové cesty; PE má ochrannou funkci a není náhradou pracovního vodiče.' },
+          { id: 'b', text: 'N a PE jsou totéž — jen jiný název pro stejný vodič v každé instalaci.' },
+          { id: 'c', text: 'PE běžně napájí spotřebič místo fázového vodiče.' },
+          { id: 'd', text: 'Podle barvy je každý z nich vždy bezpečný.' },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'N patří do pracovní proudové cesty. PE má ochrannou funkci a neslouží jako náhrada pracovního vodiče. Barva sama bezpečnost nepotvrzuje.',
+      },
+      {
+        id: 'q2',
+        text: 'Co platí o vodiči PEN?',
+        options: [
+          { id: 'a', text: 'Je to jen starší název pro PE.' },
+          { id: 'b', text: 'Kombinuje ochrannou a střední funkci; přerušení může narušit obě.' },
+          { id: 'c', text: 'Lze ho libovolně nahradit dvěma vodiči bez ohledu na návrh instalace.' },
+          { id: 'd', text: 'Bezpečně ho vždy poznáš jen podle barvy.' },
+        ],
+        correctOptionId: 'b',
+        explanation:
+          'PEN spojuje ochrannou a střední funkci. Přerušení může narušit obě. Nejde jen o jiný název PE a barva sama nestačí.',
+      },
+      {
+        id: 'q3',
+        text: 'V neznámé skutečné instalaci vidíš vodič očekávané barvy. Co je správný postup?',
+        options: [
+          { id: 'a', text: 'Dotknout se ho — očekávaná barva znamená, že je bezpečný.' },
+          { id: 'b', text: 'Otevřít zásuvku nebo rozvaděč a vodič přeznačit.' },
+          { id: 'c', text: 'Barva nepotvrzuje funkci ani bezpečný stav; s vodičem nemanipuluj — instalaci ověřuje oprávněná osoba.' },
+          { id: 'd', text: 'Proměřit ho žákovským multimetrem a podle naměřené hodnoty rozhodnout o bezpečnosti.' },
+        ],
+        correctOptionId: 'c',
+        explanation:
+          'Barva není důkaz funkce ani beznapěťového stavu. Žák s vodičem nemanipuluje a skutečnou instalaci ověřuje oprávněná osoba.',
+      },
+    ],
+    activityXp: 20,
+    quizXp: 15,
+    badgeId: 'vodicovy-strazce',
+    mvpAvailable: true,
+  },
+  {
     id: 'co-dela-chranic',
     subjectId: 'rozvody',
     topicId: 'rozvod-obytne-budovy',
