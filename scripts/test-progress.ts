@@ -1245,6 +1245,56 @@ test('starý progress: dokončený výkon a jištění bez sériového → dopor
   assert.equal(total, 11);
 });
 
+/** Délka explanation před MVP-12H4B — horní mez, ne cílový počet znaků. */
+const ZKRAT_EXPLANATION_MAX_CHARS_BEFORE_H4B = 2700;
+
+test('výklad Zkrat, přetížení a jištění zachovává odborné a bezpečnostní jádro', () => {
+  const lesson = getLessonById('zkrat-pretizeni-a-jisteni');
+  assert.ok(lesson);
+  const text = lesson.explanation;
+  assert.ok(text.includes('nadproud') || text.includes('Nadproud'));
+  assert.ok(text.includes('Přetížení') || text.includes('přetížení'));
+  assert.ok(text.includes('Zkrat') || text.includes('zkrat'));
+  assert.ok(text.includes('velmi malým odporem') || text.includes('velmi malý odpor'));
+  assert.ok(text.includes('není doslova nekonečný') || text.includes('není nekonečný'));
+  assert.ok(text.includes('není vždy přesně nula'));
+  assert.ok(text.includes('Pojistka') || text.includes('pojistka'));
+  assert.ok(text.includes('tavný prvek'));
+  assert.ok(text.includes('správným typem') || text.includes('správný typ'));
+  assert.ok(text.includes('Jistič') || text.includes('jistič'));
+  assert.ok(text.includes('opakované zapínání') || text.includes('Opakované zapínání'));
+  assert.ok(text.includes('vedení'));
+  assert.ok(text.includes('úrazem') || text.includes('člověka'));
+  assert.ok(/proudov[ýy] chránič/i.test(text));
+  assert.ok(/absolutn[íi]/i.test(text));
+});
+
+test('výklad Zkrat, přetížení a jištění nemá auditované duplicity a zůstává sedm bloků', () => {
+  const lesson = getLessonById('zkrat-pretizeni-a-jisteni');
+  assert.ok(lesson);
+  const text = lesson.explanation;
+  assert.ok(text.trim().length > 0);
+  assert.ok(
+    text.length <= ZKRAT_EXPLANATION_MAX_CHARS_BEFORE_H4B,
+    `explanation má ${text.length} znaků, očekáváno ≤ ${ZKRAT_EXPLANATION_MAX_CHARS_BEFORE_H4B}`,
+  );
+  assert.equal(text.includes('Jednoduše:'), false);
+  assert.equal(text.includes('nevhodně zatížený přívod'), false);
+  const paragraphs = text.split(/\n\s*\n/).filter((p) => p.trim().length > 0);
+  assert.equal(paragraphs.length, 7);
+  for (const label of [
+    '**Nadproud**',
+    '**Přetížení**',
+    '**Zkrat**',
+    '**Rozdíl:**',
+    '**Pojistka**',
+    '**Jistič**',
+    '**Hranice ochrany:**',
+  ]) {
+    assert.ok(text.includes(label), `chybí blok ${label}`);
+  }
+});
+
 console.log('');
 console.log(`Passed: ${passed}`);
 console.log(`Failed: ${failures.length}`);
