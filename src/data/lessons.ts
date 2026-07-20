@@ -678,6 +678,100 @@ export const lessons: MicroLesson[] = [
     mvpAvailable: true,
   },
   {
+    id: 'seriove-paralelni',
+    subjectId: 'zaklady',
+    topicId: 'stejnosmerny-proud',
+    title: 'Sériové a paralelní zapojení',
+    year: 1,
+    durationMinutes: 9,
+    difficulty: 'základní',
+    goal: 'Žák rozliší sériové zapojení (prvky za sebou) a paralelní zapojení (prvky ve větvích).',
+    hook: 'Vánoční řetěz — když jedna žárovka přestane svítit, zhasnou všechny. Proč u lustrů v bytě to tak není?',
+    explanation:
+      'Při **sériovém** zapojení proud prochází všemi prvky za sebou — jedna cesta. Při **paralelním** zapojení jsou prvky ve větvích vedle sebe — proud se rozdělí. Sériově: žárovky za sebou na jednom vodiči. Paralelně: každá žárovka má vlastní větev ke zdroji.',
+    safetyNote: SAFETY_NOTE,
+    memorySentence: 'Sériově za sebou, paralelně ve větvích.',
+    typicalMistake:
+      'Žáci si pletou, kde proud „teče stejně“ — sériově je stejný proud všude, paralelně stejné napětí na větvích.',
+    teacherTip:
+      'Časté téma závěrečné zkoušky. Interaktivní ukázka dvou schémat se hodí na projektor; příklad s vánočním řetězem spolehlivě chytne pozornost.',
+    interactiveDemo: {
+      type: 'series-parallel',
+      title: 'Sériové nebo paralelní?',
+      description:
+        'Vyber sériové nebo paralelní zapojení a projdi pět kroků. Sleduj, kolik má proud cest a jak se v obou zapojeních chová proud a napětí.',
+    },
+    activity: {
+      connectionType: {
+        type: 'connection-type',
+        instruction:
+          'U každého scénáře rozhodni, zda jde o sériové nebo paralelní zapojení. Všechny musí být správně.',
+        scenarios: [
+          {
+            id: 's1',
+            description:
+              'Dvě žárovky na jednom vodiči za sebou — proud prochází první, pak druhou.',
+            correctType: 'serial',
+          },
+          {
+            id: 's2',
+            description:
+              'Dvě žárovky vedle sebe — každá má vlastní větev od zdroje a zpět ke zdroji.',
+            correctType: 'parallel',
+          },
+          {
+            id: 's3',
+            description:
+              'Tři rezistory za sebou na společné větvi — jeden proud prochází všemi třemi.',
+            correctType: 'serial',
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        id: 'q1',
+        text: 'Jak poznáš sériové zapojení?',
+        options: [
+          { id: 'a', text: 'Prvky jsou za sebou na jedné cestě proudu.' },
+          { id: 'b', text: 'Každý prvek má vlastní větev ke zdroji.' },
+          { id: 'c', text: 'Chybí zdroj napětí.' },
+          { id: 'd', text: 'Jsou zapojeny jen vodiče.' },
+        ],
+        correctOptionId: 'a',
+        explanation: 'Sériově jsou prvky za sebou — proud prochází všemi postupně.',
+      },
+      {
+        id: 'q2',
+        text: 'Paralelní zapojení znamená…',
+        options: [
+          { id: 'a', text: 'Prvky ve větvích vedle sebe.' },
+          { id: 'b', text: 'Prvky za sebou na jednom drátu.' },
+          { id: 'c', text: 'Žádný proud neteče.' },
+          { id: 'd', text: 'Jen jeden spotřebič v obvodu.' },
+        ],
+        correctOptionId: 'a',
+        explanation: 'Paralelně jsou prvky ve větvích — vedle sebe, každá větev ke zdroji.',
+      },
+      {
+        id: 'q3',
+        text: 'Když v sériovém řetězu jedna žárovka přeruší obvod…',
+        options: [
+          { id: 'a', text: 'Zhasnou všechny žárovky v řetězu.' },
+          { id: 'b', text: 'Ostatní svítí dál stejně.' },
+          { id: 'c', text: 'Zdroj se okamžitě zničí.' },
+          { id: 'd', text: 'Proud se zdvojnásobí.' },
+        ],
+        correctOptionId: 'a',
+        explanation: 'Sériově je jedna cesta — přerušení zastaví proud v celém řetězu.',
+      },
+    ],
+    activityXp: 20,
+    quizXp: 15,
+    badgeId: 'seriove-paralelne',
+    mvpAvailable: true,
+  },
+  {
     id: 'elektricky-vykon-a-energie',
     subjectId: 'zaklady',
     topicId: 'stejnosmerny-proud',
@@ -873,100 +967,6 @@ export const lessons: MicroLesson[] = [
     activityXp: 20,
     quizXp: 15,
     badgeId: 'strazce-obvodu',
-    mvpAvailable: true,
-  },
-  {
-    id: 'seriove-paralelni',
-    subjectId: 'zaklady',
-    topicId: 'stejnosmerny-proud',
-    title: 'Sériové a paralelní zapojení',
-    year: 1,
-    durationMinutes: 9,
-    difficulty: 'základní',
-    goal: 'Žák rozliší sériové zapojení (prvky za sebou) a paralelní zapojení (prvky ve větvích).',
-    hook: 'Vánoční řetěz — když jedna žárovka přestane svítit, zhasnou všechny. Proč u lustrů v bytě to tak není?',
-    explanation:
-      'Při **sériovém** zapojení proud prochází všemi prvky za sebou — jedna cesta. Při **paralelním** zapojení jsou prvky ve větvích vedle sebe — proud se rozdělí. Sériově: žárovky za sebou na jednom vodiči. Paralelně: každá žárovka má vlastní větev ke zdroji.',
-    safetyNote: SAFETY_NOTE,
-    memorySentence: 'Sériově za sebou, paralelně ve větvích.',
-    typicalMistake:
-      'Žáci si pletou, kde proud „teče stejně“ — sériově je stejný proud všude, paralelně stejné napětí na větvích.',
-    teacherTip:
-      'Časté téma závěrečné zkoušky. Interaktivní ukázka dvou schémat se hodí na projektor; příklad s vánočním řetězem spolehlivě chytne pozornost.',
-    interactiveDemo: {
-      type: 'series-parallel',
-      title: 'Sériové nebo paralelní?',
-      description:
-        'Vyber sériové nebo paralelní zapojení a projdi pět kroků. Sleduj, kolik má proud cest a jak se v obou zapojeních chová proud a napětí.',
-    },
-    activity: {
-      connectionType: {
-        type: 'connection-type',
-        instruction:
-          'U každého scénáře rozhodni, zda jde o sériové nebo paralelní zapojení. Všechny musí být správně.',
-        scenarios: [
-          {
-            id: 's1',
-            description:
-              'Dvě žárovky na jednom vodiči za sebou — proud prochází první, pak druhou.',
-            correctType: 'serial',
-          },
-          {
-            id: 's2',
-            description:
-              'Dvě žárovky vedle sebe — každá má vlastní větev od zdroje a zpět ke zdroji.',
-            correctType: 'parallel',
-          },
-          {
-            id: 's3',
-            description:
-              'Tři rezistory za sebou na společné větvi — jeden proud prochází všemi třemi.',
-            correctType: 'serial',
-          },
-        ],
-      },
-    },
-    quiz: [
-      {
-        id: 'q1',
-        text: 'Jak poznáš sériové zapojení?',
-        options: [
-          { id: 'a', text: 'Prvky jsou za sebou na jedné cestě proudu.' },
-          { id: 'b', text: 'Každý prvek má vlastní větev ke zdroji.' },
-          { id: 'c', text: 'Chybí zdroj napětí.' },
-          { id: 'd', text: 'Jsou zapojeny jen vodiče.' },
-        ],
-        correctOptionId: 'a',
-        explanation: 'Sériově jsou prvky za sebou — proud prochází všemi postupně.',
-      },
-      {
-        id: 'q2',
-        text: 'Paralelní zapojení znamená…',
-        options: [
-          { id: 'a', text: 'Prvky ve větvích vedle sebe.' },
-          { id: 'b', text: 'Prvky za sebou na jednom drátu.' },
-          { id: 'c', text: 'Žádný proud neteče.' },
-          { id: 'd', text: 'Jen jeden spotřebič v obvodu.' },
-        ],
-        correctOptionId: 'a',
-        explanation: 'Paralelně jsou prvky ve větvích — vedle sebe, každá větev ke zdroji.',
-      },
-      {
-        id: 'q3',
-        text: 'Když v sériovém řetězu jedna žárovka přeruší obvod…',
-        options: [
-          { id: 'a', text: 'Zhasnou všechny žárovky v řetězu.' },
-          { id: 'b', text: 'Ostatní svítí dál stejně.' },
-          { id: 'c', text: 'Zdroj se okamžitě zničí.' },
-          { id: 'd', text: 'Proud se zdvojnásobí.' },
-        ],
-        correctOptionId: 'a',
-        explanation: 'Sériově je jedna cesta — přerušení zastaví proud v celém řetězu.',
-      },
-    ],
-    activityXp: 20,
-    quizXp: 15,
-    badgeId: 'seriove-paralelne',
     mvpAvailable: true,
   },
   {
