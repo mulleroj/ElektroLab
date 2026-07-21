@@ -118,6 +118,140 @@ export const strojeLessons: MicroLesson[] = [
     mvpAvailable: true,
   },
   {
+    id: 'prevod-transformatoru',
+    subjectId: 'stroje',
+    topicId: 'transformatory',
+    title: 'Převod transformátoru',
+    year: 2,
+    durationMinutes: 10,
+    difficulty: 'základní',
+    goal:
+      'Žák použije idealizovaný vztah mezi počtem závitů a napětím, vypočítá U2, rozliší zvyšovací, snižovací a přibližně 1 : 1 převod a zkontroluje rozumnost výsledku.',
+    hook:
+      'Už víš, že více závitů na sekundáru znamená vyšší napětí. Dokážeš ale spočítat, kolikrát se napětí změní?',
+    explanation:
+      '**Co už znáš:** Transformátor má primární a sekundární vinutí na společném jádru. Více závitů na sekundáru znamená v jednoduchém modelu vyšší napětí, méně závitů nižší napětí.\n\n' +
+      '**Čtyři značky:** U1 je napětí na primárním vinutí a N1 je počet jeho závitů. U2 je napětí na sekundárním vinutí a N2 je počet jeho závitů. U1 a U2 se udávají ve voltech. N1 a N2 jsou počty závitů — počet závitů nemá jednotku volt.\n\n' +
+      '**Poměr závitů a napětí:** V jednoduchém idealizovaném modelu transformátoru platí přibližně U1 / U2 = N1 / N2. Poměr napětí odpovídá poměru závitů.\n\n' +
+      '**Výpočet sekundárního napětí:** Ze stejného vztahu dostaneme praktický tvar U2 = U1 × N2 / N1. Do vzorce dosadíme známé hodnoty a spočítáme U2.\n\n' +
+      '**Nejdřív odhad, potom výpočet:** Před počítáním porovnej N2 a N1. Když je N2 menší než N1, očekávej U2 menší než U1. Když je N2 větší než N1, očekávej U2 větší než U1. Když je N2 rovno N1, očekávej přibližně U2 rovno U1. Po výpočtu porovnej výsledek s tímto odhadem.\n\n' +
+      '**Zvyšovací, snižovací a 1 : 1:** Příklad snižovacího převodu: U1 = 24 V, N1 = 120 závitů, N2 = 60 závitů. N2 je polovina N1, takže očekáváme přibližně poloviční U2. Výpočet: U2 = 24 × 60 / 120 = 12 V. Dvanáct voltů je méně než 24 V, výsledek odpovídá snižovacímu transformátoru. Příklad zvyšovacího převodu: U1 = 12 V, N1 = 100 závitů, N2 = 200 závitů. N2 je dvojnásobné proti N1, takže U2 je v idealizovaném modelu přibližně dvojnásobné: U2 = 12 × 200 / 100 = 24 V.\n\n' +
+      '**Hranice jednoduchého modelu:** Idealizovaný vztah popisuje jen poměr závitů a napětí. Transformátor energii nevyrábí; proud, výkon a ztráty budeme řešit v další lekci. Převod určuje poměr závitů, ne samotná velikost zařízení.',
+    safetyNote:
+      'Výpočty probíhají pouze z připravených údajů nebo simulace. Žák nepřipojuje transformátor k zásuvce, neměří primární ani sekundární stranu síťového transformátoru a neotevírá nabíječku, zdroj ani transformátor. Odkryté svorky se nepoužívají. Žádné pokusy s 230 V a žádné přepojování vinutí. Sekundární strana není automaticky bezpečná. Nižší napětí neznamená nulové riziko. Transformátor bez připojené zátěže může mít na sekundáru napětí. Nelze předpokládat, že každý transformátor galvanicky odděluje. Místní školní pravidla a pokyn učitele mají přednost.',
+    memorySentence:
+      'V idealizovaném modelu platí U2 = U1 × N2 / N1; více závitů na sekundáru znamená vyšší napětí.',
+    typicalMistake:
+      'Obrácení poměru N1 a N2 ve vzorci. Zaměnění počtu závitů za volty. Počítání bez předchozího odhadu zvyšovacího nebo snižovacího směru. Přijetí výsledku, který odporuje poměru závitů. Představa, že transformátor vytváří energii. Představa, že větší fyzický transformátor automaticky více zvyšuje napětí — převod určuje poměr závitů, ne velikost zařízení. Idealizovaný vztah nepopisuje výkon ani bezpečnost.',
+    teacherTip:
+      'Nakresli tabulku U1, U2, N1, N2. Nejdřív nech žáky odhadnout zvyšovací nebo snižovací směr, až potom dosadit do vzorce a výsledek porovnat s odhadem. Používej připravené kartičky a bezpečná data 12 V nebo 24 V. Nech žáky vysvětlit chybu v obráceném poměru N1 / N2. Existující TransformerDemo můžeš použít jen jako kvalitativní připomenutí — neměň jeho komponentu a nevkládej je do této lekce. Zakázáno je síťové měření, vlastní přepojování vinutí, otevírání zařízení a práce s odkrytými svorkami.',
+    activity: {
+      measurementJudgment: {
+        type: 'measurement-judgment',
+        instruction:
+          'U každého tvrzení rozhodni, zda platí, nebo neplatí. Všech pět musí být správně.',
+        correctLabel: 'Tvrzení platí',
+        wrongLabel: 'Tvrzení neplatí',
+        successMessage:
+          'Výborně! Umíš použít vzorec U2 = U1 × N2 / N1, rozlišit směr převodu a nezaměnit závity za volty.',
+        scenarios: [
+          {
+            id: 's1',
+            text: 'U1 = 24 V, N1 = 120 a N2 = 60. Výsledek U2 = 12 V odpovídá poměru závitů.',
+            correct: 'correct',
+            explanation:
+              'Ano. V idealizovaném modelu platí U2 = U1 × N2 / N1, tedy 24 × 60 / 120 = 12 V.',
+          },
+          {
+            id: 's2',
+            text: 'Sekundární vinutí má více závitů než primární, proto musí být sekundární napětí v idealizovaném modelu nižší.',
+            correct: 'wrong',
+            explanation:
+              'Neplatí. Více závitů na sekundáru znamená v jednoduchém modelu vyšší sekundární napětí.',
+          },
+          {
+            id: 's3',
+            text: 'N1 a N2 jsou počty závitů; jejich jednotkou nejsou volty.',
+            correct: 'correct',
+            explanation:
+              'Ano. U1 a U2 jsou ve voltech, N1 a N2 jsou počty závitů bez jednotky volt.',
+          },
+          {
+            id: 's4',
+            text: 'Pro výpočet U2 vždy použijeme U2 = U1 × N1 / N2.',
+            correct: 'wrong',
+            explanation:
+              'Neplatí. Správný poměr je U2 = U1 × N2 / N1 — v čitateli je počet závitů sekundáru.',
+          },
+          {
+            id: 's5',
+            text: 'Když N1 = N2, očekáváme v idealizovaném modelu přibližně U2 = U1.',
+            correct: 'correct',
+            explanation:
+              'Ano. Stejný počet závitů znamená v idealizovaném modelu přibližně stejné napětí.',
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        id: 'q1',
+        text: 'Který vztah správně vypočítá sekundární napětí v idealizovaném modelu?',
+        options: [
+          { id: 'a', text: 'U2 = U1 × N1 / N2' },
+          { id: 'b', text: 'U2 = U1 × N2 / N1' },
+          { id: 'c', text: 'U2 = N1 × N2 / U1' },
+          { id: 'd', text: 'U2 = U1 + N2 − N1' },
+        ],
+        correctOptionId: 'b',
+        explanation:
+          'V idealizovaném modelu platí U2 = U1 × N2 / N1. Obrácený poměr N1 / N2 by výsledek pokazil.',
+      },
+      {
+        id: 'q2',
+        text: 'U1 = 24 V, N1 = 120 a N2 = 60. Jaké je U2 v idealizovaném modelu?',
+        options: [
+          { id: 'a', text: '24 V' },
+          { id: 'b', text: '48 V' },
+          { id: 'c', text: '12 V' },
+          { id: 'd', text: '240 V' },
+        ],
+        correctOptionId: 'c',
+        explanation:
+          'U2 = 24 × 60 / 120 = 12 V. N2 je polovina N1, takže očekáváme přibližně poloviční napětí.',
+      },
+      {
+        id: 'q3',
+        text: 'Sekundární vinutí má třikrát více závitů než primární. Co očekáváme?',
+        options: [
+          {
+            id: 'a',
+            text: 'Zvyšovací převod; U2 je přibližně trojnásobné proti U1.',
+          },
+          {
+            id: 'b',
+            text: 'Snižovací převod; U2 je přibližně třetinové proti U1.',
+          },
+          {
+            id: 'c',
+            text: 'Převod zůstane přibližně 1 : 1 a napětí se téměř nezmění.',
+          },
+          {
+            id: 'd',
+            text: 'Počet závitů neurčuje, jestli se napětí zvýší nebo sníží.',
+          },
+        ],
+        correctOptionId: 'a',
+        explanation:
+          'Když je N2 trojnásobné proti N1, očekáváme v idealizovaném modelu přibližně trojnásobné U2 — zvyšovací převod.',
+      },
+    ],
+    activityXp: 20,
+    quizXp: 15,
+    badgeId: 'pocitar-prevodu',
+    mvpAvailable: true,
+  },
+  {
     id: 'asynchronni-motor',
     subjectId: 'stroje',
     topicId: 'asynchronni-stroje',
