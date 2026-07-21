@@ -412,21 +412,28 @@ export const strojeLessons: MicroLesson[] = [
     topicId: 'asynchronni-stroje',
     title: 'Asynchronní motor jednoduše',
     year: 2,
-    durationMinutes: 9,
+    durationMinutes: 10,
     difficulty: 'základní',
     goal:
-      'Žák získá základní představu, že asynchronní motor využívá točivé magnetické pole a rotor se za tímto polem „opožďuje“.',
+      'Žák kvalitativně vysvětlí, jak točivé magnetické pole statoru indukuje v rotoru napětí a proud, jak vzniká elektromagnetický moment a proč rotor při běžném motorickém chodu pole úplně nedohoní.',
     hook:
-      'Nejrozšířenější motor na světě nemá uvnitř žádné kartáče ani magnety na hřídeli. Točí s ním neviditelné pole.',
+      'Rotor není připojen vodičem ke statoru a není to permanentní magnet. Odkud se tedy v rotoru vezme proud a proč se začne otáčet?',
     explanation:
-      '**Stator** (pevná část) vytváří po připojení ke střídavé síti **točivé magnetické pole**. To pole „táhne“ **rotor** (otáčivou část) za sebou — rotor se roztočí a přes **hřídel** pohání stroj. Rotor se ale točí vždy o kousek **pomaleji než pole** — „opožďuje se“. Právě proto se motor jmenuje **asynchronní**.',
+      '**Navázání na točivé pole:** V předchozí lekci jsi viděl, že mechanicky nehybný stator se základním modelem třífázového asynchronního motoru vytváří točivé magnetické pole. Teď nesledujeme znovu vznik statorového pole — sledujeme, jak na něj reaguje **rotor**, otáčivá část uvnitř statoru.\n\n' +
+      '**Pole se vůči rotoru pohybuje:** Při rozběhu rotor zpočátku stojí. Točivé pole se vůči rotorovým vodičům pohybuje, takže magnetické působení na tyto vodivé části se mění. Právě tato relativní změna umožní indukci. Proud ze statoru do rotoru nepřechází a nepřeskakuje vzduchovou mezerou.\n\n' +
+      '**Nejdřív napětí, potom proud:** Změna magnetického působení nejprve indukuje v rotorových vodičích **napětí**. V základním modelu klecového rotoru tvoří vodivé tyče a jejich spojení uzavřené vodivé cesty. Teprve v uzavřené cestě může téct **rotorový proud**. Indukované napětí a rotorový proud nejsou totéž. Rotor není přímo elektricky napájen stejně jako stator.\n\n' +
+      '**Rotor vytváří vlastní magnetické působení:** Rotorový proud vytváří vlastní magnetické pole neboli magnetické působení. Statorové a rotorové magnetické působení na sebe působí.\n\n' +
+      '**Vzniká elektromagnetický moment:** Na rotorové vodiče působí elektromagnetické síly. Jejich společný účinek vytváří otáčivý **moment**, který roztáčí rotor ve směru točivého pole. Rotor se snaží točivé pole následovat — ale ne proto, že by pole „jen táhlo železo“ nebo že by rotor byl permanentní magnet.\n\n' +
+      '**Proč rotor pole nedohoní:** Jak rotor zrychluje, rozdíl rychlostí mezi polem a rotorem se zmenšuje a relativní změna magnetického působení slábne. Indukované napětí i rotorový proud se v základním modelu zmenšují. Kdyby se rotor v idealizovaném modelu otáčel přesně stejně rychle a stejným směrem jako pole, relativní změna by zanikla, potřebné rotorové napětí a proud by se neindukovaly a potřebný motorický moment by nevznikal. Proto při běžném motorickém chodu rotor zůstává o něco pomalejší než pole.\n\n' +
+      '**Co znamená asynchronní a skluz:** Motor se jmenuje asynchronní právě proto, že rotor při běžném motorickém chodu neběží synchronně s polem. **Skluz** kvalitativně popisuje, že rotor se otáčí pomaleji než točivé pole. Není to mechanické klouzání součástí ani automaticky porucha a v této lekci jej nepočítáme. Velikost skluzu není vždy stejná.',
     safetyNote:
-      'Tato lekce je zjednodušená školní simulace. Skutečné motory se nesmí rozebírat, spouštět ani zkoušet bez pokynů učitele, odborného dohledu a bezpečného pracovního prostředí.',
-    memorySentence: 'Pole se točí, rotor ho honí — a nikdy ho úplně nedožene.',
+      'Výuka probíhá pouze pomocí schémat, simulace, připravených dat nebo učitelem zabezpečeného modelu. Žák nepřipojuje motor k síti, neotevírá motor ani svorkovnici, nepřepojuje vinutí a nemění pořadí fází na skutečném zařízení. Živé části se neměří. Nezajištěný motor se nespouští. Rotor ani hřídel se neblokují. Hřídele, ventilátoru, spojky ani jiných rotujících částí se nedotýkej. Motor se může neočekávaně rozběhnout. Rotor a připojený stroj mohou po vypnutí dobíhat. Motor a jeho povrch se mohou zahřívat. Volný oděv, vlasy a šperky se mohou zachytit. Odpojený ovládací obvod nemusí znamenat beznapěťový silový obvod. Místní školní pravidla a pokyn učitele mají přednost.',
+    memorySentence:
+      'Točivé pole vůči rotoru indukuje proud, jeho magnetické působení vytváří moment a rotor proto pole sleduje s malým skluzem.',
     typicalMistake:
-      'Žáci zaměňují stator a rotor. Pomůcka: STÁtor STOJÍ, ROTor ROTUJE.',
+      'Žáci zaměňují stator a rotor, myslí si, že rotor je permanentní magnet, nebo že proud přeskakuje ze statoru do rotoru. Časté je i tvrzení, že samotné „pole táhne železo" vysvětluje motorický moment, že se rotor točí stejně rychle jako pole, že skluz je mechanické prokluzování nebo automaticky porucha, anebo že točivé pole vzniká mechanickým otáčením statorových cívek. Správně: STÁtor STOJÍ a ROTor ROTUJE, rotorový proud vzniká indukcí v uzavřených vodivých cestách, moment vzniká magnetickým působením statoru i rotoru a při běžném motorickém chodu rotor pole úplně nedohoní.',
     teacherTip:
-      'Navazuje na transformátor (obojí je o magnetickém poli). Demo se šesti kroky se hodí projít společně a nechat třídu předvídat další krok.',
+      'Použij kartičkový řetězec: točivé pole → indukované napětí → rotorový proud → rotorové magnetické působení → moment → otáčení → skluz. Před každým krokem nech žáky říct, co musí platit, a zvlášť rozliš napětí a proud. InductionMotorDemo použij jako vizuální potvrzení — zastav ukázku u kroků indukce, momentu a skluzu a ukaž rotorové tyče jen jako uzavřené vodivé cesty. Pracuj jen se schématem, simulací nebo odpojeným zabezpečeným modelem. Praktické přepojování motoru ani změnu sledu fází neprováděj. Demo komponentu v této lekci neměň.',
     interactiveDemo: {
       type: 'induction-motor',
       title: 'Od stojícího motoru k běhu',
@@ -434,69 +441,137 @@ export const strojeLessons: MicroLesson[] = [
         'Projdi šest kroků ukázky a sleduj, jak točivé pole roztáčí rotor — a proč ho nikdy úplně nedožene.',
     },
     activity: {
-      termMatching: {
-        type: 'term-matching',
+      scenarioChoice: {
+        type: 'scenario-choice',
         instruction:
-          'Klikni na část motoru vlevo a pak na její úlohu vpravo. Spáruj všechny čtyři dvojice.',
-        leftTitle: 'Část motoru',
-        rightTitle: 'Co dělá',
-        terms: [
-          { id: 'stator', label: 'Stator' },
-          { id: 'rotor', label: 'Rotor' },
-          { id: 'pole', label: 'Magnetické pole' },
-          { id: 'hridel', label: 'Hřídel' },
+          'U každé situace rozhodni, co platí pro indukční děj v rotoru. Všechny čtyři musí být správně.',
+        options: [
+          {
+            id: 'proud-a-moment',
+            label: 'Indukuje se napětí, teče rotorový proud a vzniká moment',
+          },
+          {
+            id: 'napeti-bez-proudu',
+            label: 'Indukuje se napětí, ale bez uzavřené cesty neteče proud',
+          },
+          {
+            id: 'zanika-indukce',
+            label: 'V základním modelu zanikne potřebná indukce i moment',
+          },
+          {
+            id: 'bez-statoroveho-pole',
+            label: 'Bez statorového pole tento indukční děj nevznikne',
+          },
         ],
-        definitions: [
-          { id: 'def-stator', label: 'Pevná část — vytváří točivé pole' },
-          { id: 'def-rotor', label: 'Otáčí se uvnitř, opožďuje se za polem' },
-          { id: 'def-pole', label: 'Neviditelné, točí se a „táhne“ rotor' },
-          { id: 'def-hridel', label: 'Mechanický výstup k poháněnému stroji' },
+        successMessage:
+          'Výborně! Víš, že točivé pole indukuje v rotoru napětí a proud, vytváří moment a při běžném chodu vyžaduje skluz.',
+        scenarios: [
+          {
+            id: 's1',
+            text: 'Stator vytváří točivé magnetické pole. Rotor zpočátku stojí a jeho vodivé cesty jsou v základním modelu uzavřené.',
+            correctOptionId: 'proud-a-moment',
+            explanation:
+              'Pole se vůči stojícímu rotoru pohybuje, takže se mění magnetické působení. Indukuje se napětí, uzavřenou cestou teče proud, vzniká rotorové magnetické působení a elektromagnetický moment.',
+          },
+          {
+            id: 's2',
+            text: 'Točivé pole se vůči rotorovému vodiči mění, ale modelovaná vodivá cesta je rozpojená. Jde jen o myšlenkový simulační model — skutečný rotor neotevíráme ani neupravujeme.',
+            correctOptionId: 'napeti-bez-proudu',
+            explanation:
+              'Relativní změna může indukovat napětí i v otevřeném modelu. Bez uzavřené vodivé cesty ale rotorový proud neteče, takže v tomto modelu nevzniká potřebný motorický moment.',
+          },
+          {
+            id: 's3',
+            text: 'V idealizovaném modelu se rotor otáčí přesně stejnou rychlostí a stejným směrem jako točivé pole. Relativní změna magnetického působení vůči rotoru zanikla.',
+            correctOptionId: 'zanika-indukce',
+            explanation:
+              'Bez relativní změny se v základním modelu neindukuje potřebné rotorové napětí. Bez rotorového proudu nevzniká potřebný motorický moment. Proto běžný asynchronní motor pracuje se skluzem.',
+          },
+          {
+            id: 's4',
+            text: 'Statorovými vinutími neteče proud. V základním modelu neuvažujeme jiné zdroje magnetického pole.',
+            correctOptionId: 'bez-statoroveho-pole',
+            explanation:
+              'Bez proudu nevzniká vlastní elektromagnetické pole statorových vinutí. Bez statorového pole tento indukční děj v rotoru nevznikne. Permanentní, zbytkový nebo vnější magnetismus v tomto modelu neřešíme.',
+          },
         ],
-        correctPairs: {
-          stator: 'def-stator',
-          rotor: 'def-rotor',
-          pole: 'def-pole',
-          hridel: 'def-hridel',
-        },
       },
     },
     quiz: [
       {
         id: 'q1',
-        text: 'Co vytváří točivé magnetické pole v asynchronním motoru?',
+        text: 'Jak v základním modelu vznikne proud v rotorových vodičích?',
         options: [
-          { id: 'a', text: 'Stator připojený ke střídavé síti.' },
-          { id: 'b', text: 'Rotor svým otáčením.' },
-          { id: 'c', text: 'Hřídel.' },
-          { id: 'd', text: 'Ventilátor motoru.' },
+          {
+            id: 'a',
+            text: 'Rotor je vodičem napájený přímo ze stejných svorek jako stator.',
+          },
+          {
+            id: 'b',
+            text: 'Proud přeskakuje vzduchovou mezerou ze statorových vinutí přímo do rotorových tyčí.',
+          },
+          {
+            id: 'c',
+            text: 'Točivé pole se vůči rotoru mění, indukuje napětí a uzavřenou cestou teče proud.',
+          },
+          {
+            id: 'd',
+            text: 'Rotor je permanentní magnet a sám vytváří proud i bez jakékoli změny magnetického působení.',
+          },
         ],
-        correctOptionId: 'a',
-        explanation: 'Točivé pole vzniká ve statoru — rotor je jím teprve roztáčen.',
+        correctOptionId: 'c',
+        explanation:
+          'Relativní změna magnetického působení indukuje napětí. Proud teče teprve v uzavřené vodivé cestě. Rotor není napájen stejně jako stator a proud nepřeskakuje mezerou.',
       },
       {
         id: 'q2',
-        text: 'Proč se motoru říká asynchronní?',
+        text: 'Co v základním modelu vytváří elektromagnetický moment působící na rotor?',
         options: [
-          { id: 'a', text: 'Rotor se točí o něco pomaleji než pole — neběží s ním stejně.' },
-          { id: 'b', text: 'Protože se točí proti směru pole.' },
-          { id: 'c', text: 'Protože běží jen střídavě.' },
-          { id: 'd', text: 'Podle jména vynálezce.' },
+          {
+            id: 'a',
+            text: 'Statorové cívky se mechanicky otáčejí kolem hřídele a tím roztáčí celý rotor.',
+          },
+          {
+            id: 'b',
+            text: 'Rotorový proud vytváří magnetické působení; se statorovým polem vzniká moment.',
+          },
+          {
+            id: 'c',
+            text: 'Rotor se roztočí jen setrvačností po prvním krátkém impulsu bez dalšího elektromagnetického děje.',
+          },
+          {
+            id: 'd',
+            text: 'Neprotékaný kus železa je polem přitahován a právě tím vzniká celý motorický moment.',
+          },
         ],
-        correctOptionId: 'a',
+        correctOptionId: 'b',
         explanation:
-          '„Asynchronní“ = neběží synchronně (stejně) s polem — rotor se opožďuje.',
+          'Moment vzniká elektromagnetickým působením statorového a rotorového pole. Samotné „táhnutí železa“, setrvačnost ani mechanické otáčení statoru to nenahradí.',
       },
       {
         id: 'q3',
-        text: 'Kudy jde otáčení z motoru ven k poháněnému stroji?',
+        text: 'Proč při běžném motorickém chodu rotor točivé pole úplně nedohoní?',
         options: [
-          { id: 'a', text: 'Hřídelí.' },
-          { id: 'b', text: 'Statorem.' },
-          { id: 'c', text: 'Přívodním kabelem.' },
-          { id: 'd', text: 'Magnetickým polem do vzduchu.' },
+          {
+            id: 'a',
+            text: 'Skluz znamená, že části motoru po sobě mechanicky kloužou a prokluzují.',
+          },
+          {
+            id: 'b',
+            text: 'Rotor je pomalejší pouze kvůli tření v ložiskách, vzduchu a mechanických ztrátách.',
+          },
+          {
+            id: 'c',
+            text: 'Asynchronní znamená, že se rotor otáčí zcela nepravidelně, náhodně a bez stálého směru.',
+          },
+          {
+            id: 'd',
+            text: 'Při stejné rychlosti by v základním modelu zanikla relativní změna a potřebný moment.',
+          },
         ],
-        correctOptionId: 'a',
-        explanation: 'Hřídel je mechanický výstup motoru.',
+        correctOptionId: 'd',
+        explanation:
+          'Bez relativní změny by se neindukovalo potřebné rotorové napětí a proud a nevznikal by motorický moment. Skluz není mechanické klouzání ani nepravidelné otáčení.',
       },
     ],
     activityXp: 20,
@@ -504,6 +579,7 @@ export const strojeLessons: MicroLesson[] = [
     badgeId: 'motorovy-elev',
     mvpAvailable: true,
   },
+
   {
     id: 'stykac-a-rele',
     subjectId: 'stroje',
