@@ -15,7 +15,7 @@ export const magnetismusIndukceLessons: MicroLesson[] = [
       'Vodič nevypadá jako magnet. Jakmile jím ale teče proud, kompas v jeho blízkosti může změnit směr. Kde se magnetický účinek vzal?',
     explanation:
       '**Proud vytváří magnetické pole:** Když vodičem teče elektrický proud, v okolním prostoru vzniká magnetické pole. Nemusí jít o permanentní magnet — stačí proud.\n\n' +
-      '**Pole je kolem vodiče:** Magnetické pole existuje v prostoru kolem vodiče, ne uvnitř něj. Není to látka, která by vodičem protékala.\n\n' +
+      '**Pole v okolí vodiče:** Magnetické pole existuje v okolí vodiče a může existovat také uvnitř jeho materiálu. V této lekci sledujeme hlavně jeho účinek v okolním prostoru. Není to látka, která by vodičem protékala.\n\n' +
       '**Směr proudu a orientace pole:** Když se změní směr proudu, změní se i orientace magnetického pole kolem vodiče.\n\n' +
       '**Cívka soustřeďuje účinek závitů:** Když vodič navineme do cívky, magnetické účinky jednotlivých závitů se sčítají a soustřeďují. Cívka s proudem vytváří společné magnetické pole podobné poli tyčového magnetu.\n\n' +
       '**Úloha jádra:** Feromagnetické jádro (například železné) může magnetický účinek cívky výrazně zesílit. Jádro ale není zdrojem energie — zesiluje účinek proudu, který cívkou prochází. V jednoduchém modelu a za jinak stejných podmínek může větší proud nebo více závitů zesílit magnetický účinek.\n\n' +

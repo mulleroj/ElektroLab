@@ -2305,6 +2305,24 @@ function collectMagIndLessonProductionText(lesson: NonNullable<ReturnType<typeof
   ].join('\n');
 }
 
+/** Vysvětlující pole bez textů chybných distractorů — pro odborné kotvy. */
+function collectMagIndExplanatoryText(lesson: NonNullable<ReturnType<typeof getLessonById>>) {
+  const activity = getLessonActivity(lesson) as {
+    scenarios?: { explanation: string }[];
+    successMessage?: string;
+  } | undefined;
+  return [
+    lesson.explanation,
+    lesson.typicalMistake,
+    lesson.memorySentence,
+    lesson.goal,
+    lesson.hook,
+    ...lesson.quiz.map((q) => q.explanation),
+    ...(activity?.scenarios ?? []).map((s) => s.explanation),
+    activity?.successMessage ?? '',
+  ].join('\n');
+}
+
 test('téma Magnetické pole je aktivní a má 10 minut', () => {
   const topic = getTopicById('magneticke-pole');
   assert.ok(topic);
@@ -2396,9 +2414,26 @@ test('výklad magnetismu a indukce zachovává odborné a bezpečnostní jádro'
   const l2Text = collectMagIndLessonProductionText(l2);
   const text = l1Text + '\n' + l2Text;
 
-  // Magnetické pole
+  // Magnetické pole — pozitivní význam + zákaz absolutního „ne uvnitř“
   assert.ok(/proud.*vytváří.*magnet/i.test(l1Text), 'proud vytváří magnetické pole');
-  assert.ok(/prost\w+.*kolem.*vodiče|kolem.*vodiče/i.test(l1Text), 'pole v prostoru kolem vodiče');
+  assert.ok(
+    /účinek.*okoln|okolí.*vodiče|okolním prostoru/i.test(l1Text),
+    'pole sledujeme v okolí vodiče',
+  );
+  assert.ok(
+    /může existovat.*uvnitř|také uvnitř/i.test(l1.explanation),
+    'výklad připouští pole uvnitř materiálu vodiče',
+  );
+  assert.equal(
+    /ne uvnitř|není uvnitř|pouze kolem|jen kolem vodiče|pouze v okolí/i.test(l1.explanation),
+    false,
+    'výklad nesmí tvrdit, že pole uvnitř vodiče neexistuje ani že je jen kolem',
+  );
+  assert.equal(
+    /(?<!ne)teče vodičem|magnetické pole je elektrický proud/i.test(l1.explanation),
+    false,
+    'výklad nesmí tvrdit, že pole teče vodičem nebo že je totéž co proud',
+  );
   assert.ok(/směr.*proud.*orientac|obrác.*směr.*proud.*orientac|orientac.*pole/i.test(l1Text), 'změna směru mění orientaci');
   assert.ok(/cívka.*soustřeď|sčítají.*soustřeď/i.test(l1Text), 'cívka soustřeďuje');
   assert.ok(/jádro.*není.*zdroj.*energie/i.test(l1Text), 'jádro není zdroj energie');
@@ -2412,7 +2447,29 @@ test('výklad magnetismu a indukce zachovává odborné a bezpečnostní jádro'
   assert.ok(/pohyb.*změn.*proudu|pohyb.*magnet|změn.*proudu.*cívce/i.test(l2Text), 'dva způsoby změny');
   assert.ok(/napětí.*otevřen|otevřen.*obvod.*napětí/i.test(l2Text), 'napětí v otevřeném obvodu');
   assert.ok(/proud.*uzavřen|uzavřen.*cest.*proud/i.test(l2Text), 'proud v uzavřené cestě');
-  assert.ok(/nepřeskakuje|přeskakuje.*ne/i.test(l2Text), 'nepřeskakování');
+
+  // Proud nepřeskakuje — pouze vysvětlující text, ne distractory
+  const l2Explain = collectMagIndExplanatoryText(l2);
+  assert.ok(
+    /nepřeskakuje/i.test(l2Explain),
+    'vysvětlující text: proud nepřeskakuje',
+  );
+  assert.ok(
+    /primárn|sekundárn|vinut/i.test(l2Explain),
+    'vysvětlující text: zmínka o vinutích',
+  );
+  assert.ok(
+    /magnetick/i.test(l2Explain),
+    'vysvětlující text: magnetická vazba / pole',
+  );
+  assert.equal(
+    /proud přeskakuje přímo|proud přeskakuje přes jádro|vinutí jsou vodivě spojena/i.test(
+      l2Explain,
+    ),
+    false,
+    'vysvětlující text nesmí tvrdit přímé přeskakování nebo vodivé spojení',
+  );
+
   assert.ok(/nevyrábí.*energi|nevytváří.*energi/i.test(l2Text), 'trafo nevyrábí energii');
   assert.ok(/ustálen.*DC.*není|stejnosměrn.*není.*běžn/i.test(l2Text), 'DC není běžný režim');
 
