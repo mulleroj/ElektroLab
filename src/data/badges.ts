@@ -255,6 +255,20 @@ export const badges: Badge[] = [
     description: 'Dokončil jsi všechny dostupné mikrolekce o bezpečném chování v dílně.',
     icon: '🛡️',
   },
+  {
+    id: 'rozlisovac-proudu',
+    title: 'Rozlišovač proudu',
+    description:
+      'Rozlišíš stejnosměrný a střídavý průběh podle polarity a směru — ne podle blikání.',
+    icon: '🔀',
+  },
+  {
+    id: 'ctenar-prubehu',
+    title: 'Čtenář průběhu',
+    description:
+      'Čteš periodu a frekvenci a nezaměníš hertz za volt ani nulový průchod za bezpečí.',
+    icon: '📈',
+  },
 ];
 
 export function getBadgeById(id: string): Badge | undefined {
