@@ -2636,6 +2636,382 @@ test('dokončení magnetismu a indukce, starý badge a projektor', () => {
   assert.equal(Object.keys(projector.state.lessons).length, 0);
 });
 
+// --- MVP-12H8F: Převod transformátoru --------------------------------------
+
+const ORIGINAL_STROJE_IDS = [
+  'co-je-transformator',
+  'asynchronni-motor',
+  'stykac-a-rele',
+  'pristroje-nn-vn-vvn',
+] as const;
+
+function collectRatioLessonProductionText(
+  lesson: NonNullable<ReturnType<typeof getLessonById>>,
+) {
+  return [
+    lesson.explanation,
+    lesson.safetyNote,
+    lesson.typicalMistake,
+    lesson.memorySentence,
+    lesson.goal,
+    lesson.hook,
+    lesson.teacherTip,
+    ...lesson.quiz.flatMap((q) => [
+      q.text,
+      q.explanation,
+      ...q.options.map((o) => o.text),
+    ]),
+    ...((getLessonActivity(lesson) as { scenarios?: { text: string; explanation: string }[] })
+      ?.scenarios ?? []
+    ).flatMap((s) => [s.text, s.explanation]),
+  ].join('\n');
+}
+
+function collectRatioExplanatoryText(
+  lesson: NonNullable<ReturnType<typeof getLessonById>>,
+) {
+  const activity = getLessonActivity(lesson) as {
+    scenarios?: { explanation: string }[];
+    successMessage?: string;
+  } | undefined;
+  return [
+    lesson.explanation,
+    lesson.typicalMistake,
+    lesson.memorySentence,
+    lesson.goal,
+    lesson.hook,
+    ...lesson.quiz.map((q) => q.explanation),
+    ...(activity?.scenarios ?? []).map((s) => s.explanation),
+    activity?.successMessage ?? '',
+  ].join('\n');
+}
+
+test('téma Transformátory má 20 minut a dvě aktivní lekce', () => {
+  const topic = getTopicById('transformatory');
+  assert.ok(topic);
+  assert.equal(topic.subjectId, 'stroje');
+  assert.equal(topic.year, 2);
+  assert.equal(topic.mvpAvailable, true);
+  assert.equal(topic.estimatedMinutes, 20);
+  assert.ok(/poměr závitů|převod/i.test(topic.description));
+  assert.ok(/napětí/i.test(topic.description));
+  assert.equal(/proud|výkon|účinnost|ztrát|autotransformátor/i.test(topic.description), false);
+
+  const topicLessons = getLessonsByTopic('transformatory').filter((l) => l.mvpAvailable);
+  assert.equal(topicLessons.length, 2);
+  assert.equal(
+    topicLessons.reduce((sum, l) => sum + l.durationMinutes, 0),
+    18,
+  );
+  assert.deepEqual(
+    topicLessons.map((l) => l.id),
+    ['co-je-transformator', 'prevod-transformatoru'],
+  );
+  assert.equal(topics.length, 28);
+  assert.equal(topics.filter((t) => t.mvpAvailable).length, 22);
+
+  const strojeTopics = getTopicsBySubject('stroje');
+  assert.equal(strojeTopics[0]?.id, 'transformatory');
+});
+
+test('lekce Převod transformátoru je measurement-judgment bez dema', () => {
+  const lesson = getLessonById('prevod-transformatoru');
+  assert.ok(lesson);
+  assert.equal(lesson.title, 'Převod transformátoru');
+  assert.equal(lesson.subjectId, 'stroje');
+  assert.equal(lesson.year, 2);
+  assert.equal(lesson.topicId, 'transformatory');
+  assert.equal(lesson.durationMinutes, 10);
+  assert.equal(lesson.interactiveDemo, undefined);
+  assert.equal(lesson.quiz.length, 3);
+  assert.equal(lesson.badgeId, 'pocitar-prevodu');
+  assert.ok(getBadgeById('pocitar-prevodu'));
+  assert.equal(lesson.activityXp, 20);
+  assert.equal(lesson.quizXp, 15);
+  const activity = getLessonActivity(lesson);
+  assert.ok(activity);
+  assert.equal(activity.type, 'measurement-judgment');
+  assert.equal(activity.scenarios.length, 5);
+  assert.equal(
+    getMvpLessonsBySubject('stroje').filter((l) => l.id === 'prevod-transformatoru').length,
+    1,
+  );
+  assertQuizOptionLengthFairness('prevod-transformatoru');
+});
+
+test('pořadí Strojů po přidání převodu transformátoru', () => {
+  const order = getMvpLessonsBySubject('stroje').map((l) => l.id);
+  assert.equal(order.length, 5);
+  assert.deepEqual(order.slice(0, 2), [
+    'co-je-transformator',
+    'prevod-transformatoru',
+  ]);
+  assert.deepEqual(order.slice(2), [
+    'asynchronni-motor',
+    'stykac-a-rele',
+    'pristroje-nn-vn-vvn',
+  ]);
+  for (const id of ORIGINAL_STROJE_IDS) {
+    const lesson = getLessonById(id);
+    assert.ok(lesson);
+    assert.equal(lesson.mvpAvailable, true);
+  }
+  assert.equal(getLessonById('co-je-transformator')?.interactiveDemo?.type, 'transformer-demo');
+});
+
+test('výklad převodu zachovává vzorec a jednotky', () => {
+  const lesson = getLessonById('prevod-transformatoru');
+  assert.ok(lesson);
+  const text = collectRatioLessonProductionText(lesson);
+  const explain = collectRatioExplanatoryText(lesson);
+
+  assert.ok(/U1.*primár|primár.*U1/i.test(explain), 'U1 na primáru');
+  assert.ok(/N1.*primár|primár.*N1/i.test(explain), 'N1 na primáru');
+  assert.ok(/U2.*sekundár|sekundár.*U2/i.test(explain), 'U2 na sekundáru');
+  assert.ok(/N2.*sekundár|sekundár.*N2/i.test(explain), 'N2 na sekundáru');
+  assert.ok(/volt/i.test(explain), 'napětí ve voltech');
+  assert.ok(/počet.*závit|závitů/i.test(explain), 'N je počet závitů');
+  assert.ok(/nemá jednotku volt|nejsou volty|jednotkou nejsou volty/i.test(text), 'N ≠ V');
+  assert.ok(/U1\s*\/\s*U2\s*=\s*N1\s*\/\s*N2/i.test(explain), 'poměr U/N');
+  assert.ok(/U2\s*=\s*U1\s*×\s*N2\s*\/\s*N1/i.test(explain), 'výpočet U2');
+  assert.ok(/idealizovan|přibližně/i.test(explain), 'idealizovaný model');
+  assert.equal(
+    /U2\s*=\s*U1\s*×\s*N1\s*\/\s*N2/.test(explain) &&
+      !/neplatí|správný poměr je U2 = U1 × N2/i.test(explain),
+    false,
+    'nesmí učit obrácený poměr jako správný',
+  );
+
+  // Forbidden teaching of current/power formulas (boundary sentence about later lesson is OK)
+  assert.equal(/P1\s*≈\s*P2|P₁\s*≈\s*P₂/i.test(text), false, 'žádné P1 ≈ P2');
+  assert.equal(/U1\s*×\s*I1\s*≈\s*U2\s*×\s*I2|U₁\s*[×*]\s*I₁/i.test(text), false);
+  assert.equal(/výpočet.*I[12]|I1\s*=|I2\s*=/i.test(text), false);
+  assert.equal(/účinnost\s*=|η\s*=|procent.*ztrát/i.test(text), false);
+  assert.ok(
+    /nevyrábí energii.*proud.*výkon.*ztráty|proud, výkon a ztráty/i.test(explain),
+    'hranice: proud/výkon/ztráty později',
+  );
+});
+
+test('příklady převodu a kontrola rozumnosti', () => {
+  const lesson = getLessonById('prevod-transformatoru');
+  assert.ok(lesson);
+  const text = collectRatioLessonProductionText(lesson);
+
+  assert.ok(/24\s*×\s*60\s*\/\s*120\s*=\s*12\s*V/i.test(text), 'příklad 12 V');
+  assert.ok(/12\s*×\s*200\s*\/\s*100\s*=\s*24\s*V/i.test(text), 'příklad 24 V');
+  assert.ok(
+    /N2.*menší.*N1.*U2.*menší|N2 < N1|N2 je polovina N1/i.test(text),
+    'N2 < N1 → U2 < U1',
+  );
+  assert.ok(
+    /N2.*větší.*N1.*U2.*větší|N2 > N1|N2 je dvojnásobné/i.test(text),
+    'N2 > N1 → U2 > U1',
+  );
+  assert.ok(
+    /N2.*rovno N1|N1 = N2|stejný počet závitů.*přibližně.*U2/i.test(text),
+    'N2 = N1 → U2 ≈ U1',
+  );
+  assert.ok(
+    /odhad|porovnej výsledek|kontrola|očekáváme/i.test(text),
+    'odhad a kontrola rozumnosti',
+  );
+});
+
+test('aktivita a quiz převodu: tvrzení, fairness a bez proudu', () => {
+  const lesson = getLessonById('prevod-transformatoru');
+  assert.ok(lesson);
+  const activity = getLessonActivity(lesson) as {
+    type: string;
+    scenarios: { id: string; text: string; correct: string; explanation: string }[];
+  };
+  assert.equal(activity.type, 'measurement-judgment');
+  assert.equal(activity.scenarios.length, 5);
+  assert.deepEqual(
+    activity.scenarios.map((s) => s.correct),
+    ['correct', 'wrong', 'correct', 'wrong', 'correct'],
+  );
+  assert.ok(/24 × 60 \/ 120 = 12 V/i.test(activity.scenarios[0].explanation));
+  assert.ok(/vyšší sekundární napětí/i.test(activity.scenarios[1].explanation));
+  assert.ok(/U2 = U1 × N2 \/ N1/i.test(activity.scenarios[3].explanation));
+
+  assert.equal(lesson.quiz.length, 3);
+  assert.equal(lesson.quiz[0].correctOptionId, 'b');
+  assert.ok(lesson.quiz[0].options.some((o) => /U2 = U1 × N2 \/ N1/.test(o.text)));
+  assert.equal(lesson.quiz[1].correctOptionId, 'c');
+  assert.ok(lesson.quiz[1].options.some((o) => o.id === 'c' && o.text.trim() === '12 V'));
+  assert.equal(lesson.quiz[2].correctOptionId, 'a');
+  assert.ok(/zvyšovací|trojnásobné/i.test(
+    lesson.quiz[2].options.find((o) => o.id === 'a')!.text,
+  ));
+
+  for (const q of lesson.quiz) {
+    assert.equal(
+      q.options.filter((o) => o.id === q.correctOptionId).length,
+      1,
+    );
+  }
+  assertQuizOptionLengthFairness('prevod-transformatoru');
+
+  const text = collectRatioLessonProductionText(lesson);
+  assert.equal(/I1\s*=|I2\s*=|P1\s*≈|účinnost\s*=/i.test(text), false);
+});
+
+test('starý progress Strojů bez subject badge: 4/5 a doporučí převod', () => {
+  const allLessons = getMvpLessonsBySubject('stroje');
+  assert.equal(allLessons.length, 5);
+  const lessonsState: ProgressState['lessons'] = {};
+  const originalBadges = [
+    'mistr-transformatoru',
+    'motorovy-elev',
+    'vladce-kontaktu',
+    'bezpecny-u-vn',
+  ];
+  for (const id of ORIGINAL_STROJE_IDS) {
+    lessonsState[id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  saveProgress({
+    totalXp: 140,
+    earnedBadges: [...originalBadges],
+    lessons: lessonsState,
+    calmMode: false,
+  });
+  const loaded = loadProgress();
+  const { completed, total } = getSubjectProgress(
+    loaded,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 4);
+  assert.equal(total, 5);
+  assert.equal(loaded.totalXp, 140);
+  assert.equal(loaded.earnedBadges.includes('strojarsky-elev'), false);
+  for (const badge of originalBadges) {
+    assert.equal(loaded.earnedBadges.includes(badge), true);
+  }
+  const next = allLessons.find((l) => !isLessonComplete(loaded, l.id));
+  assert.ok(next);
+  assert.equal(next.id, 'prevod-transformatoru');
+
+  const done = completeLessonFully('prevod-transformatoru', 'pocitar-prevodu');
+  assert.equal(done.lessonBadgeAwarded, true);
+  assert.deepEqual(done.subjectBadgeIdsAwarded, ['strojarsky-elev']);
+  assert.equal(done.state.totalXp, 140 + 35);
+  const { completed: c2, total: t2 } = getSubjectProgress(
+    done.state,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(c2, 5);
+  assert.equal(t2, 5);
+  assert.equal(done.state.earnedBadges.filter((b) => b === 'pocitar-prevodu').length, 1);
+  assert.equal(done.state.earnedBadges.filter((b) => b === 'strojarsky-elev').length, 1);
+});
+
+test('uložený strojarsky-elev, retry a projektor u převodu', () => {
+  const allLessons = getMvpLessonsBySubject('stroje');
+  const lessonsState: ProgressState['lessons'] = {};
+  for (const id of ORIGINAL_STROJE_IDS) {
+    lessonsState[id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  saveProgress({
+    totalXp: 140,
+    earnedBadges: ['strojarsky-elev', 'mistr-transformatoru'],
+    lessons: lessonsState,
+    calmMode: false,
+  });
+  const loaded = loadProgress();
+  assert.equal(loaded.earnedBadges.includes('strojarsky-elev'), true);
+  const { completed, total } = getSubjectProgress(
+    loaded,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 4);
+  assert.equal(total, 5);
+
+  const afterNew = completeLessonFully('prevod-transformatoru', 'pocitar-prevodu');
+  assert.equal(afterNew.lessonBadgeAwarded, true);
+  assert.deepEqual(afterNew.subjectBadgeIdsAwarded, []);
+  assert.equal(
+    afterNew.state.earnedBadges.filter((b) => b === 'strojarsky-elev').length,
+    1,
+  );
+  assert.equal(
+    afterNew.state.earnedBadges.filter((b) => b === 'pocitar-prevodu').length,
+    1,
+  );
+
+  const retry = applyQuizCompletion(loadProgress(), {
+    lessonId: 'prevod-transformatoru',
+    xp: 15,
+    badgeId: 'pocitar-prevodu',
+    correct: 2,
+    total: 3,
+    projectorMode: false,
+  });
+  assert.equal(retry.xpAwarded, 0);
+  assert.equal(retry.lessonBadgeAwarded, false);
+  assert.deepEqual(retry.subjectBadgeIdsAwarded, []);
+  assert.deepEqual(retry.state.lessons['prevod-transformatoru']?.bestQuizScore, {
+    correct: 3,
+    total: 3,
+  });
+  assert.equal(
+    retry.state.earnedBadges.filter((b) => b === 'pocitar-prevodu').length,
+    1,
+  );
+
+  saveProgress({
+    totalXp: 0,
+    earnedBadges: [],
+    lessons: {},
+    calmMode: false,
+  });
+  const projector = applyQuizCompletion(loadProgress(), {
+    lessonId: 'prevod-transformatoru',
+    xp: 15,
+    badgeId: 'pocitar-prevodu',
+    correct: 3,
+    total: 3,
+    projectorMode: true,
+  });
+  assert.equal(projector.xpAwarded, 0);
+  assert.equal(projector.lessonBadgeAwarded, false);
+  assert.deepEqual(projector.subjectBadgeIdsAwarded, []);
+  assert.equal(projector.state.totalXp, 0);
+  assert.equal(projector.state.earnedBadges.includes('pocitar-prevodu'), false);
+  assert.equal(isLessonComplete(projector.state, 'prevod-transformatoru'), false);
+  assert.equal(Object.keys(projector.state.lessons).length, 0);
+
+  saveProgress({
+    totalXp: 35,
+    earnedBadges: ['pocitar-prevodu', 'strojarsky-elev'],
+    lessons: {
+      'prevod-transformatoru': {
+        activityCompleted: true,
+        quizCompleted: true,
+        completedAt: '2026-01-01T00:00:00.000Z',
+        bestQuizScore: { correct: 3, total: 3 },
+      },
+    },
+    calmMode: false,
+  });
+  const cleared = resetProgress(loadProgress());
+  saveProgress(cleared);
+  const afterReset = loadProgress();
+  assert.equal(afterReset.totalXp, 0);
+  assert.equal(afterReset.earnedBadges.includes('pocitar-prevodu'), false);
+  assert.equal(Object.keys(afterReset.lessons).length, 0);
+});
+
 console.log('');
 console.log(`Passed: ${passed}`);
 console.log(`Failed: ${failures.length}`);

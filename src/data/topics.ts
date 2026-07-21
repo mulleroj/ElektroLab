@@ -153,9 +153,10 @@ export const topics: Topic[] = [
     id: 'transformatory',
     subjectId: 'stroje',
     title: 'Transformátory',
-    description: 'Jak transformátor mění velikost střídavého napětí.',
+    description:
+      'Jak transformátor mění střídavé napětí a jak se převod určuje z poměru závitů.',
     year: 2,
-    estimatedMinutes: 10,
+    estimatedMinutes: 20,
     mvpAvailable: true,
   },
   {

@@ -208,6 +208,13 @@ export const badges: Badge[] = [
     icon: '🧲',
   },
   {
+    id: 'pocitar-prevodu',
+    title: 'Počtář převodu',
+    description:
+      'Spočítáš sekundární napětí z poměru závitů a zkontroluješ, zda výsledek dává smysl.',
+    icon: '🔢',
+  },
+  {
     id: 'motorovy-elev',
     title: 'Motorový elév',
     description: 'Chápeš točivé pole a proč se rotor za polem opožďuje.',
