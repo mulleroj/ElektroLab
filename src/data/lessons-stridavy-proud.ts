@@ -75,19 +75,21 @@ export const stridavyProudLessons: MicroLesson[] = [
         options: [
           {
             id: 'a',
-            text: 'Velikost musí být vždy dokonale stálá a nikdy se nesmí měnit.',
+            text:
+              'Velikost může měnit, ale směr i polarita se přitom pravidelně střídají jako u střídavého průběhu.',
           },
           {
             id: 'b',
-            text: 'Směr nebo polarita se neobrací; velikost se přitom může měnit.',
+            text: 'Směr nebo polarita se nemění; velikost se přitom může měnit.',
           },
           {
             id: 'c',
-            text: 'Proud teče současně oběma směry.',
+            text: 'Proud v celém vodiči současně teče oběma směry ve stejném okamžiku.',
           },
           {
             id: 'd',
-            text: 'Zařízení pravidelně bliká, takže jde určitě o DC.',
+            text:
+              'Pravidelné blikání napájení samo o sobě prokazuje stejnosměrný proud ve vodiči.',
           },
         ],
         correctOptionId: 'b',
@@ -100,19 +102,22 @@ export const stridavyProudLessons: MicroLesson[] = [
         options: [
           {
             id: 'a',
-            text: 'Polarita a směr se postupně mění; proud neteče současně oběma směry.',
+            text: 'Polarita a směr se postupně mění; neteče současně oběma směry.',
           },
           {
             id: 'b',
-            text: 'Proud teče současně oběma směry naráz.',
+            text:
+              'Proud vodičem současně teče oběma směry a obě polarity platí zároveň.',
           },
           {
             id: 'c',
-            text: 'Každé zapnutí a vypnutí bez obrácení polarity je AC.',
+            text:
+              'Každé opakované zapnutí a vypnutí bez změny polarity už je střídavý průběh.',
           },
           {
             id: 'd',
-            text: 'Sinusovka je dráha, po které elektrony fyzicky běží.',
+            text:
+              'Sinusovka na grafu je fyzická dráha, po které elektrony v vodiči běží.',
           },
         ],
         correctOptionId: 'a',
@@ -125,19 +130,22 @@ export const stridavyProudLessons: MicroLesson[] = [
         options: [
           {
             id: 'a',
-            text: 'Běžný transformátor potřebuje proměnný průběh; žák to ověří připojením k zásuvce.',
+            text:
+              'Běžný transformátor potřebuje proměnný průběh, který žák ověří multimetrem přímo v zásuvce.',
           },
           {
             id: 'b',
-            text: 'Běžný transformátor potřebuje proměnný průběh; žák to neověřuje připojením k síti.',
+            text: 'Transformátor potřebuje proměnný průběh; žák jej v síti neověřuje.',
           },
           {
             id: 'c',
-            text: 'Ustálené stejnosměrné napětí je běžný pracovní režim transformátoru.',
+            text:
+              'Ustálené stejnosměrné napětí je běžný pracovní režim síťového transformátoru.',
           },
           {
             id: 'd',
-            text: 'Stačí zapínat a vypínat stejnosměrný zdroj — to už je střídání pro trafo.',
+            text:
+              'Stačí zapínat a vypínat stejnosměrný zdroj — to už je střídání pro trafo.',
           },
         ],
         correctOptionId: 'b',
@@ -225,10 +233,17 @@ export const stridavyProudLessons: MicroLesson[] = [
         id: 'q1',
         text: 'Co je perioda?',
         options: [
-          { id: 'a', text: 'Počet cyklů za sekundu.' },
+          {
+            id: 'a',
+            text: 'Počet úplných cyklů, které proběhnou během jedné vteřiny.',
+          },
           { id: 'b', text: 'Doba jednoho úplného opakování průběhu.' },
           { id: 'c', text: 'Velikost napětí ve voltech.' },
-          { id: 'd', text: 'Okamžik, kdy je obvod vždy bezpečný.' },
+          {
+            id: 'd',
+            text:
+              'Okamžik nulového průchodu grafu, kdy je skutečný obvod vždy bezpečný.',
+          },
         ],
         correctOptionId: 'b',
         explanation:
@@ -257,11 +272,12 @@ export const stridavyProudLessons: MicroLesson[] = [
           },
           {
             id: 'b',
-            text: 'Když graf prochází nulou, žák se může bezpečně dotknout sítě.',
+            text:
+              'Když graf právě prochází nulou, žák se může bezpečně dotknout živého obvodu v síti.',
           },
           {
             id: 'c',
-            text: '50 Hz znamená 50 úplných period za sekundu; síť žákovsky neměříme.',
+            text: '50 Hz = 50 úplných period za sekundu; síť žák neměří.',
           },
           {
             id: 'd',

@@ -1955,6 +1955,46 @@ const ORIGINAL_ZAKLADY_IDS = [
   'zakladni-znacky',
 ] as const;
 
+const AC_LESSON_IDS = ['stejnosmerny-a-stridavy-proud', 'perioda-a-frekvence'] as const;
+
+/** Správná quiz odpověď nesmí být jedinou nejdelší možností. */
+function assertQuizOptionLengthFairness(lessonId: string) {
+  const lesson = getLessonById(lessonId);
+  assert.ok(lesson, `lesson ${lessonId} must exist`);
+  for (const question of lesson.quiz) {
+    const correct = question.options.find((o) => o.id === question.correctOptionId);
+    assert.ok(correct, `${lessonId} ${question.id}: correct option`);
+    const correctLen = correct.text.trim().length;
+    const wrongLengths = question.options
+      .filter((o) => o.id !== question.correctOptionId)
+      .map((o) => o.text.trim().length);
+    assert.ok(
+      wrongLengths.some((len) => len >= correctLen),
+      `${lessonId} ${question.id}: correct must not be uniquely longest (${correctLen} vs ${wrongLengths.join(',')})`,
+    );
+  }
+}
+
+function collectAcLessonProductionText(lesson: NonNullable<ReturnType<typeof getLessonById>>) {
+  return [
+    lesson.explanation,
+    lesson.safetyNote,
+    lesson.typicalMistake,
+    lesson.memorySentence,
+    lesson.goal,
+    lesson.hook,
+    lesson.teacherTip,
+    ...lesson.quiz.flatMap((q) => [
+      q.text,
+      q.explanation,
+      ...q.options.map((o) => o.text),
+    ]),
+    ...((getLessonActivity(lesson) as { scenarios?: { text: string; explanation: string }[] })
+      ?.scenarios ?? []
+    ).flatMap((s) => [s.text, s.explanation]),
+  ].join('\n');
+}
+
 test('téma Střídavý proud je aktivní a má 20 minut', () => {
   const topic = getTopicById('stridavy-proud');
   assert.ok(topic);
@@ -1988,6 +2028,7 @@ test('lekce Stejnosměrný a střídavý proud je scenario-choice bez dema', () 
   assert.ok(activity);
   assert.equal(activity.type, 'scenario-choice');
   assert.equal(activity.scenarios.length, 4);
+  assertQuizOptionLengthFairness('stejnosmerny-a-stridavy-proud');
 });
 
 test('lekce Perioda a frekvence je measurement-judgment bez dema', () => {
@@ -2006,6 +2047,7 @@ test('lekce Perioda a frekvence je measurement-judgment bez dema', () => {
   assert.ok(activity);
   assert.equal(activity.type, 'measurement-judgment');
   assert.equal(activity.scenarios.length, 5);
+  assertQuizOptionLengthFairness('perioda-a-frekvence');
 });
 
 test('pořadí Základů po přidání střídavého proudu', () => {
@@ -2021,32 +2063,14 @@ test('pořadí Základů po přidání střídavého proudu', () => {
 });
 
 test('výklad střídavého proudu zachovává odborné a bezpečnostní jádro', () => {
-  const lessons = [
-    getLessonById('stejnosmerny-a-stridavy-proud'),
-    getLessonById('perioda-a-frekvence'),
-  ];
+  const lessons = AC_LESSON_IDS.map((id) => getLessonById(id));
   assert.ok(lessons.every(Boolean));
-  const text = lessons
-    .flatMap((l) => [
-      l!.explanation,
-      l!.safetyNote,
-      l!.typicalMistake,
-      l!.memorySentence,
-      l!.goal,
-      l!.hook,
-      l!.teacherTip,
-      ...l!.quiz.flatMap((q) => [
-        q.text,
-        q.explanation,
-        ...q.options.map((o) => o.text),
-      ]),
-      ...((getLessonActivity(l!) as { scenarios?: { text: string; explanation: string }[] })
-        ?.scenarios ?? []
-      ).flatMap((s) => [s.text, s.explanation]),
-    ])
-    .join('\n');
-  assert.ok(/polarit/i.test(text));
-  assert.ok(/směr/i.test(text));
+  const l1 = lessons[0]!;
+  const l2 = lessons[1]!;
+  const text = lessons.map((l) => collectAcLessonProductionText(l!)).join('\n');
+  const l1Text = collectAcLessonProductionText(l1);
+  const l2Text = collectAcLessonProductionText(l2);
+
   assert.ok(/stejnosměr/i.test(text));
   assert.ok(/střídav/i.test(text));
   assert.ok(/současně oběma směry/i.test(text));
@@ -2055,12 +2079,47 @@ test('výklad střídavého proudu zachovává odborné a bezpečnostní jádro'
   assert.ok(/frekvenc/i.test(text));
   assert.ok(/hertz|Hz/i.test(text));
   assert.ok(/kratší.*vyšší|vyšší frekvenc/i.test(text));
-  assert.ok(/50\s*Hz/i.test(text));
-  assert.ok(/nulov/i.test(text));
-  assert.ok(/zásuvk/i.test(text));
-  assert.ok(/osciloskop|multimetr/i.test(text));
-  assert.ok(/transformátor/i.test(text));
-  assert.equal(/zásuvk.*změř|změř.*zásuvk/i.test(text) && /navod.*zásuv/i.test(text), false);
+
+  // DC: velikost se může měnit a směr/polarita se neobrací
+  assert.ok(
+    /velikost.*může.*měnit|může.*měnit.*velikost|nemusí mít stále stejnou velikost/i.test(l1Text),
+    'DC: velikost se může měnit',
+  );
+  assert.ok(
+    /směr.*neobrac|neobrac.*směr|polarita.*neobrac|neobrac.*polarita|se nemění/i.test(l1Text),
+    'DC: směr nebo polarita se neobrací',
+  );
+
+  // 50 Hz: perioda, frekvence a jednotky
+  assert.ok(/50\s*úplných\s*period\s*za\s*sekundu|50\s*Hz.*50\s*úplných\s*period/i.test(l2Text));
+  assert.ok(/1\s*\/\s*50\s*s|1\/50\s*s/i.test(l2Text));
+  assert.ok(/0[,.]02\s*s/i.test(l2Text));
+  assert.ok(/20\s*ms/i.test(l2Text));
+  assert.ok(/nejde o 50 voltů|50\s*Hz.*ne.*50\s*V|není.*50\s*V/i.test(l2Text));
+  assert.ok(/nejde.*50 změn směru|ne.*50 změn směru/i.test(l2Text));
+
+  // Bezpečnost: pozitivní kotvy
+  assert.ok(/neměř.*zásuv|zásuv.*neměř/i.test(text), 'žák neměří v zásuvce');
+  assert.ok(
+    /nepřipojuje.*multimetr|multimetr.*síť|osciloskop.*síť|nepoužívá.*osciloskop|nepřipojuje osciloskop/i.test(
+      text,
+    ),
+    'žák nepřipojuje multimetr nebo osciloskop k síti',
+  );
+  assert.ok(
+    /nepřipojuje.*transformátor.*síti|transformátor.*síti|transformátor k síti/i.test(text),
+    'žák nepřipojuje transformátor k síti',
+  );
+  assert.ok(
+    /nulov.*není.*bezpeč|bezpeč.*není.*nulov|nulov.*neznamená.*bezpeč|nulový průchod.*není bezpeč/i.test(
+      text,
+    ),
+    'nulový průchod není bezpečnostní potvrzení',
+  );
+
+  for (const id of AC_LESSON_IDS) {
+    assertQuizOptionLengthFairness(id);
+  }
 });
 
 test('starý progress Základů bez subject badge: 11/13 a doporučí AC lekci', () => {
