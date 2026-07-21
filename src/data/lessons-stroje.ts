@@ -586,21 +586,28 @@ export const strojeLessons: MicroLesson[] = [
     topicId: 'pristroje-nn',
     title: 'Stykač a relé',
     year: 2,
-    durationMinutes: 8,
+    durationMinutes: 10,
     difficulty: 'základní',
     goal:
-      'Žák pochopí, že relé a stykač umožňují ovládat jeden obvod pomocí druhého — malý ovládací signál sepne kontakt pro jiný obvod.',
+      'Žák rozliší ovládací a silový obvod, vysvětlí řetězec cívka → magnetické pole → kotva → kontakty a ví, že stykač spíná, ale sám není jistič ani důkaz beznapěťovosti.',
     hook:
-      'Tlačítko u dveří je malé a slaboučké — a přesto spustí velký motor vrat. Mezi nimi sedí stykač.',
+      'Motor z minulé lekce potřebuje spínat, ale jeho proud nemá téct obyčejným ovládacím tlačítkem. Jak může malý ovládací obvod bezpečně řídit kontakty v jiném obvodu?',
     explanation:
-      '**Relé i stykač** mají **cívku** a **kontakt**. Když cívkou v **ovládacím obvodu** prochází proud, cívka se chová jako elektromagnet a **přitáhne kontakt**. Kontakt tím sepne **jiný, výkonový obvod** — třeba motor. Malý ovládací signál tak řídí velkou zátěž. Stykač je zjednodušeně „silnější relé“ pro větší proudy.',
+      '**Motor potřebuje řízení:** Asynchronní motor z předchozí lekce potřebuje řízené zapnutí a vypnutí. Proud motoru nemá procházet běžným ovládacím tlačítkem. **Ovládací obvod** dává povel; **stykač** nebo **relé** mechanicky přestaví kontakty v jiném obvodu.\n\n' +
+      '**Dva odlišné obvody:** Ovládací obvod napájí a řídí **cívku**. **Silový obvod** přivádí energii ke spotřebiči, například k motoru. Oba mohou mít jiné napětí a proud. Proud motoru **neteče cívkou**; energii motoru nedává ovládací obvod, ale zdroj silového obvodu. Obvody spojuje **mechanický pohyb kontaktů**, proud mezi nimi nepřeskakuje.\n\n' +
+      '**Cívka a magnetické pole:** Po přivedení **správného napětí** na cívku jí proteče proud a vznikne **magnetické pole**, které přitáhne pohyblivou **kotvu**. Na cívku nepatří libovolné napětí.\n\n' +
+      '**Kotva přestaví kontakty:** Pohyb kotvy **mechanicky** změní stav kontaktů. Po odpojení cívky působení zeslábne a **pružina** vrátí mechanismus do **klidového stavu**. Cívka sama nevede proud motoru a kontakty se bez pohybu nemění.\n\n' +
+      '**Hlavní, pomocné, NO a NC:** **Hlavní kontakty** spínají silový obvod a jsou navrženy pro zátěž, například motor. **Pomocné kontakty** slouží ovládání, signalizaci nebo blokovací logice a běžně nenesou proud motoru. **NO** (spínací) je v klidu bez buzení cívky **rozepnutý**; **NC** (rozpínací) je v klidu **sepnutý**. Po buzení cívky se jejich stav změní. „Normálně“ znamená klidový stav cívky, ne běžný provoz zařízení.\n\n' +
+      '**Relé versus stykač:** Oba mohou mít cívku, kotvu a kontakty. Relé se často používá v ovládání, signalizaci nebo pro menší zátěže; stykač pro časté spínání výkonových zátěží, například motorů. Pracují na podobném principu, ale pro jiné úlohy a zatížení — rozhodují jmenovité parametry a určení zařízení.\n\n' +
+      '**Stykač spíná, nechrání:** Stykač především **spíná**. Nenahrazuje jistič, pojistku ani určenou ochranu proti přetížení (například samostatné tepelné relé). **Vypnutá cívka** neznamená beznapěťový silový obvod. **Rozepnutý kontakt** není důkaz ověřené beznapěťovosti — kontakt může být svařený a část zařízení může mít jiné napájení.',
     safetyNote:
-      'Tato lekce vysvětluje princip ve školní simulaci. Skutečné stykače, relé a rozvaděče se nesmí zapojovat ani upravovat bez odborného dohledu, dokumentace a dodržení BOZP.',
-    memorySentence: 'Cívka pod napětím přitáhne kontakt — malý obvod spíná velký.',
+      'Výuka probíhá pouze pomocí schématu, simulace nebo učitelem zabezpečeného nízkonapěťového modelu. Žák nepřipojuje stykač, relé ani motor k síti, neotevírá rozvaděč ani svorkovnici, nepřepojuje vodiče, vinutí ani fáze a neprovádí živé měření na živých částech. Nezajištěný motor ani mechanismus se nespouští. Kontaktů ani svorek se nedotýkej. Vypnutá cívka neznamená bezpečný silový obvod. Rozepnutý kontakt neznamená ověřenou beznapěťovost — kontakt může být svařený a část zařízení může mít jiné napájení. Zařízení se může neočekávaně rozběhnout. Cívka i kontakty se mohou zahřívat. Tato lekce neučí servisní postup odpojování, měření ani ověřování beznapěťového stavu. Místní školní pravidla a pokyn učitele mají přednost.',
+    memorySentence:
+      'Proud cívkou pohne kotvou a kontakty přepnou jiný obvod; stykač spíná, nezesiluje ani sám nechrání.',
     typicalMistake:
-      'Žáci si pletou ovládací a výkonový obvod — jsou to dva ODDĚLENÉ obvody; propojuje je jen pohyb kontaktu, ne drát.',
+      'Žáci si myslí, že cívkou teče proud motoru, že stykač proud zesiluje, nebo že pomocný kontakt je hlavní cesta k motoru. Časté je i číst NO jako „normálně zapnutý“ a NC jako „normálně vypnutý“, případně brát stykač jako jistič. Správně: cívka mechanicky přestaví kontakty jiného obvodu; NO a NC se vztahují ke klidovému stavu bez buzení cívky; stykač není jistič ani automatická ochrana; vypnutá cívka neznamená ověřenou beznapěťovost silového obvodu.',
     teacherTip:
-      'Navazuje na tranzistor jako spínač (stejný princip, jiná technika). Dobré propojit s ukázkou skutečného stykače v dílně — jen ukázat, nezapojovat.',
+      'Barevně odliš ovládací a silový obvod. Použij kartičkový řetězec: povel → cívka → magnetické pole → pohyb kotvy → změna kontaktů → sepnutí nebo rozepnutí jiného obvodu. Přidej samostatné kartičky cívka, hlavní kontakt a pomocný kontakt a dvě kartičky NO a NC se stavem před a po buzení. Nech žáky vysvětlit, kudy proud motoru neteče. ContactorRelayDemo zastav u aktivace cívky, pohybu kotvy a sepnutí kontaktu a navaž na motor z předchozí lekce. Pracuj jen se schématem, simulací nebo odpojeným nízkonapěťovým modelem — praktické síťové přepojování neprováděj.',
     interactiveDemo: {
       type: 'contactor-relay',
       title: 'Cívka spíná kontakt',
@@ -608,42 +615,58 @@ export const strojeLessons: MicroLesson[] = [
         'Zapni a vypni napájení cívky a sleduj, co udělá kontakt a motor ve výkonovém obvodu.',
     },
     activity: {
-      measurementJudgment: {
-        type: 'measurement-judgment',
+      scenarioChoice: {
+        type: 'scenario-choice',
         instruction:
-          'U každé situace rozhodni, jestli je kontakt stykače sepnutý, nebo rozepnutý. Všechny musí být správně.',
-        correctLabel: 'Kontakt je sepnutý',
-        wrongLabel: 'Kontakt je rozepnutý',
+          'U každé situace rozhodni, co platí pro stykač a jeho obvody. Všechny čtyři musí být správně.',
+        options: [
+          {
+            id: 'hlavni-no-sepne',
+            label: 'Hlavní NO kontakt se sepne a silový obvod může napájet motor',
+          },
+          {
+            id: 'pomocny-nc-rozepne',
+            label: 'Pomocný NC kontakt se rozepne, protože cívka už není v klidovém stavu',
+          },
+          {
+            id: 'spina-nechrani',
+            label: 'Stykač pouze spíná; ochranu musí zajistit určený ochranný prvek',
+          },
+          {
+            id: 'nelze-potvrdit-beznapeti',
+            label: 'Z vypnuté cívky nelze potvrdit, že je celý silový obvod bez napětí',
+          },
+        ],
         successMessage:
-          'Výborně! Víš, kdy cívka kontakt přitáhne — a kdy zůstane rozepnutý.',
+          'Výborně! Rozlišuješ ovládací a silový obvod, NO/NC i to, že stykač spíná, ale sám nechrání ani nepotvrzuje beznapěťovost.',
         scenarios: [
           {
             id: 's1',
-            text: 'Cívka stykače je připojená k napětí.',
-            correct: 'correct',
+            text: 'Cívka stykače dostane správné napětí. Hlavní kontakt je typu NO, mechanismus je funkční a silový zdroj i ostatní podmínky jsou připravené.',
+            correctOptionId: 'hlavni-no-sepne',
             explanation:
-              'Cívka pod napětím se chová jako elektromagnet a kontakt přitáhne — sepnuto.',
+              'Správné napětí na cívce → proud cívkou → magnetické pole → pohyb kotvy → sepnutí hlavního NO kontaktu. Silový obvod pak může napájet motor — motor se ale nerozběhne vždy automaticky.',
           },
           {
             id: 's2',
-            text: 'Cívka je bez napětí.',
-            correct: 'wrong',
+            text: 'Pomocný NC kontakt je v klidovém stavu bez buzení cívky sepnutý. Cívka stykače teď dostane správné napětí.',
+            correctOptionId: 'pomocny-nc-rozepne',
             explanation:
-              'Bez napětí cívka nepřitahuje — pružina drží kontakt rozepnutý.',
+              'NC je v klidu sepnutý; „klid“ znamená cívku bez buzení. Po přitažení kotvy se kontakt rozepne. Pomocný kontakt obvykle slouží ovládání nebo signalizaci, nikoli napájení motoru.',
           },
           {
             id: 's3',
-            text: 'Obsluha stiskla tlačítko START a cívka dostala napětí.',
-            correct: 'correct',
+            text: 'V silovém obvodu vznikne zkrat nebo nebezpečné přetížení. Někdo tvrdí, že samotný stykač motor automaticky ochrání.',
+            correctOptionId: 'spina-nechrani',
             explanation:
-              'Tlačítko pustilo proud do cívky → kontakt sepnul → motor běží.',
+              'Stykač není jistič. Samotná cívka ani hlavní kontakty automaticky nenahrazují ochranu. Ochrana proti zkratu a přetížení má vlastní určené prvky — nejde o návod k jejich výběru nebo zapojení.',
           },
           {
             id: 's4',
-            text: 'Vodič ovládacího obvodu k cívce je přerušený.',
-            correct: 'wrong',
+            text: 'Cívka není buzená a kontakt se jeví jako rozepnutý. Někdo z toho usuzuje, že celé zařízení je bezpečně bez napětí.',
+            correctOptionId: 'nelze-potvrdit-beznapeti',
             explanation:
-              'Do cívky nic neteče, takže kontakt zůstává rozepnutý — motor stojí.',
+              'Vypnutá cívka není důkazem beznapěťovosti. Kontakt může být svařený a může existovat jiné napájení. Mechanická poloha stykače nenahrazuje bezpečné odpojení a ověřený stav.',
           },
         ],
       },
@@ -651,41 +674,78 @@ export const strojeLessons: MicroLesson[] = [
     quiz: [
       {
         id: 'q1',
-        text: 'K čemu slouží stykač?',
+        text: 'Co se stane po přivedení správného napětí na cívku stykače?',
         options: [
-          { id: 'a', text: 'Malým ovládacím signálem spíná jiný (výkonový) obvod.' },
-          { id: 'b', text: 'Měří proud v obvodu.' },
-          { id: 'c', text: 'Zvyšuje napětí jako transformátor.' },
-          { id: 'd', text: 'Chrání před bleskem.' },
+          {
+            id: 'a',
+            text: 'Proud motoru proteče cívkou a tím přímo napájí celý silový obvod zátěže.',
+          },
+          {
+            id: 'b',
+            text: 'Proud cívkou vytvoří magnetické pole a kotva mechanicky změní kontakty.',
+          },
+          {
+            id: 'c',
+            text: 'Proud přeskakuje z ovládacího obvodu přímo do silových vodičů motoru.',
+          },
+          {
+            id: 'd',
+            text: 'Kontakt sám změní stav bez jakéhokoli mechanického pohybu kotvy.',
+          },
         ],
-        correctOptionId: 'a',
+        correctOptionId: 'b',
         explanation:
-          'Stykač (i relé) odděluje ovládání od výkonu — malý signál řídí velkou zátěž.',
+          'Správné napětí na cívce vytvoří proud a magnetické pole. Kotva se pohne a mechanicky změní kontakty jiného obvodu. Proud motoru cívkou neteče a nepřeskakuje mezi obvody.',
       },
       {
         id: 'q2',
-        text: 'Co udělá kontakt, když cívka dostane napětí?',
+        text: 'Co znamená NO a NC u kontaktů stykače nebo relé?',
         options: [
-          { id: 'a', text: 'Cívka ho přitáhne a kontakt sepne.' },
-          { id: 'b', text: 'Kontakt se rozpojí.' },
-          { id: 'c', text: 'Nic — kontakt s cívkou nesouvisí.' },
-          { id: 'd', text: 'Kontakt se roztaví.' },
+          {
+            id: 'a',
+            text: 'NO znamená normálně zapnutý kontakt a NC znamená normálně vypnutý kontakt.',
+          },
+          {
+            id: 'b',
+            text: 'Klidový stav znamená, že motor právě běží v běžném provozu celého zařízení.',
+          },
+          {
+            id: 'c',
+            text: 'Stav NO a NC se nemění, ať je cívka buzená, nebo zcela bez napětí.',
+          },
+          {
+            id: 'd',
+            text: 'NO je bez buzení rozepnutý a NC sepnutý; po přitažení kotvy se stav změní.',
+          },
         ],
-        correctOptionId: 'a',
-        explanation: 'Cívka pod napětím = elektromagnet = přitažený, sepnutý kontakt.',
+        correctOptionId: 'd',
+        explanation:
+          '„Normálně“ se vztahuje ke klidovému stavu cívky bez buzení: NO (spínací) je rozepnutý, NC (rozpínací) sepnutý. Po přitažení kotvy se jejich stav změní.',
       },
       {
         id: 'q3',
-        text: 'Jak spolu souvisí ovládací a výkonový obvod stykače?',
+        text: 'Co platí o stykači, ochraně a vypnuté cívce?',
         options: [
-          { id: 'a', text: 'Jsou oddělené — spojuje je jen pohyb kontaktu.' },
-          { id: 'b', text: 'Je to jeden a tentýž obvod.' },
-          { id: 'c', text: 'Jsou spojené vodičem přes cívku.' },
-          { id: 'd', text: 'Výkonový obvod napájí cívku.' },
+          {
+            id: 'a',
+            text: 'Stykač zesiluje proud motoru, proto stačí slabé ovládací tlačítko v obvodu.',
+          },
+          {
+            id: 'b',
+            text: 'Stykač automaticky jistí motor proti zkratu i proti každému přetížení.',
+          },
+          {
+            id: 'c',
+            text: 'Stykač spíná silový obvod, ale sám není jističem ani zárukou beznapěťovosti.',
+          },
+          {
+            id: 'd',
+            text: 'Vypnutá cívka zaručuje, že je celé zařízení včetně silového obvodu bez napětí.',
+          },
         ],
-        correctOptionId: 'a',
+        correctOptionId: 'c',
         explanation:
-          'Dva oddělené obvody — proto může slabé tlačítko bezpečně ovládat velký motor.',
+          'Stykač především spíná silový obvod. Není jistič ani automatická ochrana a vypnutá cívka nepotvrzuje bezpečný beznapěťový stav.',
       },
     ],
     activityXp: 20,
