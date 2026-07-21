@@ -47,7 +47,15 @@ import {
   LAST_LESSON_KEY,
 } from '../src/lib/progress';
 import { migrateProgressLessonReferences } from '../src/lib/lessonIdMigration';
-import { getMvpLessonsBySubject, getLessonById, getLessonsByTopic } from '../src/data/lessons';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import {
+  getMvpLessonsBySubject,
+  getLessonById,
+  getLessonsByTopic,
+  lessons,
+} from '../src/data/lessons';
 import { getTopicById, getTopicsBySubject, topics } from '../src/data/topics';
 import { getBadgeById } from '../src/data/badges';
 import { subjects } from '../src/data/subjects';
@@ -3077,7 +3085,7 @@ test('téma Asynchronní stroje má 20 minut a dvě aktivní lekce', () => {
   assert.equal(topicLessons.length, 2);
   assert.equal(
     topicLessons.reduce((sum, l) => sum + l.durationMinutes, 0),
-    19,
+    20,
   );
   assert.deepEqual(
     topicLessons.map((l) => l.id),
@@ -3132,7 +3140,7 @@ test('pořadí Strojů po přidání točivého magnetického pole', () => {
   const motor = getLessonById('asynchronni-motor');
   assert.ok(motor);
   assert.equal(motor.interactiveDemo?.type, 'induction-motor');
-  assert.equal(motor.durationMinutes, 9);
+  assert.equal(motor.durationMinutes, 10);
   assert.match(motor.explanation, /točivé magnetické pole/);
 
   const prevod = getLessonById('prevod-transformatoru');
@@ -3443,6 +3451,298 @@ test('uložený strojarsky-elev, retry a projektor u točivého pole', () => {
   const afterReset = loadProgress();
   assert.equal(afterReset.totalXp, 0);
   assert.equal(afterReset.earnedBadges.includes('pruvodce-tocivym-polem'), false);
+  assert.equal(Object.keys(afterReset.lessons).length, 0);
+});
+
+// --- MVP-12H8J: Prohloubení asynchronni-motor --------------------------------
+
+function collectMotorProductionText(
+  lesson: NonNullable<ReturnType<typeof getLessonById>>,
+) {
+  return [
+    lesson.explanation,
+    lesson.safetyNote,
+    lesson.typicalMistake,
+    lesson.memorySentence,
+    lesson.goal,
+    lesson.hook,
+    lesson.teacherTip,
+    ...lesson.quiz.flatMap((q) => [
+      q.text,
+      q.explanation,
+      ...q.options.map((o) => o.text),
+    ]),
+    ...((getLessonActivity(lesson) as { scenarios?: { text: string; explanation: string }[] })
+      ?.scenarios ?? []
+    ).flatMap((s) => [s.text, s.explanation]),
+  ].join('\n');
+}
+
+function collectMotorExplanatoryText(
+  lesson: NonNullable<ReturnType<typeof getLessonById>>,
+) {
+  const activity = getLessonActivity(lesson) as {
+    scenarios?: { explanation: string }[];
+    successMessage?: string;
+  } | undefined;
+  return [
+    lesson.explanation,
+    lesson.typicalMistake,
+    lesson.memorySentence,
+    lesson.goal,
+    lesson.hook,
+    ...lesson.quiz.map((q) => q.explanation),
+    ...(activity?.scenarios ?? []).map((s) => s.explanation),
+    activity?.successMessage ?? '',
+  ].join('\n');
+}
+
+test('H8J: kontrakt prohloubené lekce asynchronni-motor', () => {
+  const lesson = getLessonById('asynchronni-motor');
+  assert.ok(lesson);
+  assert.equal(lesson.id, 'asynchronni-motor');
+  assert.equal(lesson.title, 'Asynchronní motor jednoduše');
+  assert.equal(lesson.subjectId, 'stroje');
+  assert.equal(lesson.year, 2);
+  assert.equal(lesson.topicId, 'asynchronni-stroje');
+  assert.equal(lesson.durationMinutes, 10);
+  assert.equal(lesson.interactiveDemo?.type, 'induction-motor');
+  assert.equal(lesson.badgeId, 'motorovy-elev');
+  assert.ok(getBadgeById('motorovy-elev'));
+  assert.equal(lesson.activityXp, 20);
+  assert.equal(lesson.quizXp, 15);
+  assert.equal(lesson.quiz.length, 3);
+  const activity = getLessonActivity(lesson);
+  assert.ok(activity);
+  assert.equal(activity.type, 'scenario-choice');
+  assert.equal(activity.scenarios.length, 4);
+  assert.equal(getMvpLessonsBySubject('stroje').length, 6);
+  assert.equal(lessons.length, 41);
+  assertQuizOptionLengthFairness('asynchronni-motor');
+});
+
+test('H8J: návaznost na H8H a zachování točivého pole', () => {
+  const order = getMvpLessonsBySubject('stroje').map((l) => l.id);
+  const iField = order.indexOf('tocive-magneticke-pole');
+  const iMotor = order.indexOf('asynchronni-motor');
+  assert.equal(iMotor, iField + 1);
+
+  const field = getLessonById('tocive-magneticke-pole');
+  const motor = getLessonById('asynchronni-motor');
+  assert.ok(field);
+  assert.ok(motor);
+  assert.ok(/most k rotoru|neřešíme podrobně.*rotor/i.test(field.explanation));
+  assert.ok(/reakce rotoru|reaguje \*\*rotor\*\*|reaguje rotor/i.test(motor.explanation));
+  assert.ok(/třífázového asynchronního motoru/i.test(motor.explanation));
+  assert.equal(/120°|třetinu periody/i.test(motor.explanation), false);
+  assert.equal(field.durationMinutes, 10);
+  assert.equal(field.badgeId, 'pruvodce-tocivym-polem');
+  const fieldActivity = getLessonActivity(field) as {
+    scenarios: { correctOptionId: string }[];
+  };
+  assert.deepEqual(
+    fieldActivity.scenarios.map((s) => s.correctOptionId),
+    ['toci', 'pulzuje', 'nelze', 'nevznika'],
+  );
+});
+
+test('H8J: indukované napětí versus rotorový proud', () => {
+  const lesson = getLessonById('asynchronni-motor');
+  assert.ok(lesson);
+  const explain = collectMotorExplanatoryText(lesson);
+  assert.ok(/relativní změna|vůči rotor/i.test(explain));
+  assert.ok(/indukuje.*napětí|indukované napětí/i.test(explain));
+  assert.ok(/uzavřen(é|ou) vodiv/i.test(explain));
+  assert.ok(/rotorový proud|teče.*proud/i.test(explain));
+  assert.ok(/napětí a.*proud nejsou totéž|nejsou totéž/i.test(explain));
+  assert.ok(/není přímo elektricky napájen|není.*napájen stejně/i.test(explain));
+  assert.ok(
+    lesson.explanation.includes('nepřeskakuje vzduchovou mezerou'),
+    'výklad musí výslovně říct, že proud nepřeskakuje mezerou',
+  );
+});
+
+test('H8J: moment a rotorové magnetické působení', () => {
+  const lesson = getLessonById('asynchronni-motor');
+  assert.ok(lesson);
+  const explain = collectMotorExplanatoryText(lesson);
+  assert.ok(/rotorový proud vytváří.*magnetické/i.test(explain));
+  assert.ok(/statorové a rotorové.*působení|působení statoru i rotoru/i.test(explain));
+  assert.ok(/elektromagnetick.*síly/i.test(explain));
+  assert.ok(/moment/i.test(explain));
+  assert.ok(/ve směru točivého pole|následovat/i.test(explain));
+  assert.ok(/permanentní magnet/i.test(lesson.typicalMistake));
+  assert.ok(/táhne železo|táhlo železo|táhnutí železa/i.test(explain));
+  assert.equal(
+    /To pole „táhne“|pole „táhne“ rotor|jednoduše táhne/i.test(lesson.explanation),
+    false,
+    'výklad nesmí mít „táhne“ jako jediný mechanismus',
+  );
+});
+
+test('H8J: opoždění, asynchronní a kvalitativní skluz', () => {
+  const lesson = getLessonById('asynchronni-motor');
+  assert.ok(lesson);
+  const text = collectMotorProductionText(lesson);
+  const explain = collectMotorExplanatoryText(lesson);
+  assert.ok(/pomalejší než pole|opožď/i.test(explain));
+  assert.ok(/stejnou rychlostí|stejné rychlosti|relativní změna by zanikla/i.test(explain));
+  assert.ok(/bez.*rotorového proudu|bez rotorového proudu/i.test(explain));
+  assert.ok(/skluz/i.test(explain));
+  assert.ok(/není to mechanické klouzání|není mechanické/i.test(explain));
+  assert.ok(/asynchronní/i.test(explain));
+  assert.equal(/s\s*=\s*|n1\s*-|synchronní otáčky\s*=/i.test(text), false);
+  assert.equal(/vzorec skluzu|procent.*skluz/i.test(text), false);
+});
+
+test('H8J: aktivita scenario-choice a nový quiz', () => {
+  const lesson = getLessonById('asynchronni-motor');
+  assert.ok(lesson);
+  const activity = getLessonActivity(lesson) as {
+    type: string;
+    scenarios: { id: string; correctOptionId: string; explanation: string; text: string }[];
+    options: { id: string }[];
+  };
+  assert.equal(activity.type, 'scenario-choice');
+  assert.equal(activity.scenarios.length, 4);
+  assert.deepEqual(
+    activity.scenarios.map((s) => s.correctOptionId),
+    ['proud-a-moment', 'napeti-bez-proudu', 'zanika-indukce', 'bez-statoroveho-pole'],
+  );
+  assert.ok(/napětí.*proud.*moment/i.test(activity.scenarios[0].explanation));
+  assert.ok(/myšlenkový|simulační model/i.test(activity.scenarios[1].text));
+  assert.ok(/skluzem/i.test(activity.scenarios[2].explanation));
+  assert.ok(/permanentní|zbytkový|vnější/i.test(activity.scenarios[3].explanation));
+
+  assert.equal(lesson.quiz[0].correctOptionId, 'c');
+  assert.equal(lesson.quiz[1].correctOptionId, 'b');
+  assert.equal(lesson.quiz[2].correctOptionId, 'd');
+  for (const q of lesson.quiz) {
+    assert.equal(q.options.filter((o) => o.id === q.correctOptionId).length, 1);
+  }
+  assertQuizOptionLengthFairness('asynchronni-motor');
+
+  const text = collectMotorProductionText(lesson);
+  assert.equal(/připoj.*zásuvk|změň sled fází na motoru|hvězda|trojúhelník/i.test(text), false);
+});
+
+test('H8J: SafetyNote a regrese InductionMotorDemo', () => {
+  const lesson = getLessonById('asynchronni-motor');
+  assert.ok(lesson);
+  const safety = lesson.safetyNote;
+  assert.ok(/nepřipojuje motor k síti/i.test(safety));
+  assert.ok(/neotevírá motor ani svorkovnici|svorkovnici/i.test(safety));
+  assert.ok(/nepřepojuje vinutí/i.test(safety));
+  assert.ok(/pořadí fází/i.test(safety));
+  assert.ok(/Živé části se neměří|neměří/i.test(safety));
+  assert.ok(/Nezajištěný motor se nespouští/i.test(safety));
+  assert.ok(/Hřídele, ventilátoru, spojky|rotujících částí/i.test(safety));
+  assert.ok(/neočekávaně rozběhnout/i.test(safety));
+  assert.ok(/dobíhat/i.test(safety));
+  assert.ok(/zahřívat/i.test(safety));
+  assert.ok(/oděv, vlasy|zachytit/i.test(safety));
+  assert.ok(/ovládací obvod nemusí znamenat beznapěťový silový/i.test(safety));
+  assert.ok(/zabezpečeného modelu|schémat, simulace/i.test(safety));
+  assert.ok(/školní pravidla|pokyn učitele/i.test(safety));
+  assert.ok(/neblokují|Rotor ani hřídel se neblokují/i.test(safety));
+
+  const demoPath = path.join(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '../src/components/demos/InductionMotorDemo.tsx',
+  );
+  const hash = execFileSync('git', ['hash-object', demoPath], {
+    encoding: 'utf8',
+  }).trim();
+  assert.equal(
+    hash,
+    'ed1a0968839689ea7ea45156e67a4cc7b56bee2b',
+    'InductionMotorDemo musí zůstat blobově beze změny',
+  );
+});
+
+test('H8J: starý progress, retry, projektor a reset u motoru', () => {
+  const allLessons = getMvpLessonsBySubject('stroje');
+  assert.equal(allLessons.length, 6);
+  const lessonsState: ProgressState['lessons'] = {};
+  for (const l of allLessons) {
+    lessonsState[l.id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  saveProgress({
+    totalXp: 210,
+    earnedBadges: [
+      'mistr-transformatoru',
+      'pocitar-prevodu',
+      'pruvodce-tocivym-polem',
+      'motorovy-elev',
+      'vladce-kontaktu',
+      'bezpecny-u-vn',
+      'strojarsky-elev',
+    ],
+    lessons: lessonsState,
+    calmMode: false,
+  });
+  const loaded = loadProgress();
+  const { completed, total } = getSubjectProgress(
+    loaded,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 6);
+  assert.equal(total, 6);
+  assert.equal(isLessonComplete(loaded, 'asynchronni-motor'), true);
+  assert.equal(loaded.earnedBadges.filter((b) => b === 'motorovy-elev').length, 1);
+  assert.equal(loaded.earnedBadges.filter((b) => b === 'strojarsky-elev').length, 1);
+  assert.equal(loaded.totalXp, 210);
+
+  const worse = applyQuizCompletion(loadProgress(), {
+    lessonId: 'asynchronni-motor',
+    xp: 15,
+    badgeId: 'motorovy-elev',
+    correct: 1,
+    total: 3,
+  });
+  assert.equal(worse.xpAwarded, 0);
+  assert.equal(worse.lessonBadgeAwarded, false);
+  assert.deepEqual(worse.subjectBadgeIdsAwarded, []);
+  assert.equal(worse.state.totalXp, 210);
+  assert.deepEqual(worse.state.lessons['asynchronni-motor']?.bestQuizScore, {
+    correct: 3,
+    total: 3,
+  });
+  assert.equal(worse.state.earnedBadges.filter((b) => b === 'motorovy-elev').length, 1);
+  assert.equal(worse.state.earnedBadges.filter((b) => b === 'strojarsky-elev').length, 1);
+
+  const projector = applyQuizCompletion(
+    {
+      totalXp: 0,
+      earnedBadges: [],
+      lessons: {},
+      calmMode: false,
+    },
+    {
+      lessonId: 'asynchronni-motor',
+      xp: 15,
+      badgeId: 'motorovy-elev',
+      correct: 3,
+      total: 3,
+      projectorMode: true,
+    },
+  );
+  assert.equal(projector.xpAwarded, 0);
+  assert.equal(projector.lessonBadgeAwarded, false);
+  assert.equal(projector.state.totalXp, 0);
+  assert.equal(Object.keys(projector.state.lessons).length, 0);
+
+  const cleared = resetProgress(loadProgress());
+  saveProgress(cleared);
+  const afterReset = loadProgress();
+  assert.equal(afterReset.totalXp, 0);
+  assert.equal(afterReset.earnedBadges.includes('motorovy-elev'), false);
+  assert.equal(afterReset.earnedBadges.includes('strojarsky-elev'), false);
   assert.equal(Object.keys(afterReset.lessons).length, 0);
 });
 
