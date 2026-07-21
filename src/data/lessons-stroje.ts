@@ -309,10 +309,10 @@ export const strojeLessons: MicroLesson[] = [
           },
           {
             id: 's3',
-            text: 'Tři vinutí jsou rozmístěna kolem statoru, ale jejich proudy mají stejný časový průběh bez vzájemného fázového posunu.',
-            correctOptionId: 'pulzuje',
+            text: 'Tři vinutí jsou rozmístěna kolem statoru a jejich proudy mají stejný časový průběh bez vzájemného fázového posunu. Neznáme ale přesnou orientaci ani polaritu vinutí. Co můžeme rozhodnout o výsledném poli?',
+            correctOptionId: 'nelze',
             explanation:
-              'Prostorové rozložení samo nestačí. Bez časového posunu proudů nevzniká v tomto modelu výsledné točivé pole — pole spíš společně pulzuje.',
+              'Bez vzájemného časového posunu nevznikne standardní točivé pole třífázového statoru. Přesnou výslednici ale bez znalosti orientace a polarity vinutí určit nelze: může pulzovat, zeslabit se nebo se v ideálním symetrickém uspořádání vyrušit. Pro točivé pole jsou potřeba prostorově rozložená vinutí i časově posunuté proudy.',
           },
           {
             id: 's4',
