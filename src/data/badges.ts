@@ -256,6 +256,20 @@ export const badges: Badge[] = [
     icon: '🛡️',
   },
   {
+    id: 'znalec-pole',
+    title: 'Znalec pole',
+    description:
+      'Víš, že proud vytváří magnetické pole, cívka ho soustřeďuje a jádro zesiluje.',
+    icon: '🧲',
+  },
+  {
+    id: 'objevitel-indukce',
+    title: 'Objevitel indukce',
+    description:
+      'Chápeš, že indukované napětí vzniká při změně magnetického působení — ne při pouhé přítomnosti pole.',
+    icon: '⚡',
+  },
+  {
     id: 'rozlisovac-proudu',
     title: 'Rozlišovač proudu',
     description:

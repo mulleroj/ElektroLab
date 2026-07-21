@@ -958,7 +958,6 @@ test('zakladni-elev se neudělí bez lekce Jednotky a převody', () => {
   const lessons = getMvpLessonsBySubject('zaklady', 1);
   const withoutUnits = lessons.filter((l) => l.id !== 'jednotky-a-prevody');
   assert.equal(withoutUnits.length, lessons.length - 1);
-  assert.equal(withoutUnits.length, 12);
   for (const l of withoutUnits) {
     const partial = completeLessonFully(l.id, l.badgeId);
     assert.deepEqual(partial.subjectBadgeIdsAwarded, []);
@@ -971,8 +970,8 @@ test('zakladni-elev se neudělí bez lekce Jednotky a převody', () => {
 test('dříve uložený zakladni-elev se po přidání lekce o jednotkách nemaže', () => {
   const allLessons = getMvpLessonsBySubject('zaklady', 1);
   const oldLessons = allLessons.filter((l) => l.id !== 'jednotky-a-prevody');
-  assert.equal(oldLessons.length, 12);
-  assert.equal(allLessons.length, 13);
+  assert.equal(oldLessons.length, allLessons.length - 1);
+  assert.equal(allLessons.length, 15);
   const lessonsState: ProgressState['lessons'] = {};
   for (const l of oldLessons) {
     lessonsState[l.id] = {
@@ -996,8 +995,8 @@ test('dříve uložený zakladni-elev se po přidání lekce o jednotkách nema�
     loaded,
     allLessons.map((l) => l.id),
   );
-  assert.equal(completed, 12);
-  assert.equal(total, 13);
+  assert.equal(completed, oldLessons.length);
+  assert.equal(total, 15);
   const afterOther = completeActivity(loaded, 'jednotky-a-prevody', 20);
   assert.equal(afterOther.earnedBadges.includes('zakladni-elev'), true);
   const retry = applyQuizCompletion(afterOther, {
@@ -1202,7 +1201,7 @@ test('pořadí Základů: Ohm, sériové-paralelní, výkon, zkrat-jištění', 
 
 test('starý progress: dokončený výkon a jištění bez sériového → doporučí seriove-paralelni', () => {
   const allLessons = getMvpLessonsBySubject('zaklady', 1);
-  assert.equal(allLessons.length, 13);
+  assert.equal(allLessons.length, 15);
   const completedIds = allLessons
     .map((l) => l.id)
     .filter((id) => id !== 'seriove-paralelni');
@@ -1243,8 +1242,8 @@ test('starý progress: dokončený výkon a jištění bez sériového → dopor
     loaded,
     allLessons.map((l) => l.id),
   );
-  assert.equal(completed, 12);
-  assert.equal(total, 13);
+  assert.equal(completed, completedIds.length);
+  assert.equal(total, 15);
 });
 
 /** Délka explanation před MVP-12H4B — horní mez, ne cílový počet znaků. */
@@ -1766,7 +1765,7 @@ test('téma Bezpečné chování v dílně je aktivní a má 30 minut', () => {
     30,
   );
   assert.equal(topics.length, 28);
-  assert.equal(topics.filter((t) => t.mvpAvailable).length, 20);
+  assert.equal(topics.filter((t) => t.mvpAvailable).length, 22);
   assert.equal(getTopicsBySubject('bezpecnost', 2).filter((t) => t.mvpAvailable).length, 0);
   assert.equal(getTopicsBySubject('bezpecnost', 3).filter((t) => t.mvpAvailable).length, 0);
 });
@@ -2009,7 +2008,7 @@ test('téma Střídavý proud je aktivní a má 20 minut', () => {
     20,
   );
   assert.equal(topics.length, 28);
-  assert.equal(topics.filter((t) => t.mvpAvailable).length, 20);
+  assert.equal(topics.filter((t) => t.mvpAvailable).length, 22);
 });
 
 test('lekce Stejnosměrný a střídavý proud je scenario-choice bez dema', () => {
@@ -2052,13 +2051,15 @@ test('lekce Perioda a frekvence je measurement-judgment bez dema', () => {
 
 test('pořadí Základů po přidání střídavého proudu', () => {
   const order = getMvpLessonsBySubject('zaklady', 1).map((l) => l.id);
-  assert.equal(order.length, 13);
+  assert.equal(order.length, 15);
   assert.deepEqual(order.slice(0, 11), [...ORIGINAL_ZAKLADY_IDS]);
-  assert.deepEqual(order.slice(-4), [
+  assert.deepEqual(order.slice(-6), [
     'zkrat-pretizeni-a-jisteni',
     'zakladni-znacky',
     'stejnosmerny-a-stridavy-proud',
     'perioda-a-frekvence',
+    'magneticke-pole-vodice-a-civky',
+    'jak-vznika-indukovane-napeti',
   ]);
 });
 
@@ -2122,9 +2123,9 @@ test('výklad střídavého proudu zachovává odborné a bezpečnostní jádro'
   }
 });
 
-test('starý progress Základů bez subject badge: 11/13 a doporučí AC lekci', () => {
+test('starý progress Základů bez subject badge: 11/15 a doporučí AC lekci', () => {
   const allLessons = getMvpLessonsBySubject('zaklady', 1);
-  assert.equal(allLessons.length, 13);
+  assert.equal(allLessons.length, 15);
   const lessonsState: ProgressState['lessons'] = {};
   for (const id of ORIGINAL_ZAKLADY_IDS) {
     lessonsState[id] = {
@@ -2146,7 +2147,7 @@ test('starý progress Základů bez subject badge: 11/13 a doporučí AC lekci',
     allLessons.map((l) => l.id),
   );
   assert.equal(completed, 11);
-  assert.equal(total, 13);
+  assert.equal(total, 15);
   assert.equal(loaded.totalXp, 300);
   assert.equal(loaded.earnedBadges.includes('zakladni-elev'), false);
   assert.equal(loaded.earnedBadges.includes('znalec-materialu'), true);
@@ -2155,9 +2156,9 @@ test('starý progress Základů bez subject badge: 11/13 a doporučí AC lekci',
   assert.equal(next.id, 'stejnosmerny-a-stridavy-proud');
 });
 
-test('dokončení AC lekcí Základů udělí odznaky a zakladni-elev jednou', () => {
+test('dokončení AC lekcí Základů udělí odznaky ale zakladni-elev až po všech 15', () => {
   const allLessons = getMvpLessonsBySubject('zaklady', 1);
-  assert.equal(allLessons.length, 13);
+  assert.equal(allLessons.length, 15);
   for (const id of ORIGINAL_ZAKLADY_IDS) {
     completeLessonFully(id, getLessonById(id)?.badgeId);
   }
@@ -2177,7 +2178,7 @@ test('dokončení AC lekcí Základů udělí odznaky a zakladni-elev jednou', (
     allLessons.map((l) => l.id),
   );
   assert.equal(completed, 12);
-  assert.equal(total, 13);
+  assert.equal(total, 15);
   const mid = loadProgress();
   const next = allLessons.find((l) => !isLessonComplete(mid, l.id));
   assert.ok(next);
@@ -2185,16 +2186,17 @@ test('dokončení AC lekcí Základů udělí odznaky a zakladni-elev jednou', (
 
   const second = completeLessonFully('perioda-a-frekvence', 'ctenar-prubehu');
   assert.equal(second.lessonBadgeAwarded, true);
-  assert.deepEqual(second.subjectBadgeIdsAwarded, ['zakladni-elev']);
+  assert.deepEqual(second.subjectBadgeIdsAwarded, []);
   assert.equal(second.state.totalXp, xpBefore + 70);
   ({ completed, total } = getSubjectProgress(
     second.state,
     allLessons.map((l) => l.id),
   ));
   assert.equal(completed, 13);
-  assert.equal(total, 13);
+  assert.equal(total, 15);
+  assert.equal(second.state.earnedBadges.includes('zakladni-elev'), false);
 
-  for (const badge of ['rozlisovac-proudu', 'ctenar-prubehu', 'zakladni-elev']) {
+  for (const badge of ['rozlisovac-proudu', 'ctenar-prubehu']) {
     assert.equal(second.state.earnedBadges.filter((b) => b === badge).length, 1);
   }
 
@@ -2217,7 +2219,7 @@ test('dokončení AC lekcí Základů udělí odznaky a zakladni-elev jednou', (
 
 test('uložený zakladni-elev a projektor u AC lekcí', () => {
   const allLessons = getMvpLessonsBySubject('zaklady', 1);
-  assert.equal(allLessons.length, 13);
+  assert.equal(allLessons.length, 15);
   const lessonsState: ProgressState['lessons'] = {};
   for (const id of ORIGINAL_ZAKLADY_IDS) {
     lessonsState[id] = {
@@ -2239,7 +2241,7 @@ test('uložený zakladni-elev a projektor u AC lekcí', () => {
     allLessons.map((l) => l.id),
   );
   assert.equal(completed, 11);
-  assert.equal(total, 13);
+  assert.equal(total, 15);
   assert.equal(loaded.earnedBadges.includes('zakladni-elev'), true);
 
   const afterNew = completeLessonFully(
@@ -2273,6 +2275,307 @@ test('uložený zakladni-elev a projektor u AC lekcí', () => {
   assert.equal(projector.state.totalXp, 0);
   assert.equal(projector.state.earnedBadges.includes('rozlisovac-proudu'), false);
   assert.equal(isLessonComplete(projector.state, 'stejnosmerny-a-stridavy-proud'), false);
+  assert.equal(Object.keys(projector.state.lessons).length, 0);
+});
+
+// ─── MVP-12H8D: Magnetismus a indukce ───────────────────────────────
+
+const MAGNETISM_INDUCTION_IDS = [
+  'magneticke-pole-vodice-a-civky',
+  'jak-vznika-indukovane-napeti',
+] as const;
+
+function collectMagIndLessonProductionText(lesson: NonNullable<ReturnType<typeof getLessonById>>) {
+  return [
+    lesson.explanation,
+    lesson.safetyNote,
+    lesson.typicalMistake,
+    lesson.memorySentence,
+    lesson.goal,
+    lesson.hook,
+    lesson.teacherTip,
+    ...lesson.quiz.flatMap((q) => [
+      q.text,
+      q.explanation,
+      ...q.options.map((o) => o.text),
+    ]),
+    ...((getLessonActivity(lesson) as { scenarios?: { text: string; explanation: string }[] })
+      ?.scenarios ?? []
+    ).flatMap((s) => [s.text, s.explanation]),
+  ].join('\n');
+}
+
+test('téma Magnetické pole je aktivní a má 10 minut', () => {
+  const topic = getTopicById('magneticke-pole');
+  assert.ok(topic);
+  assert.equal(topic.subjectId, 'zaklady');
+  assert.equal(topic.year, 1);
+  assert.equal(topic.mvpAvailable, true);
+  assert.equal(topic.estimatedMinutes, 10);
+  const topicLessons = getLessonsByTopic('magneticke-pole');
+  assert.equal(topicLessons.filter((l) => l.mvpAvailable).length, 1);
+
+  assert.equal(topics.length, 28);
+  assert.equal(topics.filter((t) => t.mvpAvailable).length, 22);
+
+  const zakladyTopics = topics.filter((t) => t.subjectId === 'zaklady');
+  const spIdx = zakladyTopics.findIndex((t) => t.id === 'stridavy-proud');
+  const mpIdx = zakladyTopics.findIndex((t) => t.id === 'magneticke-pole');
+  const indIdx = zakladyTopics.findIndex((t) => t.id === 'indukce');
+  assert.ok(spIdx < mpIdx, 'stridavy-proud before magneticke-pole');
+  assert.ok(mpIdx < indIdx, 'magneticke-pole before indukce');
+});
+
+test('téma Indukce je aktivní a má 10 minut', () => {
+  const topic = getTopicById('indukce');
+  assert.ok(topic);
+  assert.equal(topic.subjectId, 'zaklady');
+  assert.equal(topic.year, 1);
+  assert.equal(topic.mvpAvailable, true);
+  assert.equal(topic.estimatedMinutes, 10);
+  const topicLessons = getLessonsByTopic('indukce');
+  assert.equal(topicLessons.filter((l) => l.mvpAvailable).length, 1);
+});
+
+test('lekce Magnetické pole vodiče a cívky je scenario-choice bez dema', () => {
+  const lesson = getLessonById('magneticke-pole-vodice-a-civky');
+  assert.ok(lesson);
+  assert.equal(lesson.title, 'Magnetické pole vodiče a cívky');
+  assert.equal(lesson.subjectId, 'zaklady');
+  assert.equal(lesson.year, 1);
+  assert.equal(lesson.topicId, 'magneticke-pole');
+  assert.equal(lesson.durationMinutes, 10);
+  assert.equal(lesson.interactiveDemo, undefined);
+  assert.equal(lesson.quiz.length, 3);
+  assert.equal(lesson.badgeId, 'znalec-pole');
+  assert.ok(getBadgeById('znalec-pole'));
+  const activity = getLessonActivity(lesson);
+  assert.ok(activity);
+  assert.equal(activity.type, 'scenario-choice');
+  assert.equal(activity.scenarios.length, 4);
+  assertQuizOptionLengthFairness('magneticke-pole-vodice-a-civky');
+});
+
+test('lekce Jak vzniká indukované napětí je measurement-judgment bez dema', () => {
+  const lesson = getLessonById('jak-vznika-indukovane-napeti');
+  assert.ok(lesson);
+  assert.equal(lesson.title, 'Jak vzniká indukované napětí');
+  assert.equal(lesson.subjectId, 'zaklady');
+  assert.equal(lesson.year, 1);
+  assert.equal(lesson.topicId, 'indukce');
+  assert.equal(lesson.durationMinutes, 10);
+  assert.equal(lesson.interactiveDemo, undefined);
+  assert.equal(lesson.quiz.length, 3);
+  assert.equal(lesson.badgeId, 'objevitel-indukce');
+  assert.ok(getBadgeById('objevitel-indukce'));
+  const activity = getLessonActivity(lesson);
+  assert.ok(activity);
+  assert.equal(activity.type, 'measurement-judgment');
+  assert.equal(activity.scenarios.length, 5);
+  assertQuizOptionLengthFairness('jak-vznika-indukovane-napeti');
+});
+
+test('pořadí Základů po přidání magnetismu a indukce', () => {
+  const order = getMvpLessonsBySubject('zaklady', 1).map((l) => l.id);
+  assert.equal(order.length, 15);
+  assert.deepEqual(order.slice(0, 11), [...ORIGINAL_ZAKLADY_IDS]);
+  assert.deepEqual(order.slice(-4), [
+    'stejnosmerny-a-stridavy-proud',
+    'perioda-a-frekvence',
+    'magneticke-pole-vodice-a-civky',
+    'jak-vznika-indukovane-napeti',
+  ]);
+});
+
+test('výklad magnetismu a indukce zachovává odborné a bezpečnostní jádro', () => {
+  const lessons = MAGNETISM_INDUCTION_IDS.map((id) => getLessonById(id));
+  assert.ok(lessons.every(Boolean));
+  const l1 = lessons[0]!;
+  const l2 = lessons[1]!;
+  const l1Text = collectMagIndLessonProductionText(l1);
+  const l2Text = collectMagIndLessonProductionText(l2);
+  const text = l1Text + '\n' + l2Text;
+
+  // Magnetické pole
+  assert.ok(/proud.*vytváří.*magnet/i.test(l1Text), 'proud vytváří magnetické pole');
+  assert.ok(/prost\w+.*kolem.*vodiče|kolem.*vodiče/i.test(l1Text), 'pole v prostoru kolem vodiče');
+  assert.ok(/směr.*proud.*orientac|obrác.*směr.*proud.*orientac|orientac.*pole/i.test(l1Text), 'změna směru mění orientaci');
+  assert.ok(/cívka.*soustřeď|sčítají.*soustřeď/i.test(l1Text), 'cívka soustřeďuje');
+  assert.ok(/jádro.*není.*zdroj.*energie/i.test(l1Text), 'jádro není zdroj energie');
+  assert.ok(/stálý.*proud.*stálé.*pole|ustálen.*stálé/i.test(l1Text), 'stálý proud → stálé pole');
+  assert.ok(/střídavý.*proud.*proměnné.*pole|proměnný.*proud.*proměnné/i.test(l1Text), 'AC → proměnné pole');
+  assert.ok(/pole.*není.*proud|není.*proudící.*látka|není.*látka/i.test(l1Text), 'pole není proud');
+
+  // Indukce
+  assert.ok(/změn.*magnet.*působení|změn.*je.*rozhodující/i.test(l2Text), 'změna je klíčová');
+  assert.ok(/neměnn.*nestačí|přítomnost.*nestačí|stálý.*nestačí/i.test(l2Text), 'neměnný stav nestačí');
+  assert.ok(/pohyb.*změn.*proudu|pohyb.*magnet|změn.*proudu.*cívce/i.test(l2Text), 'dva způsoby změny');
+  assert.ok(/napětí.*otevřen|otevřen.*obvod.*napětí/i.test(l2Text), 'napětí v otevřeném obvodu');
+  assert.ok(/proud.*uzavřen|uzavřen.*cest.*proud/i.test(l2Text), 'proud v uzavřené cestě');
+  assert.ok(/nepřeskakuje|přeskakuje.*ne/i.test(l2Text), 'nepřeskakování');
+  assert.ok(/nevyrábí.*energi|nevytváří.*energi/i.test(l2Text), 'trafo nevyrábí energii');
+  assert.ok(/ustálen.*DC.*není|stejnosměrn.*není.*běžn/i.test(l2Text), 'DC není běžný režim');
+
+  // Bezpečnost
+  assert.ok(/síťov.*cívk|cívk.*zásuvk|nepřipojuje.*cívk/i.test(text), 'žádná síťová cívka');
+  assert.ok(/nepřipojuje.*transformátor.*síti|transformátor.*síti/i.test(text), 'trafo ne k síti');
+  assert.ok(/neměří.*síťov.*transformátor|neměří.*transformátor/i.test(text), 'neměřit síťový trafo');
+  assert.ok(/neotevírá.*zdroj|neotevír.*transformátor/i.test(text), 'neotevírat');
+  assert.ok(/odkryté.*svorky|nechráněn.*svorky/i.test(text), 'žádné odkryté svorky');
+  assert.ok(/230\s*V|pokus.*230|žádné pokusy/i.test(text), 'žádné 230 V');
+  assert.ok(/nízkonapěťov/i.test(text), 'nízkonapěťový model');
+  assert.ok(/zahříván.*cívk|cívk.*zahříván/i.test(text), 'zahřívání cívky');
+
+  for (const id of MAGNETISM_INDUCTION_IDS) {
+    assertQuizOptionLengthFairness(id);
+  }
+});
+
+test('starý progress Základů bez subject badge: 13/15 a doporučí magnetické pole', () => {
+  const allLessons = getMvpLessonsBySubject('zaklady', 1);
+  assert.equal(allLessons.length, 15);
+  const lessonsState: ProgressState['lessons'] = {};
+  for (const id of [...ORIGINAL_ZAKLADY_IDS, ...AC_LESSON_IDS]) {
+    lessonsState[id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  saveProgress({
+    totalXp: 455,
+    earnedBadges: [
+      'znalec-materialu', 'ctenar-znaciek', 'rozlisovac-proudu', 'ctenar-prubehu',
+    ],
+    lessons: lessonsState,
+    calmMode: false,
+  });
+  const loaded = loadProgress();
+  const { completed, total } = getSubjectProgress(
+    loaded,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 13);
+  assert.equal(total, 15);
+  assert.equal(loaded.totalXp, 455);
+  assert.equal(loaded.earnedBadges.includes('zakladni-elev'), false);
+  const next = allLessons.find((l) => !isLessonComplete(loaded, l.id));
+  assert.ok(next);
+  assert.equal(next.id, 'magneticke-pole-vodice-a-civky');
+
+  const first = completeLessonFully('magneticke-pole-vodice-a-civky', 'znalec-pole');
+  assert.equal(first.lessonBadgeAwarded, true);
+  assert.deepEqual(first.subjectBadgeIdsAwarded, []);
+  assert.equal(first.state.totalXp, 455 + 35);
+  const { completed: c2, total: t2 } = getSubjectProgress(
+    first.state,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(c2, 14);
+  assert.equal(t2, 15);
+  const mid = loadProgress();
+  const next2 = allLessons.find((l) => !isLessonComplete(mid, l.id));
+  assert.ok(next2);
+  assert.equal(next2.id, 'jak-vznika-indukovane-napeti');
+});
+
+test('dokončení magnetismu a indukce, starý badge a projektor', () => {
+  const allLessons = getMvpLessonsBySubject('zaklady', 1);
+  assert.equal(allLessons.length, 15);
+
+  // Complete all 13 original + AC lessons
+  for (const id of [...ORIGINAL_ZAKLADY_IDS, ...AC_LESSON_IDS]) {
+    completeLessonFully(id, getLessonById(id)?.badgeId);
+  }
+  const before = loadProgress();
+  assert.equal(before.earnedBadges.includes('zakladni-elev'), false);
+  const xpBefore = before.totalXp;
+
+  const first = completeLessonFully('magneticke-pole-vodice-a-civky', 'znalec-pole');
+  assert.equal(first.lessonBadgeAwarded, true);
+  assert.deepEqual(first.subjectBadgeIdsAwarded, []);
+  assert.equal(first.state.totalXp, xpBefore + 35);
+
+  const second = completeLessonFully('jak-vznika-indukovane-napeti', 'objevitel-indukce');
+  assert.equal(second.lessonBadgeAwarded, true);
+  assert.deepEqual(second.subjectBadgeIdsAwarded, ['zakladni-elev']);
+  assert.equal(second.state.totalXp, xpBefore + 70);
+
+  const { completed, total } = getSubjectProgress(
+    second.state,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 15);
+  assert.equal(total, 15);
+
+  for (const badge of ['znalec-pole', 'objevitel-indukce', 'zakladni-elev']) {
+    assert.equal(second.state.earnedBadges.filter((b) => b === badge).length, 1);
+  }
+
+  // Retry: no extra XP, badges not duplicated
+  const retry = applyQuizCompletion(loadProgress(), {
+    lessonId: 'jak-vznika-indukovane-napeti',
+    xp: 15,
+    badgeId: 'objevitel-indukce',
+    correct: 2,
+    total: 3,
+    projectorMode: false,
+  });
+  assert.equal(retry.xpAwarded, 0);
+  assert.equal(retry.lessonBadgeAwarded, false);
+  assert.deepEqual(retry.subjectBadgeIdsAwarded, []);
+  assert.deepEqual(retry.state.lessons['jak-vznika-indukovane-napeti']?.bestQuizScore, {
+    correct: 3,
+    total: 3,
+  });
+
+  // Old saved zakladni-elev stays, not duplicated
+  const lessonsState: ProgressState['lessons'] = {};
+  for (const id of [...ORIGINAL_ZAKLADY_IDS, ...AC_LESSON_IDS]) {
+    lessonsState[id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  saveProgress({
+    totalXp: 455,
+    earnedBadges: ['zakladni-elev'],
+    lessons: lessonsState,
+    calmMode: false,
+  });
+  const loaded = loadProgress();
+  assert.equal(loaded.earnedBadges.includes('zakladni-elev'), true);
+  const afterNew = completeLessonFully('magneticke-pole-vodice-a-civky', 'znalec-pole');
+  assert.deepEqual(afterNew.subjectBadgeIdsAwarded, []);
+  assert.equal(
+    afterNew.state.earnedBadges.filter((b) => b === 'zakladni-elev').length,
+    1,
+  );
+
+  // Projector: nothing persisted
+  saveProgress({
+    totalXp: 0,
+    earnedBadges: [],
+    lessons: {},
+    calmMode: false,
+  });
+  const projector = applyQuizCompletion(loadProgress(), {
+    lessonId: 'magneticke-pole-vodice-a-civky',
+    xp: 15,
+    badgeId: 'znalec-pole',
+    correct: 3,
+    total: 3,
+    projectorMode: true,
+  });
+  assert.equal(projector.xpAwarded, 0);
+  assert.equal(projector.lessonBadgeAwarded, false);
+  assert.deepEqual(projector.subjectBadgeIdsAwarded, []);
+  assert.equal(projector.state.totalXp, 0);
+  assert.equal(projector.state.earnedBadges.includes('znalec-pole'), false);
+  assert.equal(isLessonComplete(projector.state, 'magneticke-pole-vodice-a-civky'), false);
   assert.equal(Object.keys(projector.state.lessons).length, 0);
 });
 

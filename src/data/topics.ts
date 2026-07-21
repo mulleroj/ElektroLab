@@ -56,24 +56,6 @@ export const topics: Topic[] = [
     mvpAvailable: false,
   },
   {
-    id: 'magneticke-pole',
-    subjectId: 'zaklady',
-    title: 'Magnetické pole',
-    description: 'Magnetismus a jeho vztah k elektrickému proudu.',
-    year: 1,
-    estimatedMinutes: 40,
-    mvpAvailable: false,
-  },
-  {
-    id: 'indukce',
-    subjectId: 'zaklady',
-    title: 'Elektromagnetická indukce',
-    description: 'Indukované napětí a jeho využití.',
-    year: 1,
-    estimatedMinutes: 40,
-    mvpAvailable: false,
-  },
-  {
     id: 'stridavy-proud',
     subjectId: 'zaklady',
     title: 'Střídavý proud',
@@ -81,6 +63,26 @@ export const topics: Topic[] = [
       'Základní rozdíl stejnosměrného a střídavého průběhu, perioda a frekvence.',
     year: 1,
     estimatedMinutes: 20,
+    mvpAvailable: true,
+  },
+  {
+    id: 'magneticke-pole',
+    subjectId: 'zaklady',
+    title: 'Magnetické pole',
+    description:
+      'Jak elektrický proud vytváří magnetické pole kolem vodiče a jak cívka a jádro soustřeďují jeho účinek.',
+    year: 1,
+    estimatedMinutes: 10,
+    mvpAvailable: true,
+  },
+  {
+    id: 'indukce',
+    subjectId: 'zaklady',
+    title: 'Elektromagnetická indukce',
+    description:
+      'Proč změna magnetického působení na cívku může vyvolat napětí a jak tento princip využívá transformátor.',
+    year: 1,
+    estimatedMinutes: 10,
     mvpAvailable: true,
   },
   {
