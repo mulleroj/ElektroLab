@@ -618,7 +618,7 @@ export const strojeLessons: MicroLesson[] = [
       scenarioChoice: {
         type: 'scenario-choice',
         instruction:
-          'U každé situace rozhodni, co platí pro stykač a jeho obvody. Všechny čtyři musí být správně.',
+          'U každé situace vyber možnost, která přímo odpovídá na závěrečnou otázku. Všechny čtyři musí být správně.',
         options: [
           {
             id: 'hlavni-no-sepne',
@@ -642,28 +642,28 @@ export const strojeLessons: MicroLesson[] = [
         scenarios: [
           {
             id: 's1',
-            text: 'Cívka stykače dostane správné napětí. Hlavní kontakt je typu NO, mechanismus je funkční a silový zdroj i ostatní podmínky jsou připravené.',
+            text: 'Cívka stykače dostane správné napětí. Hlavní kontakt je typu NO, mechanismus je funkční a silový zdroj i ostatní podmínky jsou připravené. Co se v tomto okamžiku stane s hlavním NO kontaktem a silovým obvodem?',
             correctOptionId: 'hlavni-no-sepne',
             explanation:
               'Správné napětí na cívce → proud cívkou → magnetické pole → pohyb kotvy → sepnutí hlavního NO kontaktu. Silový obvod pak může napájet motor — motor se ale nerozběhne vždy automaticky.',
           },
           {
             id: 's2',
-            text: 'Pomocný NC kontakt je v klidovém stavu bez buzení cívky sepnutý. Cívka stykače teď dostane správné napětí.',
+            text: 'Pomocný kontakt je typu NC. Bez buzení cívky je sepnutý; nyní cívka dostane správné napětí a kotva se přitáhne. Co se v tomto okamžiku stane s pomocným NC kontaktem?',
             correctOptionId: 'pomocny-nc-rozepne',
             explanation:
               'NC je v klidu sepnutý; „klid“ znamená cívku bez buzení. Po přitažení kotvy se kontakt rozepne. Pomocný kontakt obvykle slouží ovládání nebo signalizaci, nikoli napájení motoru.',
           },
           {
             id: 's3',
-            text: 'V silovém obvodu vznikne zkrat nebo nebezpečné přetížení. Někdo tvrdí, že samotný stykač motor automaticky ochrání.',
+            text: 'V silovém obvodu vznikne zkrat nebo nebezpečné přetížení. Někdo tvrdí, že samotný stykač motor automaticky ochrání. Jak toto tvrzení správně posoudit?',
             correctOptionId: 'spina-nechrani',
             explanation:
               'Stykač není jistič. Samotná cívka ani hlavní kontakty automaticky nenahrazují ochranu. Ochrana proti zkratu a přetížení má vlastní určené prvky — nejde o návod k jejich výběru nebo zapojení.',
           },
           {
             id: 's4',
-            text: 'Cívka není buzená a kontakt se jeví jako rozepnutý. Někdo z toho usuzuje, že celé zařízení je bezpečně bez napětí.',
+            text: 'Cívka není buzená a kontakt se jeví jako rozepnutý. Někdo chce z tohoto stavu usoudit, že celé zařízení je bezpečně bez napětí. Co lze z tohoto pozorování skutečně potvrdit?',
             correctOptionId: 'nelze-potvrdit-beznapeti',
             explanation:
               'Vypnutá cívka není důkazem beznapěťovosti. Kontakt může být svařený a může existovat jiné napájení. Mechanická poloha stykače nenahrazuje bezpečné odpojení a ověřený stav.',

@@ -3911,6 +3911,7 @@ test('H8L: aktivita, quiz, SafetyNote a demo regrese', () => {
   assert.ok(lesson);
   const activity = getLessonActivity(lesson) as {
     type: string;
+    instruction?: string;
     scenarios: { id: string; correctOptionId: string; explanation: string; text: string }[];
     options: { id: string }[];
   };
@@ -3920,10 +3921,38 @@ test('H8L: aktivita, quiz, SafetyNote a demo regrese', () => {
     activity.scenarios.map((s) => s.correctOptionId),
     ['hlavni-no-sepne', 'pomocny-nc-rozepne', 'spina-nechrani', 'nelze-potvrdit-beznapeti'],
   );
-  assert.ok(/napětí.*proud.*magnetické pole.*kotv/i.test(activity.scenarios[0].explanation));
-  assert.ok(/klidu sepnutý|bez buzení/i.test(activity.scenarios[1].explanation));
-  assert.ok(/není jistič/i.test(activity.scenarios[2].explanation));
-  assert.ok(/svařený|beznapěťovosti/i.test(activity.scenarios[3].explanation));
+  assert.ok(
+    /závěrečnou otázku|přímo odpovídá na.*otázk/i.test(activity.instruction ?? ''),
+    'instrukce musí odkazovat na závěrečnou otázku situace',
+  );
+  assert.equal(
+    /co platí pro stykač a jeho obvody/i.test(activity.instruction ?? ''),
+    false,
+    'instrukce nesmí zůstat u obecného „co platí“',
+  );
+
+  const [s1, s2, s3, s4] = activity.scenarios;
+  assert.ok(/hlavním NO kontaktem|hlavní NO kontakt/i.test(s1.text));
+  assert.ok(/silovým obvodem|silový obvod/i.test(s1.text));
+  assert.ok(/Co se.*stane.*hlavním NO|Co se v tomto okamžiku stane s hlavním NO/i.test(s1.text));
+  assert.equal(s1.correctOptionId, 'hlavni-no-sepne');
+  assert.equal(/automaticky ochrání|beznapěťovost/i.test(s1.text), false);
+
+  assert.ok(/pomocn(ým|ý) NC kontaktem|pomocný NC kontakt/i.test(s2.text));
+  assert.ok(/Co se.*stane.*pomocným NC|Co se v tomto okamžiku stane s pomocným NC/i.test(s2.text));
+  assert.equal(s2.correctOptionId, 'pomocny-nc-rozepne');
+  assert.equal(/automaticky ochrání|beznapěťovost/i.test(s2.text), false);
+
+  assert.ok(/Jak toto tvrzení správně posoudit|posoudit.*tvrzení|automaticky ochrání/i.test(s3.text));
+  assert.equal(s3.correctOptionId, 'spina-nechrani');
+
+  assert.ok(/Co lze.*potvrdit|skutečně potvrdit|beznapěť|bez napětí/i.test(s4.text));
+  assert.equal(s4.correctOptionId, 'nelze-potvrdit-beznapeti');
+
+  assert.ok(/napětí.*proud.*magnetické pole.*kotv/i.test(s1.explanation));
+  assert.ok(/klidu sepnutý|bez buzení/i.test(s2.explanation));
+  assert.ok(/není jistič/i.test(s3.explanation));
+  assert.ok(/svařený|beznapěťovosti/i.test(s4.explanation));
 
   assert.equal(lesson.quiz[0].correctOptionId, 'b');
   assert.equal(lesson.quiz[1].correctOptionId, 'd');
