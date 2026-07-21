@@ -2741,12 +2741,13 @@ test('lekce Převod transformátoru je measurement-judgment bez dema', () => {
 
 test('pořadí Strojů po přidání převodu transformátoru', () => {
   const order = getMvpLessonsBySubject('stroje').map((l) => l.id);
-  assert.equal(order.length, 5);
+  assert.equal(order.length, 6);
   assert.deepEqual(order.slice(0, 2), [
     'co-je-transformator',
     'prevod-transformatoru',
   ]);
   assert.deepEqual(order.slice(2), [
+    'tocive-magneticke-pole',
     'asynchronni-motor',
     'stykac-a-rele',
     'pristroje-nn-vn-vvn',
@@ -2857,9 +2858,9 @@ test('aktivita a quiz převodu: tvrzení, fairness a bez proudu', () => {
   assert.equal(/I1\s*=|I2\s*=|P1\s*≈|účinnost\s*=/i.test(text), false);
 });
 
-test('starý progress Strojů bez subject badge: 4/5 a doporučí převod', () => {
+test('starý progress Strojů bez subject badge: 4/6 a doporučí převod', () => {
   const allLessons = getMvpLessonsBySubject('stroje');
-  assert.equal(allLessons.length, 5);
+  assert.equal(allLessons.length, 6);
   const lessonsState: ProgressState['lessons'] = {};
   const originalBadges = [
     'mistr-transformatoru',
@@ -2887,7 +2888,7 @@ test('starý progress Strojů bez subject badge: 4/5 a doporučí převod', () =
     allLessons.map((l) => l.id),
   );
   assert.equal(completed, 4);
-  assert.equal(total, 5);
+  assert.equal(total, 6);
   assert.equal(loaded.totalXp, 140);
   assert.equal(loaded.earnedBadges.includes('strojarsky-elev'), false);
   for (const badge of originalBadges) {
@@ -2899,16 +2900,16 @@ test('starý progress Strojů bez subject badge: 4/5 a doporučí převod', () =
 
   const done = completeLessonFully('prevod-transformatoru', 'pocitar-prevodu');
   assert.equal(done.lessonBadgeAwarded, true);
-  assert.deepEqual(done.subjectBadgeIdsAwarded, ['strojarsky-elev']);
+  assert.deepEqual(done.subjectBadgeIdsAwarded, []);
   assert.equal(done.state.totalXp, 140 + 35);
   const { completed: c2, total: t2 } = getSubjectProgress(
     done.state,
     allLessons.map((l) => l.id),
   );
   assert.equal(c2, 5);
-  assert.equal(t2, 5);
+  assert.equal(t2, 6);
   assert.equal(done.state.earnedBadges.filter((b) => b === 'pocitar-prevodu').length, 1);
-  assert.equal(done.state.earnedBadges.filter((b) => b === 'strojarsky-elev').length, 1);
+  assert.equal(done.state.earnedBadges.filter((b) => b === 'strojarsky-elev').length, 0);
 });
 
 test('uložený strojarsky-elev, retry a projektor u převodu', () => {
@@ -2935,7 +2936,7 @@ test('uložený strojarsky-elev, retry a projektor u převodu', () => {
     allLessons.map((l) => l.id),
   );
   assert.equal(completed, 4);
-  assert.equal(total, 5);
+  assert.equal(total, 6);
 
   const afterNew = completeLessonFully('prevod-transformatoru', 'pocitar-prevodu');
   assert.equal(afterNew.lessonBadgeAwarded, true);
@@ -3009,6 +3010,401 @@ test('uložený strojarsky-elev, retry a projektor u převodu', () => {
   const afterReset = loadProgress();
   assert.equal(afterReset.totalXp, 0);
   assert.equal(afterReset.earnedBadges.includes('pocitar-prevodu'), false);
+  assert.equal(Object.keys(afterReset.lessons).length, 0);
+});
+
+// --- MVP-12H8H: Točivé magnetické pole -------------------------------------
+
+const PRE_ROTATING_FIELD_STROJE_IDS = [
+  'co-je-transformator',
+  'prevod-transformatoru',
+  'asynchronni-motor',
+  'stykac-a-rele',
+  'pristroje-nn-vn-vvn',
+] as const;
+
+function collectRotatingFieldProductionText(
+  lesson: NonNullable<ReturnType<typeof getLessonById>>,
+) {
+  return [
+    lesson.explanation,
+    lesson.safetyNote,
+    lesson.typicalMistake,
+    lesson.memorySentence,
+    lesson.goal,
+    lesson.hook,
+    lesson.teacherTip,
+    ...lesson.quiz.flatMap((q) => [
+      q.text,
+      q.explanation,
+      ...q.options.map((o) => o.text),
+    ]),
+    ...((getLessonActivity(lesson) as { scenarios?: { text: string; explanation: string }[] })
+      ?.scenarios ?? []
+    ).flatMap((s) => [s.text, s.explanation]),
+  ].join('\n');
+}
+
+function collectRotatingFieldExplanatoryText(
+  lesson: NonNullable<ReturnType<typeof getLessonById>>,
+) {
+  const activity = getLessonActivity(lesson) as {
+    scenarios?: { explanation: string }[];
+    successMessage?: string;
+  } | undefined;
+  return [
+    lesson.explanation,
+    lesson.typicalMistake,
+    lesson.memorySentence,
+    lesson.goal,
+    lesson.hook,
+    ...lesson.quiz.map((q) => q.explanation),
+    ...(activity?.scenarios ?? []).map((s) => s.explanation),
+    activity?.successMessage ?? '',
+  ].join('\n');
+}
+
+test('téma Asynchronní stroje má 20 minut a dvě aktivní lekce', () => {
+  const topic = getTopicById('asynchronni-stroje');
+  assert.ok(topic);
+  assert.equal(topic.mvpAvailable, true);
+  assert.equal(topic.estimatedMinutes, 20);
+  assert.ok(/točivé|tocive/i.test(topic.description));
+  assert.ok(/rotor/i.test(topic.description));
+  assert.equal(/synchronní otáč|skluz|hvězda|trojúhelník|měnič/i.test(topic.description), false);
+
+  const topicLessons = getLessonsByTopic('asynchronni-stroje').filter((l) => l.mvpAvailable);
+  assert.equal(topicLessons.length, 2);
+  assert.equal(
+    topicLessons.reduce((sum, l) => sum + l.durationMinutes, 0),
+    19,
+  );
+  assert.deepEqual(
+    topicLessons.map((l) => l.id),
+    ['tocive-magneticke-pole', 'asynchronni-motor'],
+  );
+  assert.equal(topics.length, 28);
+  assert.equal(topics.filter((t) => t.mvpAvailable).length, 22);
+});
+
+test('lekce Jak vzniká točivé magnetické pole je scenario-choice bez dema', () => {
+  const lesson = getLessonById('tocive-magneticke-pole');
+  assert.ok(lesson);
+  assert.equal(lesson.title, 'Jak vzniká točivé magnetické pole');
+  assert.equal(lesson.subjectId, 'stroje');
+  assert.equal(lesson.year, 2);
+  assert.equal(lesson.topicId, 'asynchronni-stroje');
+  assert.equal(lesson.durationMinutes, 10);
+  assert.equal(lesson.interactiveDemo, undefined);
+  assert.equal(lesson.quiz.length, 3);
+  assert.equal(lesson.badgeId, 'pruvodce-tocivym-polem');
+  assert.ok(getBadgeById('pruvodce-tocivym-polem'));
+  assert.equal(lesson.activityXp, 20);
+  assert.equal(lesson.quizXp, 15);
+  const activity = getLessonActivity(lesson);
+  assert.ok(activity);
+  assert.equal(activity.type, 'scenario-choice');
+  assert.equal(activity.scenarios.length, 4);
+  assert.equal(
+    getMvpLessonsBySubject('stroje').filter((l) => l.id === 'tocive-magneticke-pole').length,
+    1,
+  );
+  assertQuizOptionLengthFairness('tocive-magneticke-pole');
+});
+
+test('pořadí Strojů po přidání točivého magnetického pole', () => {
+  const order = getMvpLessonsBySubject('stroje').map((l) => l.id);
+  assert.equal(order.length, 6);
+  assert.deepEqual(order.slice(1, 4), [
+    'prevod-transformatoru',
+    'tocive-magneticke-pole',
+    'asynchronni-motor',
+  ]);
+  assert.deepEqual(order, [
+    'co-je-transformator',
+    'prevod-transformatoru',
+    'tocive-magneticke-pole',
+    'asynchronni-motor',
+    'stykac-a-rele',
+    'pristroje-nn-vn-vvn',
+  ]);
+
+  const motor = getLessonById('asynchronni-motor');
+  assert.ok(motor);
+  assert.equal(motor.interactiveDemo?.type, 'induction-motor');
+  assert.equal(motor.durationMinutes, 9);
+  assert.match(motor.explanation, /točivé magnetické pole/);
+
+  const prevod = getLessonById('prevod-transformatoru');
+  assert.ok(prevod);
+  assert.ok(/proud, výkon a ztráty budeme řešit později/i.test(prevod.explanation));
+  assert.equal(/v další lekci/i.test(prevod.explanation), false);
+});
+
+test('výklad točivého pole zachovává odborné kotvy', () => {
+  const lesson = getLessonById('tocive-magneticke-pole');
+  assert.ok(lesson);
+  const text = collectRotatingFieldProductionText(lesson);
+  const explain = collectRotatingFieldExplanatoryText(lesson);
+
+  assert.ok(/pulzuj|proměnn/i.test(explain), 'jedna cívka pulzuje/proměnné');
+  assert.ok(/prostorov|rozlož|rozmíst/i.test(explain), 'prostorové rozložení');
+  assert.ok(/stejnou frekvenc/i.test(explain), 'stejná frekvence');
+  assert.ok(/časově posunut|fázového posunu|posunuté/i.test(explain), 'časový posun');
+  assert.ok(/120°|třetinu periody|třetina periody/i.test(explain), '120° / třetina');
+  assert.ok(/skládají|společné pole/i.test(explain), 'skládání polí');
+  assert.ok(/otáčí|točivé/i.test(explain), 'výsledné pole se otáčí');
+  assert.ok(/neotáčejí|mechanicky neotáč|stojí/i.test(explain), 'stator neotáčí');
+  assert.ok(
+    /prostorové rozložení samo nestačí|bez časového posunu/i.test(text),
+    'prostor bez času nestačí',
+  );
+  assert.ok(
+    /prostorové rozložení.*časov|časový posun.*prostor/i.test(explain),
+    'obě podmínky',
+  );
+  assert.equal(
+    /rotor.*(vytváří|je zdrojem).*točivé|točivé pole vytváří jako první rotor/i.test(
+      lesson.explanation,
+    ),
+    false,
+    'rotor není prvotní zdroj točivého pole ve výkladu',
+  );
+  assert.equal(/proud přeskakuje/i.test(lesson.explanation), false);
+  assert.ok(/neřešíme podrobně.*rotor|rotor na točivé/i.test(explain), 'most k rotoru');
+
+  assert.ok(/nepřipojuje motor k síti|nepřipojuje motor/i.test(text), 'bez sítě');
+  assert.ok(/neotevírá svorkovnici|svorkovnici/i.test(text), 'bez svorkovnice');
+  assert.ok(/nepřepojuje vinutí|přepoj/i.test(text), 'bez přepojování');
+  assert.ok(/pořadí fází/i.test(text), 'bez změny pořadí fází');
+  assert.ok(/Živé části se neměří|živ/i.test(text), 'bez živého měření');
+  assert.ok(/Hřídele, ventilátoru|hřídele|ventilátoru/i.test(text), 'bez rotujících částí');
+  assert.ok(/neočekávaně rozběhnout/i.test(text), 'neočekávaný rozběh');
+  assert.ok(/zahřívat/i.test(text), 'zahřívání');
+  assert.ok(/simulace|zabezpečeného modelu/i.test(text), 'simulace/model');
+  assert.ok(
+    /ovládací obvod nemusí znamenat beznapěťový silový/i.test(text),
+    'ovládací ≠ silový beznapěťový',
+  );
+});
+
+test('hranice třífázového minima u točivého pole', () => {
+  const lesson = getLessonById('tocive-magneticke-pole');
+  assert.ok(lesson);
+  const text = collectRotatingFieldProductionText(lesson);
+  assert.ok(/minimum potřebné|plná třífázová soustava přijde později/i.test(text));
+
+  const threePhase = getTopicById('trojfazovy-proud');
+  assert.ok(threePhase);
+  assert.equal(threePhase.mvpAvailable, false);
+
+  assert.equal(/sdružen/i.test(text), false);
+  assert.equal(/fázov(é|ého) napětí/i.test(text), false);
+  assert.equal(/třífázov(ý|ého) výkon|výkon třífáz/i.test(text), false);
+  assert.equal(/synchronní otáč|ns\s*=/i.test(text), false);
+  assert.equal(/skluz\s*=|výpočet.*skluz/i.test(text), false);
+  assert.equal(/hvězda|trojúhelník/i.test(text), false);
+  assert.equal(/záměnou fází|změň.*pořadí fází|obrať směr/i.test(text), false);
+});
+
+test('aktivita a quiz točivého pole: scénáře, fairness a bez síťového návodu', () => {
+  const lesson = getLessonById('tocive-magneticke-pole');
+  assert.ok(lesson);
+  const activity = getLessonActivity(lesson) as {
+    type: string;
+    scenarios: { id: string; correctOptionId: string; explanation: string }[];
+  };
+  assert.equal(activity.type, 'scenario-choice');
+  assert.equal(activity.scenarios.length, 4);
+  assert.deepEqual(
+    activity.scenarios.map((s) => s.correctOptionId),
+    ['toci', 'pulzuje', 'pulzuje', 'nevznika'],
+  );
+  assert.ok(/prostorov|časov|sklád/i.test(activity.scenarios[0].explanation));
+  assert.ok(/pulzuj|proměnn/i.test(activity.scenarios[1].explanation));
+  assert.ok(/nestačí|časov/i.test(activity.scenarios[2].explanation));
+  assert.ok(/bez proudu|nevzniká/i.test(activity.scenarios[3].explanation));
+
+  assert.equal(lesson.quiz.length, 3);
+  assert.equal(lesson.quiz[0].correctOptionId, 'b');
+  assert.ok(/prostor|časově posunut/i.test(
+    lesson.quiz[0].options.find((o) => o.id === 'b')!.text,
+  ));
+  assert.equal(lesson.quiz[1].correctOptionId, 'b');
+  assert.ok(/pulzuj|proměnn/i.test(
+    lesson.quiz[1].options.find((o) => o.id === 'b')!.text,
+  ));
+  assert.equal(lesson.quiz[2].correctOptionId, 'c');
+  assert.ok(/magnetické pole|stojí/i.test(
+    lesson.quiz[2].options.find((o) => o.id === 'c')!.text,
+  ));
+
+  for (const q of lesson.quiz) {
+    assert.equal(
+      q.options.filter((o) => o.id === q.correctOptionId).length,
+      1,
+    );
+  }
+  assertQuizOptionLengthFairness('tocive-magneticke-pole');
+
+  const text = collectRotatingFieldProductionText(lesson);
+  assert.equal(/připoj.*zásuvk|změň sled fází na motoru/i.test(text), false);
+});
+
+test('starý progress Strojů bez subject badge: 5/6 a doporučí točivé pole', () => {
+  const allLessons = getMvpLessonsBySubject('stroje');
+  assert.equal(allLessons.length, 6);
+  const lessonsState: ProgressState['lessons'] = {};
+  const originalBadges = [
+    'mistr-transformatoru',
+    'pocitar-prevodu',
+    'motorovy-elev',
+    'vladce-kontaktu',
+    'bezpecny-u-vn',
+  ];
+  for (const id of PRE_ROTATING_FIELD_STROJE_IDS) {
+    lessonsState[id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  saveProgress({
+    totalXp: 175,
+    earnedBadges: [...originalBadges],
+    lessons: lessonsState,
+    calmMode: false,
+  });
+  const loaded = loadProgress();
+  const { completed, total } = getSubjectProgress(
+    loaded,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 5);
+  assert.equal(total, 6);
+  assert.equal(loaded.totalXp, 175);
+  assert.equal(loaded.earnedBadges.includes('strojarsky-elev'), false);
+  assert.equal(isLessonComplete(loaded, 'asynchronni-motor'), true);
+  for (const badge of originalBadges) {
+    assert.equal(loaded.earnedBadges.includes(badge), true);
+  }
+  const next = allLessons.find((l) => !isLessonComplete(loaded, l.id));
+  assert.ok(next);
+  assert.equal(next.id, 'tocive-magneticke-pole');
+
+  const done = completeLessonFully('tocive-magneticke-pole', 'pruvodce-tocivym-polem');
+  assert.equal(done.lessonBadgeAwarded, true);
+  assert.deepEqual(done.subjectBadgeIdsAwarded, ['strojarsky-elev']);
+  assert.equal(done.state.totalXp, 175 + 35);
+  const { completed: c2, total: t2 } = getSubjectProgress(
+    done.state,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(c2, 6);
+  assert.equal(t2, 6);
+  assert.equal(done.state.earnedBadges.filter((b) => b === 'pruvodce-tocivym-polem').length, 1);
+  assert.equal(done.state.earnedBadges.filter((b) => b === 'strojarsky-elev').length, 1);
+});
+
+test('uložený strojarsky-elev, retry a projektor u točivého pole', () => {
+  const allLessons = getMvpLessonsBySubject('stroje');
+  const lessonsState: ProgressState['lessons'] = {};
+  for (const id of PRE_ROTATING_FIELD_STROJE_IDS) {
+    lessonsState[id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  saveProgress({
+    totalXp: 175,
+    earnedBadges: ['strojarsky-elev', 'mistr-transformatoru'],
+    lessons: lessonsState,
+    calmMode: false,
+  });
+  const loaded = loadProgress();
+  assert.equal(loaded.earnedBadges.includes('strojarsky-elev'), true);
+  const { completed, total } = getSubjectProgress(
+    loaded,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 5);
+  assert.equal(total, 6);
+
+  const afterNew = completeLessonFully('tocive-magneticke-pole', 'pruvodce-tocivym-polem');
+  assert.equal(afterNew.lessonBadgeAwarded, true);
+  assert.deepEqual(afterNew.subjectBadgeIdsAwarded, []);
+  assert.equal(
+    afterNew.state.earnedBadges.filter((b) => b === 'strojarsky-elev').length,
+    1,
+  );
+  assert.equal(
+    afterNew.state.earnedBadges.filter((b) => b === 'pruvodce-tocivym-polem').length,
+    1,
+  );
+
+  const retry = applyQuizCompletion(loadProgress(), {
+    lessonId: 'tocive-magneticke-pole',
+    xp: 15,
+    badgeId: 'pruvodce-tocivym-polem',
+    correct: 2,
+    total: 3,
+    projectorMode: false,
+  });
+  assert.equal(retry.xpAwarded, 0);
+  assert.equal(retry.lessonBadgeAwarded, false);
+  assert.deepEqual(retry.subjectBadgeIdsAwarded, []);
+  assert.deepEqual(retry.state.lessons['tocive-magneticke-pole']?.bestQuizScore, {
+    correct: 3,
+    total: 3,
+  });
+  assert.equal(
+    retry.state.earnedBadges.filter((b) => b === 'pruvodce-tocivym-polem').length,
+    1,
+  );
+
+  saveProgress({
+    totalXp: 0,
+    earnedBadges: [],
+    lessons: {},
+    calmMode: false,
+  });
+  const projector = applyQuizCompletion(loadProgress(), {
+    lessonId: 'tocive-magneticke-pole',
+    xp: 15,
+    badgeId: 'pruvodce-tocivym-polem',
+    correct: 3,
+    total: 3,
+    projectorMode: true,
+  });
+  assert.equal(projector.xpAwarded, 0);
+  assert.equal(projector.lessonBadgeAwarded, false);
+  assert.deepEqual(projector.subjectBadgeIdsAwarded, []);
+  assert.equal(projector.state.totalXp, 0);
+  assert.equal(projector.state.earnedBadges.includes('pruvodce-tocivym-polem'), false);
+  assert.equal(isLessonComplete(projector.state, 'tocive-magneticke-pole'), false);
+  assert.equal(Object.keys(projector.state.lessons).length, 0);
+
+  saveProgress({
+    totalXp: 35,
+    earnedBadges: ['pruvodce-tocivym-polem', 'strojarsky-elev'],
+    lessons: {
+      'tocive-magneticke-pole': {
+        activityCompleted: true,
+        quizCompleted: true,
+        completedAt: '2026-01-01T00:00:00.000Z',
+        bestQuizScore: { correct: 3, total: 3 },
+      },
+    },
+    calmMode: false,
+  });
+  const cleared = resetProgress(loadProgress());
+  saveProgress(cleared);
+  const afterReset = loadProgress();
+  assert.equal(afterReset.totalXp, 0);
+  assert.equal(afterReset.earnedBadges.includes('pruvodce-tocivym-polem'), false);
   assert.equal(Object.keys(afterReset.lessons).length, 0);
 });
 

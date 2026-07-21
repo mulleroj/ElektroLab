@@ -163,9 +163,10 @@ export const topics: Topic[] = [
     id: 'asynchronni-stroje',
     subjectId: 'stroje',
     title: 'Asynchronní stroje',
-    description: 'Točivé magnetické pole a rotor, který se za ním opožďuje.',
+    description:
+      'Jak stator vytváří točivé magnetické pole a jak na něj reaguje rotor asynchronního motoru.',
     year: 2,
-    estimatedMinutes: 10,
+    estimatedMinutes: 20,
     mvpAvailable: true,
   },
   {

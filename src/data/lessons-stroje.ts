@@ -136,7 +136,7 @@ export const strojeLessons: MicroLesson[] = [
       '**Výpočet sekundárního napětí:** Ze stejného vztahu dostaneme praktický tvar U2 = U1 × N2 / N1. Do vzorce dosadíme známé hodnoty a spočítáme U2.\n\n' +
       '**Nejdřív odhad, potom výpočet:** Před počítáním porovnej N2 a N1. Když je N2 menší než N1, očekávej U2 menší než U1. Když je N2 větší než N1, očekávej U2 větší než U1. Když je N2 rovno N1, očekávej přibližně U2 rovno U1. Po výpočtu porovnej výsledek s tímto odhadem.\n\n' +
       '**Zvyšovací, snižovací a 1 : 1:** Příklad snižovacího převodu: U1 = 24 V, N1 = 120 závitů, N2 = 60 závitů. N2 je polovina N1, takže očekáváme přibližně poloviční U2. Výpočet: U2 = 24 × 60 / 120 = 12 V. Dvanáct voltů je méně než 24 V, výsledek odpovídá snižovacímu transformátoru. Příklad zvyšovacího převodu: U1 = 12 V, N1 = 100 závitů, N2 = 200 závitů. N2 je dvojnásobné proti N1, takže U2 je v idealizovaném modelu přibližně dvojnásobné: U2 = 12 × 200 / 100 = 24 V.\n\n' +
-      '**Hranice jednoduchého modelu:** Idealizovaný vztah popisuje jen poměr závitů a napětí. Transformátor energii nevyrábí; proud, výkon a ztráty budeme řešit v další lekci. Převod určuje poměr závitů, ne samotná velikost zařízení.',
+      '**Hranice jednoduchého modelu:** Idealizovaný vztah popisuje jen poměr závitů a napětí. Transformátor energii nevyrábí; proud, výkon a ztráty budeme řešit později. Převod určuje poměr závitů, ne samotná velikost zařízení.',
     safetyNote:
       'Výpočty probíhají pouze z připravených údajů nebo simulace. Žák nepřipojuje transformátor k zásuvce, neměří primární ani sekundární stranu síťového transformátoru a neotevírá nabíječku, zdroj ani transformátor. Odkryté svorky se nepoužívají. Žádné pokusy s 230 V a žádné přepojování vinutí. Sekundární strana není automaticky bezpečná. Nižší napětí neznamená nulové riziko. Transformátor bez připojené zátěže může mít na sekundáru napětí. Nelze předpokládat, že každý transformátor galvanicky odděluje. Místní školní pravidla a pokyn učitele mají přednost.',
     memorySentence:
@@ -249,6 +249,161 @@ export const strojeLessons: MicroLesson[] = [
     activityXp: 20,
     quizXp: 15,
     badgeId: 'pocitar-prevodu',
+    mvpAvailable: true,
+  },
+  {
+    id: 'tocive-magneticke-pole',
+    subjectId: 'stroje',
+    topicId: 'asynchronni-stroje',
+    title: 'Jak vzniká točivé magnetické pole',
+    year: 2,
+    durationMinutes: 10,
+    difficulty: 'základní',
+    goal:
+      'Žák kvalitativně pochopí, že prostorově rozložená statorová vinutí a časově posunuté třífázové proudy vytvoří výsledné magnetické pole, které se otáčí — aniž by se stator mechanicky točil.',
+    hook:
+      'Stator motoru se nehýbe. Přesto uvnitř vzniká magnetické pole, které se otáčí. Jak se může něco otáčet, když se žádná cívka mechanicky neotáčí?',
+    explanation:
+      '**Jedna cívka a střídavý proud:** Ze Základů víš, že změna směru proudu mění orientaci magnetického pole cívky. Jedna samostatná cívka napájená střídavým proudem vytváří magnetické pole, které se mění a v základním modelu především pulzuje. Samotná jedna cívka nevytváří plnohodnotné rovnoměrné točivé magnetické pole třífázového motoru.\n\n' +
+      '**Více vinutí kolem statoru:** Stator obsahuje několik vinutí rozložených v prostoru kolem jeho obvodu. V základním třífázovém modelu používáme tři vinutí rozmístěná kolem statoru. Vinutí zůstávají na místě — neotáčejí se jako mechanické součásti.\n\n' +
+      '**Proudy nejsou ve stejném okamžiku stejné:** Třífázové proudy mají stejnou frekvenci, ale jsou vzájemně časově posunuté. Kvalitativně je posun o třetinu periody neboli 120°. Nemusíš fázový posun počítat. Jde jen o minimum potřebné k pochopení motoru — plná třífázová soustava přijde později.\n\n' +
+      '**Magnetická pole se skládají:** Protože proudy nejsou nejsilnější ve stejném okamžiku, ani magnetický účinek jednotlivých vinutí není nejsilnější najednou. Jejich magnetická pole se v prostoru skládají. Průběhy se mění plynule — nejde o to, že by se fáze jen postupně zapínaly a vypínaly.\n\n' +
+      '**Výsledné pole se posouvá kolem statoru:** Výsledný směr nejsilnějšího magnetického působení se postupně posouvá kolem statoru. Na časových snímcích vidíš, kam „ukazuje“ společné pole — a další snímek ho ukáže o kousek dál.\n\n' +
+      '**Stator stojí, pole se otáčí:** Když jsou cívky rozloženy kolem statoru a jejich proudy jsou časově posunuté, jejich společné pole se může otáčet. Statorová vinutí ani železné části statoru se kvůli tomu mechanicky neotáčejí. Otáčí se výsledný směr magnetického pole.\n\n' +
+      '**Most k rotoru:** Zatím neřešíme podrobně, co dělá rotor. Následující lekce vysvětlí, jak rotor na točivé magnetické pole reaguje a proč se za ním opožďuje.',
+    safetyNote:
+      'Výuka probíhá pouze pomocí schémat, simulace, připravených dat nebo učitelem zabezpečeného modelu. Žák nepřipojuje motor k síti, neotevírá svorkovnici ani motor, nepřepojuje vinutí a nemění pořadí fází na skutečném zařízení. Živé části se neměří. Nezajištěný motor se nespouští. Hřídele, ventilátoru ani spojky se nedotýkej. Motor se může neočekávaně rozběhnout a jeho povrch se může zahřívat. Odpojený ovládací obvod nemusí znamenat beznapěťový silový obvod. Místní školní pravidla a pokyn učitele mají přednost.',
+    memorySentence:
+      'Prostorově rozložená statorová vinutí a časově posunuté třífázové proudy vytvářejí výsledné magnetické pole, které se otáčí.',
+    typicalMistake:
+      'Žáci si myslí, že statorové cívky se mechanicky otáčejí, že jedna střídavá cívka vytváří stejné točivé pole jako třífázový stator, nebo že fáze se jen postupně zapínají a vypínají. Časté je i tvrzení, že všechny tři proudy mají stále stejnou okamžitou hodnotu, že točivé pole vytváří jako první rotor, že proud přeskakuje ze statoru do rotoru, nebo že je nutné počítat fázory. Správně: stator stojí, otáčí se výsledný směr magnetického pole, proudové průběhy se mění plynule a nutné je prostorové rozložení i časový posun.',
+    teacherTip:
+      'Použij tři barevné šipky nebo kartičky A, B, C rozmístěné kolem kruhu a několik časových snímků společného pole. Nejdřív ukaž jednu cívku a pulzující pole, pak přidej prostorové rozmístění tří vinutí a nakonec časový posun proudů. Nech žáky ukázat, kam se výsledná šipka pole posune. InductionMotorDemo použij až jako kvalitativní návaznost v následující lekci — neměň demo komponentu ani ji nepřidávej do této lekce. Výslovně řekni, že jde o model, ne o praktické zapojování motoru. Zakázáno je žákovské přepojování motoru, živé měření, práce s odkrytými svorkami a manipulace s rotujícími částmi.',
+    activity: {
+      scenarioChoice: {
+        type: 'scenario-choice',
+        instruction:
+          'U každé situace rozhodni, co se stane s elektromagnetickým polem. Všechny čtyři musí být správně.',
+        options: [
+          { id: 'toci', label: 'Výsledné pole se otáčí' },
+          { id: 'pulzuje', label: 'Pole pouze pulzuje na pevném místě' },
+          { id: 'nevznika', label: 'Elektromagnetické pole nevzniká' },
+          { id: 'nelze', label: 'Z uvedených údajů to nelze rozhodnout' },
+        ],
+        successMessage:
+          'Výborně! Víš, kdy vzniká točivé pole — a kdy stačí jen pulzující pole jedné cívky nebo žádné pole bez proudu.',
+        scenarios: [
+          {
+            id: 's1',
+            text: 'Tři statorová vinutí jsou rozmístěna kolem statoru a protékají jimi třífázové proudy vzájemně časově posunuté.',
+            correctOptionId: 'toci',
+            explanation:
+              'Prostorové rozložení vinutí a časový posun proudů způsobí, že se magnetická pole skládají a výsledné pole se otáčí.',
+          },
+          {
+            id: 's2',
+            text: 'Jedna cívka je napájena běžným střídavým proudem a další vinutí nejsou použita.',
+            correctOptionId: 'pulzuje',
+            explanation:
+              'Jedna AC cívka vytváří proměnné, především pulzující pole. Orientace a velikost se mohou měnit, ale nevzniká plnohodnotné výsledné točivé pole třífázového statoru.',
+          },
+          {
+            id: 's3',
+            text: 'Tři vinutí jsou rozmístěna kolem statoru, ale jejich proudy mají stejný časový průběh bez vzájemného fázového posunu.',
+            correctOptionId: 'pulzuje',
+            explanation:
+              'Prostorové rozložení samo nestačí. Bez časového posunu proudů nevzniká v tomto modelu výsledné točivé pole — pole spíš společně pulzuje.',
+          },
+          {
+            id: 's4',
+            text: 'Statorovými vinutími neteče proud.',
+            correctOptionId: 'nevznika',
+            explanation:
+              'Bez proudu nevzniká vlastní elektromagnetické pole statorových vinutí. Permanentní nebo zbytkový magnetismus v tomto základním modelu neřešíme.',
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        id: 'q1',
+        text: 'Kdy vzniká v základním modelu výsledné točivé magnetické pole statoru?',
+        options: [
+          {
+            id: 'a',
+            text: 'Když se statorové cívky mechanicky otáčejí kolem celého hřídele.',
+          },
+          {
+            id: 'b',
+            text: 'Když jsou vinutí v prostoru a proudy navzájem časově posunuté.',
+          },
+          {
+            id: 'c',
+            text: 'Když jednou cívkou teče střídavý proud bez dalších vinutí.',
+          },
+          {
+            id: 'd',
+            text: 'Když rotor nejdřív vytvoří pole a stator ho jen kopíruje.',
+          },
+        ],
+        correctOptionId: 'b',
+        explanation:
+          'Potřebuješ současně prostorové rozložení vinutí i časový posun proudů. Samotná jedna cívka ani otáčení cívek to nenahradí.',
+      },
+      {
+        id: 'q2',
+        text: 'Co vytvoří jedna samostatná cívka napájená střídavým proudem?',
+        options: [
+          {
+            id: 'a',
+            text: 'Plnohodnotné výsledné točivé pole třífázového statoru.',
+          },
+          {
+            id: 'b',
+            text: 'Proměnné nebo pulzující magnetické pole na pevném místě.',
+          },
+          {
+            id: 'c',
+            text: 'Žádné elektromagnetické pole, protože cívka stojí.',
+          },
+          {
+            id: 'd',
+            text: 'Magnetické pole, které mechanicky roztáčí samotnou cívku.',
+          },
+        ],
+        correctOptionId: 'b',
+        explanation:
+          'Jedna AC cívka vytváří proměnné nebo pulzující pole. Nejde o plnohodnotné výsledné točivé pole třífázového statoru.',
+      },
+      {
+        id: 'q3',
+        text: 'Co se v tomto modelu skutečně otáčí?',
+        options: [
+          {
+            id: 'a',
+            text: 'Statorová vinutí se mechanicky točí kolem rotoru.',
+          },
+          {
+            id: 'b',
+            text: 'Proud přeskakuje mezi cívkami a tím se cívky otáčejí.',
+          },
+          {
+            id: 'c',
+            text: 'Výsledné magnetické pole; statorová vinutí přitom stojí.',
+          },
+          {
+            id: 'd',
+            text: 'Nejdřív se otáčí rotor a teprve potom vzniká magnetické pole statoru.',
+          },
+        ],
+        correctOptionId: 'c',
+        explanation:
+          'Statorová vinutí zůstávají na místě. Otáčí se výsledný směr magnetického pole, které vinutí společně vytvářejí.',
+      },
+    ],
+    activityXp: 20,
+    quizXp: 15,
+    badgeId: 'pruvodce-tocivym-polem',
     mvpAvailable: true,
   },
   {

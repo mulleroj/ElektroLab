@@ -215,6 +215,13 @@ export const badges: Badge[] = [
     icon: '🔢',
   },
   {
+    id: 'pruvodce-tocivym-polem',
+    title: 'Průvodce točivým polem',
+    description:
+      'Víš, jak prostorově rozložená statorová vinutí a časově posunuté třífázové proudy vytvoří točivé magnetické pole.',
+    icon: '🔁',
+  },
+  {
     id: 'motorovy-elev',
     title: 'Motorový elév',
     description: 'Chápeš točivé pole a proč se rotor za polem opožďuje.',
