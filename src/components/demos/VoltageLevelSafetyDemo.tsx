@@ -13,7 +13,7 @@ const LEVELS: {
   {
     id: 'nn',
     label: 'Nízké napětí (NN)',
-    examples: 'domovní rozvody, zásuvky 230 V, běžné spotřebiče, školní dílna',
+    examples: 'domovní rozvody, zásuvky a běžné spotřebiče, školní dílna',
     risk: 'I NN může vážně zranit nebo zabít — „nízké“ neznamená bezpečné.',
     behavior:
       'Pracuje se jen ve škole pod dohledem učitele a podle bezpečnostních pravidel. Do rozvaděčů a zařízení se nezasahuje.',
@@ -21,7 +21,7 @@ const LEVELS: {
   {
     id: 'vn',
     label: 'Vysoké napětí (VN)',
-    examples: 'trafostanice, venkovní vedení, průmyslové rozvodny',
+    examples: 'trafostanice, venkovní vedení, distribuční a průmyslové rozvodny',
     risk: 'Životu nebezpečné — přeskok (oblouk) může nastat i BEZ dotyku, na vzdálenost.',
     behavior:
       'Držet bezpečný odstup, nikdy nepřelézat ploty ani nevstupovat do označených prostor. Smí tam jen odborník s oprávněním.',
@@ -29,7 +29,7 @@ const LEVELS: {
   {
     id: 'vvn',
     label: 'Velmi vysoké napětí (VVN)',
-    examples: 'dálková přenosová vedení, velké rozvodny (110 kV a víc)',
+    examples: 'dálková přenosová vedení a velké přenosové rozvodny',
     risk: 'Extrémní riziko — nebezpečná je už samotná blízkost vodičů.',
     behavior:
       'Velký odstup vždy a všude. Nikdy nelézt na stožáry, nepouštět draky ani nelétat s dronem u vedení.',

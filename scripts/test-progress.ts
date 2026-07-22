@@ -4096,6 +4096,7 @@ const PRE_H8N_STROJE_IDS = [
 ] as const;
 
 const H8N_BASE = '655a3dd042d19214ee1a4f7f7d3c3689edf12972';
+const H8O_BASE = '33fc09979392b3a4eeaec01af25bd44917c1210f';
 
 function extractStrojeLessonSource(src: string, id: string): string {
   const start = src.indexOf(`    id: '${id}',`);
@@ -4193,9 +4194,12 @@ test('H8N: návaznost H8L a zachování NN/VN/VVN', () => {
   assert.ok(/napěťov/i.test(explain));
   assert.ok(/funkci|funkce/i.test(explain));
   assert.ok(/nejsou totéž|není totéž/i.test(explain));
-  assert.ok(/odstup|VN\/VVN/i.test(levels.explanation + levels.memorySentence + levels.goal));
+  assert.ok(/odstup|napěťov/i.test(levels.explanation + levels.memorySentence + levels.goal));
 
   const baseSrc = execFileSync('git', ['show', `${H8N_BASE}:src/data/lessons-stroje.ts`], {
+    encoding: 'utf8',
+  }).replace(/\r\n/g, '\n');
+  const postH8nSrc = execFileSync('git', ['show', `${H8O_BASE}:src/data/lessons-stroje.ts`], {
     encoding: 'utf8',
   }).replace(/\r\n/g, '\n');
   const headPath = path.join(
@@ -4205,16 +4209,10 @@ test('H8N: návaznost H8L a zachování NN/VN/VVN', () => {
   const current = fs.readFileSync(headPath, 'utf8').replace(/\r\n/g, '\n');
   assert.equal(extractStrojeLessonSource(current, 'stykac-a-rele'), extractStrojeLessonSource(baseSrc, 'stykac-a-rele'));
   assert.equal(
-    extractStrojeLessonSource(current, 'pristroje-nn-vn-vvn'),
-    extractStrojeLessonSource(baseSrc, 'pristroje-nn-vn-vvn'),
+    extractStrojeLessonSource(current, 'co-delaji-elektricke-pristroje'),
+    extractStrojeLessonSource(postH8nSrc, 'co-delaji-elektricke-pristroje'),
   );
-
-  const demoPath = path.join(
-    path.dirname(fileURLToPath(import.meta.url)),
-    '../src/components/demos/VoltageLevelSafetyDemo.tsx',
-  );
-  const hash = execFileSync('git', ['hash-object', demoPath], { encoding: 'utf8' }).trim();
-  assert.equal(hash, '9734b12be3502c86ebc3d316cafc9d3d330c6d23');
+  // H8O mění pristroje-nn-vn-vvn a texty dema; H8N zůstává beze změny.
 });
 
 test('H8N: napěťová hladina versus funkce', () => {
@@ -4443,6 +4441,351 @@ test('H8N: starý progress, subject badge a projektor', () => {
   assert.equal(afterReset.earnedBadges.includes('znalec-funkci-pristroju'), false);
   assert.equal(afterReset.earnedBadges.includes('strojarsky-elev'), false);
   assert.equal(Object.keys(afterReset.lessons).length, 0);
+});
+
+// --- MVP-12H8O: Bezpečný přehled NN, VN a VVN --------------------------------
+
+function collectVoltageLevelExplanatoryText(
+  lesson: NonNullable<ReturnType<typeof getLessonById>>,
+) {
+  return [
+    lesson.explanation,
+    lesson.typicalMistake,
+    lesson.memorySentence,
+    lesson.goal,
+    lesson.hook,
+    lesson.safetyNote,
+    lesson.teacherTip,
+    ...lesson.quiz.map((q) => q.explanation),
+  ].join('\n');
+}
+
+function collectVoltageLevelProductionText(
+  lesson: NonNullable<ReturnType<typeof getLessonById>>,
+) {
+  return [
+    lesson.explanation,
+    lesson.safetyNote,
+    lesson.typicalMistake,
+    lesson.memorySentence,
+    lesson.goal,
+    lesson.hook,
+    lesson.teacherTip,
+    ...lesson.quiz.flatMap((q) => [
+      q.text,
+      q.explanation,
+      ...q.options.map((o) => o.text),
+    ]),
+    ...((getLessonActivity(lesson) as { scenarios?: { text: string; explanation: string }[] })
+      ?.scenarios ?? []
+    ).flatMap((s) => [s.text, s.explanation]),
+  ].join('\n');
+}
+
+function readVoltageLevelDemoSource(): string {
+  const demoPath = path.join(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '../src/components/demos/VoltageLevelSafetyDemo.tsx',
+  );
+  return fs.readFileSync(demoPath, 'utf8').replace(/\r\n/g, '\n');
+}
+
+function extractDemoLevelsArray(src: string): string {
+  const start = src.indexOf('const LEVELS:');
+  assert.ok(start >= 0, 'LEVELS missing');
+  const end = src.indexOf('interface VoltageLevelSafetyDemoProps', start);
+  assert.ok(end > start, 'LEVELS end missing');
+  return src.slice(start, end);
+}
+
+function extractDemoComponentBody(src: string): string {
+  const start = src.indexOf('export function VoltageLevelSafetyDemoView');
+  assert.ok(start >= 0, 'demo component missing');
+  return src.slice(start);
+}
+
+test('H8O: kontrakt lekce pristroje-nn-vn-vvn', () => {
+  const lesson = getLessonById('pristroje-nn-vn-vvn');
+  assert.ok(lesson);
+  assert.equal(lesson.id, 'pristroje-nn-vn-vvn');
+  assert.equal(lesson.title, 'NN, VN a VVN — bezpečný odstup');
+  assert.equal(lesson.subjectId, 'stroje');
+  assert.equal(lesson.year, 2);
+  assert.equal(lesson.topicId, 'pristroje-vn-vvn');
+  assert.equal(lesson.durationMinutes, 10);
+  assert.equal(lesson.interactiveDemo?.type, 'voltage-level-safety');
+  assert.equal(lesson.badgeId, 'bezpecny-u-vn');
+  assert.ok(getBadgeById('bezpecny-u-vn'));
+  assert.equal(lesson.activityXp, 25);
+  assert.equal(lesson.quizXp, 15);
+  assert.equal(lesson.quiz.length, 3);
+  const activity = getLessonActivity(lesson);
+  assert.ok(activity);
+  assert.equal(activity.type, 'scenario-choice');
+  assert.equal(activity.scenarios.length, 6);
+  assert.equal(getMvpLessonsBySubject('stroje').length, 7);
+  assert.equal(lessons.length, 42);
+  assert.equal(badges.length, 49);
+  const order = getMvpLessonsBySubject('stroje').map((l) => l.id);
+  assert.equal(order.at(-1), 'pristroje-nn-vn-vvn');
+  const topic = getTopicById('pristroje-vn-vvn');
+  assert.ok(topic);
+  assert.equal(topic.estimatedMinutes, 10);
+  assert.equal(topic.mvpAvailable, true);
+  assert.equal(
+    getMvpLessonsBySubject('stroje').reduce((sum, l) => sum + l.durationMinutes, 0),
+    68,
+  );
+});
+
+test('H8O: návaznost H8N', () => {
+  const order = getMvpLessonsBySubject('stroje').map((l) => l.id);
+  assert.equal(order.indexOf('pristroje-nn-vn-vvn'), order.indexOf('co-delaji-elektricke-pristroje') + 1);
+  const h8n = getLessonById('co-delaji-elektricke-pristroje');
+  const h8o = getLessonById('pristroje-nn-vn-vvn');
+  assert.ok(h8n);
+  assert.ok(h8o);
+  const h8nExplain = collectDeviceFunctionsExplanatoryText(h8n);
+  assert.ok(/spíná|odpojuje|jistí|měří|funkci/i.test(h8nExplain));
+  const h8oExplain = collectVoltageLevelExplanatoryText(h8o);
+  assert.ok(/napěťov(ou|á) hladin/i.test(h8oExplain));
+  assert.ok(/odstup|nepokrač/i.test(h8oExplain));
+  assert.ok(/minulé lekci|co přístroj dělá|H8N/i.test(h8o.hook + h8o.teacherTip));
+  const postH8nSrc = execFileSync('git', ['show', `${H8O_BASE}:src/data/lessons-stroje.ts`], {
+    encoding: 'utf8',
+  }).replace(/\r\n/g, '\n');
+  const headPath = path.join(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '../src/data/lessons-stroje.ts',
+  );
+  const current = fs.readFileSync(headPath, 'utf8').replace(/\r\n/g, '\n');
+  assert.equal(
+    extractStrojeLessonSource(current, 'co-delaji-elektricke-pristroje'),
+    extractStrojeLessonSource(postH8nSrc, 'co-delaji-elektricke-pristroje'),
+  );
+  assert.notEqual(
+    extractStrojeLessonSource(current, 'pristroje-nn-vn-vvn'),
+    extractStrojeLessonSource(postH8nSrc, 'pristroje-nn-vn-vvn'),
+  );
+  // Funkce a hladina nejsou směšovány: H8O výklad říká, že hladina není funkce.
+  assert.ok(/Napěťová hladina \*\*není\*\* funkce|napěťová hladina není funkce/i.test(h8oExplain));
+});
+
+test('H8O: kvalitativní NN/VN/VVN', () => {
+  const lesson = getLessonById('pristroje-nn-vn-vvn');
+  assert.ok(lesson);
+  const explain = [
+    lesson.explanation,
+    lesson.typicalMistake,
+    lesson.memorySentence,
+    lesson.goal,
+    lesson.hook,
+    ...lesson.quiz.map((q) => q.explanation),
+  ].join('\n');
+  const distractors = lesson.quiz
+    .flatMap((q) => q.options.filter((o) => o.id !== q.correctOptionId).map((o) => o.text))
+    .join('\n');
+  assert.ok(/napěťov(é|ou|á) hladin/i.test(explain));
+  assert.ok(/Napěťová hladina \*\*není\*\* funkce|napěťová hladina není funkce/i.test(explain));
+  assert.ok(/Podobná funkce může existovat na různých hladinách/i.test(explain));
+  assert.ok(/Velikost.*nestačí|velikost sama nestačí/i.test(explain));
+  assert.ok(/vyšší napětí automaticky neznamená vyšší proud/i.test(explain));
+  assert.ok(/nepoužívá přesné hranice|bez přesných hranic|záměrně \*\*nepoužívá přesné hranice\*\*/i.test(explain));
+  assert.equal(/\b\d+\s*kV\b|\b\d+\s*V\b|hranice NN\s*=|NN\s*=\s*\d/i.test(explain), false);
+  assert.equal(/Podobná funkce může existovat na různých hladinách/i.test(distractors), false);
+});
+
+test('H8O: oblouk a konstrukční nároky', () => {
+  const lesson = getLessonById('pristroje-nn-vn-vvn');
+  assert.ok(lesson);
+  const explain = collectVoltageLevelExplanatoryText(lesson);
+  assert.ok(/izolaci/i.test(explain));
+  assert.ok(/vzdálenost/i.test(explain));
+  assert.ok(/určenou konstrukci|určen(á|é) konstrukc/i.test(explain));
+  assert.ok(/Elektrický oblouk|elektrický oblouk/i.test(explain));
+  assert.ok(/bez.*dotyku|bez přímého dotyku/i.test(explain));
+  assert.ok(/nesmí.*vyvolávat|nedemonstruje|nepozoruje zblízka|praktickou ukázku nepořádej/i.test(explain));
+  assert.ok(/nepřibliž/i.test(explain));
+  assert.ok(/dálkov/i.test(explain));
+  assert.ok(/automatick/i.test(explain));
+});
+
+test('H8O: bezpečný stav', () => {
+  const lesson = getLessonById('pristroje-nn-vn-vvn');
+  assert.ok(lesson);
+  const text = collectVoltageLevelProductionText(lesson);
+  const explain = collectVoltageLevelExplanatoryText(lesson);
+  assert.ok(/Vypnutý přístroj nemusí znamenat|vypnuto ještě neznamená bezpečno/i.test(explain));
+  assert.ok(/Poloha páky|páka/i.test(explain));
+  assert.ok(/kontrolky|kontrolka/i.test(explain));
+  assert.ok(/zvuk|ticho/i.test(explain));
+  assert.ok(/stojící spotřebič/i.test(explain));
+  assert.ok(/jiné napájení/i.test(explain));
+  assert.ok(/energie/i.test(explain));
+  assert.equal(/postup ověřování beznapěťovosti|postup odpojování|postup uzemňování|postup zkratování/i.test(text), false);
+  assert.equal(/bezpečn(á|é) vzdálenost\s*\d/i.test(text), false);
+});
+
+test('H8O: demo text a aktivita', () => {
+  const lesson = getLessonById('pristroje-nn-vn-vvn');
+  assert.ok(lesson);
+  const demoSrc = readVoltageLevelDemoSource();
+  const levels = extractDemoLevelsArray(demoSrc);
+  assert.equal((levels.match(/id: '/g) || []).length, 4);
+  assert.ok(/id: 'nn'/.test(levels));
+  assert.ok(/id: 'vn'/.test(levels));
+  assert.ok(/id: 'vvn'/.test(levels));
+  assert.ok(/id: 'danger'/.test(levels));
+  assert.equal(/230\s*V|110\s*kV|\b\d+\s*kV\b|\b\d+\s*V\b/i.test(levels), false);
+
+  const baseDemo = execFileSync(
+    'git',
+    ['show', `${H8O_BASE}:src/components/demos/VoltageLevelSafetyDemo.tsx`],
+    { encoding: 'utf8' },
+  ).replace(/\r\n/g, '\n');
+  assert.equal(extractDemoComponentBody(demoSrc), extractDemoComponentBody(baseDemo));
+  assert.ok(/aria-/.test(demoSrc));
+  assert.ok(/calmMode/.test(demoSrc));
+  assert.ok(/onKeyDown|onContinue|tried\.size/.test(demoSrc));
+
+  const postH8nSrc = execFileSync('git', ['show', `${H8O_BASE}:src/data/lessons-stroje.ts`], {
+    encoding: 'utf8',
+  }).replace(/\r\n/g, '\n');
+  const headPath = path.join(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '../src/data/lessons-stroje.ts',
+  );
+  const current = fs.readFileSync(headPath, 'utf8').replace(/\r\n/g, '\n');
+  const extractActivity = (src: string) => {
+    const block = extractStrojeLessonSource(src, 'pristroje-nn-vn-vvn');
+    const a0 = block.indexOf('activity:');
+    const a1 = block.indexOf('quiz:');
+    return block.slice(a0, a1);
+  };
+  assert.equal(extractActivity(current), extractActivity(postH8nSrc));
+  const activity = getLessonActivity(lesson) as {
+    scenarios: { id: string; correctOptionId: string }[];
+  };
+  assert.equal(activity.scenarios.length, 6);
+  assert.deepEqual(
+    activity.scenarios.map((s) => s.correctOptionId),
+    ['simulace', 'nepokracovat', 'odstup', 'odstup', 'nepokracovat', 'odstup'],
+  );
+  assert.equal(lesson.activityXp, 25);
+});
+
+test('H8O: quiz a pedagogická pole', () => {
+  const lesson = getLessonById('pristroje-nn-vn-vvn');
+  assert.ok(lesson);
+  assert.equal(lesson.quiz[0].correctOptionId, 'b');
+  assert.equal(lesson.quiz[1].correctOptionId, 'd');
+  assert.equal(lesson.quiz[2].correctOptionId, 'c');
+  for (const q of lesson.quiz) {
+    assert.equal(q.options.filter((o) => o.id === q.correctOptionId).length, 1);
+  }
+  assertQuizOptionLengthFairness('pristroje-nn-vn-vvn');
+  assert.ok(/fyzické velikosti|vyšší napětí automaticky|NN není automaticky|oblouk|vypnutá poloha|otevřený kryt/i.test(lesson.typicalMistake));
+  const h8l = getLessonById('stykac-a-rele');
+  const h8n = getLessonById('co-delaji-elektricke-pristroje');
+  assert.ok(h8l);
+  assert.ok(h8n);
+  const wordCount = (s: string) => (s.match(/[\p{L}\p{N}]+/gu) || []).length;
+  assert.ok(wordCount(lesson.safetyNote) >= wordCount(h8l.safetyNote) - 5);
+  assert.ok(wordCount(lesson.safetyNote) >= wordCount(h8n.safetyNote) - 5);
+  assert.ok(/nepřipojuje|neotevírá|nepřibližuje|Živé měření|oblouk|vypnutý stav|dálkové|odstup|pověřené osoby|Pravidla školy/i.test(lesson.safetyNote));
+  assert.ok(/Co zařízení dělá|Pro jakou hladinu|kartičky|oblouk|exkurzi/i.test(lesson.teacherTip));
+  assert.ok(/NN, VN a VVN označují napěťovou hladinu/i.test(lesson.memorySentence));
+  assert.ok(/vypnuto ještě neznamená bezpečno/i.test(lesson.memorySentence));
+  const text = collectVoltageLevelProductionText(lesson);
+  assert.equal(/postup ověřování beznapěťovosti|postup odpojování|postup uzemňování|postup zkratování/i.test(text), false);
+  assert.equal(/\b\d+\s*kV\b|\b\d+\s*V\b|hranice NN\s*=/i.test(text), false);
+});
+
+test('H8O: progress a regrese', () => {
+  const allLessons = getMvpLessonsBySubject('stroje');
+  assert.equal(allLessons.length, 7);
+  const lessonsState: ProgressState['lessons'] = {};
+  for (const l of allLessons) {
+    lessonsState[l.id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  saveProgress({
+    totalXp: 245,
+    earnedBadges: [
+      'mistr-transformatoru',
+      'pocitar-prevodu',
+      'pruvodce-tocivym-polem',
+      'motorovy-elev',
+      'vladce-kontaktu',
+      'znalec-funkci-pristroju',
+      'bezpecny-u-vn',
+      'strojarsky-elev',
+    ],
+    lessons: lessonsState,
+    calmMode: false,
+  });
+  const loaded = loadProgress();
+  const { completed, total } = getSubjectProgress(
+    loaded,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 7);
+  assert.equal(total, 7);
+  assert.equal(loaded.totalXp, 245);
+  assert.equal(loaded.earnedBadges.filter((b) => b === 'bezpecny-u-vn').length, 1);
+  assert.equal(loaded.earnedBadges.filter((b) => b === 'strojarsky-elev').length, 1);
+  assert.equal(isLessonComplete(loaded, 'pristroje-nn-vn-vvn'), true);
+
+  const retryAct = completeActivity(loadProgress(), 'pristroje-nn-vn-vvn', 25);
+  assert.equal(retryAct.totalXp, 245);
+  assert.equal(retryAct.lessons['pristroje-nn-vn-vvn']?.activityCompleted, true);
+
+  const worse = applyQuizCompletion(loadProgress(), {
+    lessonId: 'pristroje-nn-vn-vvn',
+    xp: 15,
+    badgeId: 'bezpecny-u-vn',
+    correct: 1,
+    total: 3,
+  });
+  assert.equal(worse.xpAwarded, 0);
+  assert.deepEqual(worse.state.lessons['pristroje-nn-vn-vvn']?.bestQuizScore, {
+    correct: 3,
+    total: 3,
+  });
+
+  const projector = applyQuizCompletion(
+    { totalXp: 0, earnedBadges: [], lessons: {}, calmMode: false },
+    {
+      lessonId: 'pristroje-nn-vn-vvn',
+      xp: 15,
+      badgeId: 'bezpecny-u-vn',
+      correct: 3,
+      total: 3,
+      projectorMode: true,
+    },
+  );
+  assert.equal(projector.xpAwarded, 0);
+  assert.equal(projector.state.totalXp, 0);
+  assert.equal(Object.keys(projector.state.lessons).length, 0);
+
+  const cleared = resetProgress(loadProgress());
+  saveProgress(cleared);
+  const afterReset = loadProgress();
+  assert.equal(afterReset.totalXp, 0);
+  assert.equal(afterReset.earnedBadges.includes('bezpecny-u-vn'), false);
+  assert.equal(afterReset.earnedBadges.includes('strojarsky-elev'), false);
+  assert.equal(Object.keys(afterReset.lessons).length, 0);
+
+  // H8N progress kontrakt: H8N zůstává před H8O a má stejné XP/badge.
+  const h8n = getLessonById('co-delaji-elektricke-pristroje');
+  assert.ok(h8n);
+  assert.equal(h8n.activityXp, 20);
+  assert.equal(h8n.quizXp, 15);
+  assert.equal(h8n.badgeId, 'znalec-funkci-pristroju');
 });
 
 
