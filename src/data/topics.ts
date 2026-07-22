@@ -192,7 +192,7 @@ export const topics: Topic[] = [
     id: 'pristroje-vn-vvn',
     subjectId: 'stroje',
     title: 'Elektrické přístroje vysokého a velmi vysokého napětí',
-    description: 'Napěťové hladiny, bezpečný odstup a proč se k VN/VVN nepřibližuje.',
+    description: 'Bezpečný přehled napěťových hladin NN, VN a VVN a bezpečný odstup.',
     year: 2,
     estimatedMinutes: 10,
     mvpAvailable: true,

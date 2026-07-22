@@ -924,23 +924,28 @@ export const strojeLessons: MicroLesson[] = [
     id: 'pristroje-nn-vn-vvn',
     subjectId: 'stroje',
     topicId: 'pristroje-vn-vvn',
-    title: 'Přístroje NN, VN a VVN bez paniky',
+    title: 'NN, VN a VVN — bezpečný odstup',
     year: 2,
-    durationMinutes: 9,
+    durationMinutes: 10,
     difficulty: 'střední',
     goal:
-      'Žák pochopí, že elektrické přístroje se liší podle napěťové hladiny a že u VN/VVN je klíčový bezpečný odstup, krytí, odborný dohled a zákaz laického zásahu.',
+      'Rozlišíš kvalitativně NN, VN a VVN a v rizikové situaci zvolíš odstup, nepokračování nebo bezpečnou simulaci.',
     hook:
-      'U zásuvky doma tě chrání kryt a jistič. U trafostanice tě chrání hlavně jedna věc: že zůstaneš daleko.',
+      'V minulé lekci jsme rozlišili, co přístroj dělá. Teď přichází druhá otázka: pro jakou napěťovou hladinu je zařízení určeno — a jak bezpečně reagovat, když se s ním setkáš?',
     explanation:
-      'Elektrická zařízení se dělí podle **napěťové hladiny**: **NN** (nízké napětí — domovní rozvody), **VN** (vysoké napětí — trafostanice, venkovní vedení) a **VVN** (velmi vysoké napětí — dálkové přenosové trasy). Čím vyšší hladina, tím větší riziko: u VN/VVN může elektřina **přeskočit vzduchem i bez dotyku**. Proto platí: **bezpečný odstup, nezasahovat, nepřelézat, nepřibližovat se** — pracovat tam smí jen odborník s oprávněním.',
+      '**Funkce a napěťová hladina jsou dvě různé věci:** Minulá lekce učila, zda zařízení **spíná, odpojuje, jistí nebo měří**. NN, VN a VVN odpovídají na **jinou** otázku — označují **napěťovou hladinu** nebo elektrické podmínky. Podobná funkce může existovat na různých hladinách. Napěťová hladina **není** funkce přístroje.\n\n' +
+      '**NN, VN a VVN kvalitativně:** Jde o různé napěťové hladiny. Tato lekce záměrně **nepoužívá přesné hranice** — ty závisí na soustavě a odborném předpisu. Důležité je rozpoznat prostředí a bezpečnostní hranici. Ani zařízení NN **není** automaticky bezpečné k dotyku nebo obsluze.\n\n' +
+      '**Vyšší hladina mění konstrukční nároky:** S vyšší hladinou rostou nároky na **izolaci**, vzdálenosti a uspořádání. Vypínání proudu vyžaduje určenou konstrukci. Zařízení může být ovládáno **dálkově**; ochrany a blokování patří do navrženého systému. **Velikost** sama nestačí k určení hladiny — neplatí „čím vyšší napětí, tím větší všechno“.\n\n' +
+      '**Nebezpečí bez dotyku:** Přímý dotyk není jedinou cestou ohrožení. **Elektrický oblouk** může vzniknout při nebezpečném přiblížení nebo poruše a způsobit vysokou teplotu, světelný účinek, tlak a další vážné následky. Oblouk se **nesmí** vyvolávat ani pozorovat zblízka. Žádná situace není výzvou k praktickému experimentu.\n\n' +
+      '**Kryt, oplocení a odstup:** Kryty, dveře, oplocení a výstražné značení vymezují bezpečnostní hranice — **nesmíš** je překonávat. Otevřený nebo poškozený kryt není pozvánka k prohlídce. Při neznámé situaci se nepřibližuj, nepokračuj a informuj učitele nebo odpovědnou osobu. Fotografie, schéma a simulace jsou vhodné výukové prostředky.\n\n' +
+      '**Vypnuto ještě neznamená bezpečno:** Vypnutý přístroj nemusí znamenat zařízení bez napětí. Poloha páky, kontaktu ani kontrolky **není** sama důkazem. Zařízení může mít jiné napájení, stav se může změnit dálkovým nebo automatickým povelem a může zůstat energie. Stav zařízení prakticky **neověřuješ**.',
     safetyNote:
-      'Tato lekce je bezpečnostní školní simulace. Zařízení VN a VVN jsou životu nebezpečná. Žák se k nim nesmí přibližovat, zasahovat do nich ani je zkoušet bez odborného oprávnění a dohledu.',
-    memorySentence: 'Čím vyšší napětí, tím větší odstup. K VN a VVN se nechodí blíž.',
+      'Výuka probíhá pouze pomocí fotografie, schématu, simulace nebo učitelem zabezpečeného nízkonapěťového modelu. Žák nepřipojuje ani nezapojuje zařízení, neotevírá rozváděč, svorkovnici, trafostanici, kobku ani oplocení a k částem VN nebo VVN se nepřibližuje. Neovládá, nepřepíná ani nezkouší skutečná zařízení a živé měření se neprovádí. Elektrický oblouk se nevyvolává ani nepozoruje zblízka. Vodičů, kontaktů, přípojnic, izolátorů ani konstrukcí zařízení se nedotýkej. Vypnutý stav neznamená potvrzenou beznapěťovost. Páka, kontrolka, zvuk ani stojící spotřebič nepotvrzují bezpečí. Dálkové nebo automatické ovládání může změnit stav a může zůstat elektrická nebo mechanická energie. Při otevřeném, poškozeném nebo neznámém zařízení zachovej odstup, nepokračuj a informuj učitele nebo odpovědnou osobu. Skutečná zařízení smí obsluhovat jen kvalifikované a pověřené osoby. Pravidla školy a pracoviště mají přednost.',
+    memorySentence: 'NN, VN a VVN označují napěťovou hladinu; čím vyšší riziko prostředí, tím důležitější je odstup — a vypnuto ještě neznamená bezpečno.',
     typicalMistake:
-      'Žáci si myslí, že nebezpečný je jen přímý dotyk. U VN/VVN může proud přeskočit obloukem na vzdálenost — nebezpečná je už blízkost.',
+      'Žáci často berou NN, VN a VVN jako popis fyzické velikosti zařízení a myslí si, že vyšší napětí automaticky znamená vyšší proud. Časté je i podcenění NN jako „bezpečného“, přesvědčení, že nebezpečný je jen přímý dotyk, nebo snaha demonstrovat oblouk. Nesprávně se bere vypnutá poloha, kontrolka či ticho zařízení jako důkaz beznapěťovosti a otevřený kryt jako výzva k bližší prohlídce. Správně: hladina není velikost; vyšší napětí automaticky neznamená vyšší proud; NN není automaticky bezpečné; oblouk se nedemonstruje; vypnuto ani ticho nepotvrzují bezpečný stav.',
     teacherTip:
-      'Bezpečnostní vyvrcholení předmětu — hodí se před exkurzí do rozvodny. Scénář „zvědavý žák" nech třídu vyřešit nahlas, než odkryješ odpověď.',
+      'Naváž na dvě otázky z H8N: „Co zařízení dělá?“ a „Pro jakou hladinu je určeno?“ Použij fotografie nebo schémata NN, VN a VVN a nezadávej určování hladiny pouze podle fyzické velikosti. Barevně odděl funkci zařízení, napěťovou hladinu a bezpečnou reakci. Použij kartičky simulace, odstup, nepokračovat. U každé karty dema nech žáky zdůvodnit bezpečnou reakci. Oblouk připomeň jen schematicky — praktickou ukázku nepořádej. Ke skutečným zařízením VN/VVN žáky nepřibližuj; případnou exkurzi jen podle pravidel provozovatele a z vymezeného bezpečného prostoru.',
     interactiveDemo: {
       type: 'voltage-level-safety',
       title: 'Tři hladiny napětí, jedno pravidlo: odstup',
@@ -1008,47 +1013,47 @@ export const strojeLessons: MicroLesson[] = [
     quiz: [
       {
         id: 'q1',
-        text: 'Čím se liší přístroje NN, VN a VVN?',
+        text: 'Co označují zkratky NN, VN a VVN u elektrických zařízení?',
         options: [
-          { id: 'a', text: 'Napěťovou hladinou — a s ní rostoucím rizikem a nároky na odstup.' },
-          { id: 'b', text: 'Jen barvou krytu.' },
-          { id: 'c', text: 'Ničím podstatným.' },
-          { id: 'd', text: 'VVN je bezpečnější než NN.' },
+          { id: 'a', text: 'NN, VN a VVN označují pouze fyzickou velikost nebo vzhled celého zařízení v daném místě.' },
+          { id: 'b', text: 'NN, VN a VVN označují napěťovou hladinu nebo elektrické podmínky, nikoli konkrétní funkci zařízení.' },
+          { id: 'c', text: 'Označení NN, VN nebo VVN určuje, zda zařízení v obvodu spíná, odpojuje, jistí anebo měří.' },
+          { id: 'd', text: 'Vyšší označení napěťové hladiny automaticky znamená, že zařízením vždy teče i vyšší provozní proud.' },
         ],
-        correctOptionId: 'a',
+        correctOptionId: 'b',
         explanation:
-          'Čím vyšší napěťová hladina, tím větší riziko a přísnější pravidla.',
+          'NN, VN a VVN označují napěťovou hladinu nebo elektrické podmínky. Nerozhodují samy o tom, zda zařízení spíná, jistí nebo měří, a neurčují proud podle velikosti označení.',
       },
       {
         id: 'q2',
-        text: 'Proč je nebezpečná už blízkost zařízení VN/VVN?',
+        text: 'Proč může být nebezpečná už blízkost zařízení VN nebo VVN?',
         options: [
-          { id: 'a', text: 'Elektřina může přeskočit obloukem i bez dotyku.' },
-          { id: 'b', text: 'Není — nebezpečný je jen dotyk.' },
-          { id: 'c', text: 'Kvůli hluku zařízení.' },
-          { id: 'd', text: 'Kvůli silnému větru u stožárů.' },
+          { id: 'a', text: 'Nebezpečný je pouze přímý dotyk živých částí; bez dotyku žádné vážné riziko v okolí zařízení vůbec nehrozí nikomu v blízkosti.' },
+          { id: 'b', text: 'Elektrický oblouk lze ve školní třídě bezpečně demonstrovat jako běžný a řízený výukový pokus pro žáky.' },
+          { id: 'c', text: 'Kryt zařízení lze otevřít k bližší prohlídce, pokud je zařízení tiché a bez zřetelného hluku v okolí.' },
+          { id: 'd', text: 'K vážnému ohrožení může dojít i bez přímého dotyku, například elektrickým obloukem při poruše nebo nebezpečném přiblížení.' },
         ],
-        correctOptionId: 'a',
+        correctOptionId: 'd',
         explanation:
-          'U vysokého napětí hrozí přeskok na vzdálenost — proto rozhoduje odstup.',
+          'Přímý dotyk není jedinou cestou ohrožení. Elektrický oblouk může vzniknout při poruše nebo nebezpečném přiblížení a nesmí se demonstrovat ani pozorovat zblízka.',
       },
       {
         id: 'q3',
-        text: 'Vidíš otevřený kryt elektrického zařízení. Co uděláš?',
+        text: 'Vidíš otevřené, neznámé nebo poškozené elektrické zařízení. Jaká je bezpečná reakce?',
         options: [
-          { id: 'a', text: 'Nesahám, držím ostatní dál a hlásím to učiteli nebo odborníkovi.' },
-          { id: 'b', text: 'Opatrně nakouknu dovnitř.' },
-          { id: 'c', text: 'Kryt sám zavřu, ať to nikoho neláká.' },
-          { id: 'd', text: 'Nic — otevřený kryt je normální.' },
+          { id: 'a', text: 'Přiblížím se blíž k zařízení a přečtu štítek, abych spolehlivě poznal typ a napěťovou hladinu.' },
+          { id: 'b', text: 'Zkusím polohu páky nebo ovládacího prvku, jestli je zařízení vypnuté a zdánlivě v klidu.' },
+          { id: 'c', text: 'Zachovám odstup, nebudu pokračovat a informuji učitele nebo odpovědnou osobu.' },
+          { id: 'd', text: 'Ověřím stav vlastním školním multimetrem přímo na svorkách nebo přípojnicích zařízení.' },
         ],
-        correctOptionId: 'a',
+        correctOptionId: 'c',
         explanation:
-          'Neznámý stav zařízení = nepokračovat a ohlásit. Ani zavírání krytu není práce pro laika.',
+          'Zachovej odstup, nepokračuj a informuj učitele nebo odpovědnou osobu. Štítek, páka ani vlastní multimetr nejsou bezpečnou reakcí žáka.',
       },
     ],
     activityXp: 25,
     quizXp: 15,
     badgeId: 'bezpecny-u-vn',
     mvpAvailable: true,
-  },
+  }
 ];
