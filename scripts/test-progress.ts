@@ -50,6 +50,7 @@ import { migrateProgressLessonReferences } from '../src/lib/lessonIdMigration';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import fs from 'node:fs';
 import {
   getMvpLessonsBySubject,
   getLessonById,
@@ -57,7 +58,7 @@ import {
   lessons,
 } from '../src/data/lessons';
 import { getTopicById, getTopicsBySubject, topics } from '../src/data/topics';
-import { getBadgeById } from '../src/data/badges';
+import { getBadgeById, badges } from '../src/data/badges';
 import { subjects } from '../src/data/subjects';
 import { getLessonActivity } from '../src/types';
 import type { ProgressState } from '../src/types';
@@ -1772,8 +1773,8 @@ test('téma Bezpečné chování v dílně je aktivní a má 30 minut', () => {
     lessons.reduce((sum, l) => sum + l.durationMinutes, 0),
     30,
   );
-  assert.equal(topics.length, 28);
-  assert.equal(topics.filter((t) => t.mvpAvailable).length, 22);
+  assert.equal(topics.length, 29);
+  assert.equal(topics.filter((t) => t.mvpAvailable).length, 23);
   assert.equal(getTopicsBySubject('bezpecnost', 2).filter((t) => t.mvpAvailable).length, 0);
   assert.equal(getTopicsBySubject('bezpecnost', 3).filter((t) => t.mvpAvailable).length, 0);
 });
@@ -2015,8 +2016,8 @@ test('téma Střídavý proud je aktivní a má 20 minut', () => {
     topicLessons.reduce((sum, l) => sum + l.durationMinutes, 0),
     20,
   );
-  assert.equal(topics.length, 28);
-  assert.equal(topics.filter((t) => t.mvpAvailable).length, 22);
+  assert.equal(topics.length, 29);
+  assert.equal(topics.filter((t) => t.mvpAvailable).length, 23);
 });
 
 test('lekce Stejnosměrný a střídavý proud je scenario-choice bez dema', () => {
@@ -2341,8 +2342,8 @@ test('téma Magnetické pole je aktivní a má 10 minut', () => {
   const topicLessons = getLessonsByTopic('magneticke-pole');
   assert.equal(topicLessons.filter((l) => l.mvpAvailable).length, 1);
 
-  assert.equal(topics.length, 28);
-  assert.equal(topics.filter((t) => t.mvpAvailable).length, 22);
+  assert.equal(topics.length, 29);
+  assert.equal(topics.filter((t) => t.mvpAvailable).length, 23);
 
   const zakladyTopics = topics.filter((t) => t.subjectId === 'zaklady');
   const spIdx = zakladyTopics.findIndex((t) => t.id === 'stridavy-proud');
@@ -2715,8 +2716,8 @@ test('téma Transformátory má 20 minut a dvě aktivní lekce', () => {
     topicLessons.map((l) => l.id),
     ['co-je-transformator', 'prevod-transformatoru'],
   );
-  assert.equal(topics.length, 28);
-  assert.equal(topics.filter((t) => t.mvpAvailable).length, 22);
+  assert.equal(topics.length, 29);
+  assert.equal(topics.filter((t) => t.mvpAvailable).length, 23);
 
   const strojeTopics = getTopicsBySubject('stroje');
   assert.equal(strojeTopics[0]?.id, 'transformatory');
@@ -2749,7 +2750,7 @@ test('lekce Převod transformátoru je measurement-judgment bez dema', () => {
 
 test('pořadí Strojů po přidání převodu transformátoru', () => {
   const order = getMvpLessonsBySubject('stroje').map((l) => l.id);
-  assert.equal(order.length, 6);
+  assert.equal(order.length, 7);
   assert.deepEqual(order.slice(0, 2), [
     'co-je-transformator',
     'prevod-transformatoru',
@@ -2758,6 +2759,7 @@ test('pořadí Strojů po přidání převodu transformátoru', () => {
     'tocive-magneticke-pole',
     'asynchronni-motor',
     'stykac-a-rele',
+    'co-delaji-elektricke-pristroje',
     'pristroje-nn-vn-vvn',
   ]);
   for (const id of ORIGINAL_STROJE_IDS) {
@@ -2868,7 +2870,7 @@ test('aktivita a quiz převodu: tvrzení, fairness a bez proudu', () => {
 
 test('starý progress Strojů bez subject badge: 4/6 a doporučí převod', () => {
   const allLessons = getMvpLessonsBySubject('stroje');
-  assert.equal(allLessons.length, 6);
+  assert.equal(allLessons.length, 7);
   const lessonsState: ProgressState['lessons'] = {};
   const originalBadges = [
     'mistr-transformatoru',
@@ -2896,7 +2898,7 @@ test('starý progress Strojů bez subject badge: 4/6 a doporučí převod', () =
     allLessons.map((l) => l.id),
   );
   assert.equal(completed, 4);
-  assert.equal(total, 6);
+  assert.equal(total, 7);
   assert.equal(loaded.totalXp, 140);
   assert.equal(loaded.earnedBadges.includes('strojarsky-elev'), false);
   for (const badge of originalBadges) {
@@ -2915,7 +2917,7 @@ test('starý progress Strojů bez subject badge: 4/6 a doporučí převod', () =
     allLessons.map((l) => l.id),
   );
   assert.equal(c2, 5);
-  assert.equal(t2, 6);
+  assert.equal(t2, 7);
   assert.equal(done.state.earnedBadges.filter((b) => b === 'pocitar-prevodu').length, 1);
   assert.equal(done.state.earnedBadges.filter((b) => b === 'strojarsky-elev').length, 0);
 });
@@ -2944,7 +2946,7 @@ test('uložený strojarsky-elev, retry a projektor u převodu', () => {
     allLessons.map((l) => l.id),
   );
   assert.equal(completed, 4);
-  assert.equal(total, 6);
+  assert.equal(total, 7);
 
   const afterNew = completeLessonFully('prevod-transformatoru', 'pocitar-prevodu');
   assert.equal(afterNew.lessonBadgeAwarded, true);
@@ -3091,8 +3093,8 @@ test('téma Asynchronní stroje má 20 minut a dvě aktivní lekce', () => {
     topicLessons.map((l) => l.id),
     ['tocive-magneticke-pole', 'asynchronni-motor'],
   );
-  assert.equal(topics.length, 28);
-  assert.equal(topics.filter((t) => t.mvpAvailable).length, 22);
+  assert.equal(topics.length, 29);
+  assert.equal(topics.filter((t) => t.mvpAvailable).length, 23);
 });
 
 test('lekce Jak vzniká točivé magnetické pole je scenario-choice bez dema', () => {
@@ -3122,7 +3124,7 @@ test('lekce Jak vzniká točivé magnetické pole je scenario-choice bez dema', 
 
 test('pořadí Strojů po přidání točivého magnetického pole', () => {
   const order = getMvpLessonsBySubject('stroje').map((l) => l.id);
-  assert.equal(order.length, 6);
+  assert.equal(order.length, 7);
   assert.deepEqual(order.slice(1, 4), [
     'prevod-transformatoru',
     'tocive-magneticke-pole',
@@ -3134,6 +3136,7 @@ test('pořadí Strojů po přidání točivého magnetického pole', () => {
     'tocive-magneticke-pole',
     'asynchronni-motor',
     'stykac-a-rele',
+    'co-delaji-elektricke-pristroje',
     'pristroje-nn-vn-vvn',
   ]);
 
@@ -3299,7 +3302,7 @@ test('aktivita a quiz točivého pole: scénáře, fairness a bez síťového n�
 
 test('starý progress Strojů bez subject badge: 5/6 a doporučí točivé pole', () => {
   const allLessons = getMvpLessonsBySubject('stroje');
-  assert.equal(allLessons.length, 6);
+  assert.equal(allLessons.length, 7);
   const lessonsState: ProgressState['lessons'] = {};
   const originalBadges = [
     'mistr-transformatoru',
@@ -3328,7 +3331,7 @@ test('starý progress Strojů bez subject badge: 5/6 a doporučí točivé pole'
     allLessons.map((l) => l.id),
   );
   assert.equal(completed, 5);
-  assert.equal(total, 6);
+  assert.equal(total, 7);
   assert.equal(loaded.totalXp, 175);
   assert.equal(loaded.earnedBadges.includes('strojarsky-elev'), false);
   assert.equal(isLessonComplete(loaded, 'asynchronni-motor'), true);
@@ -3341,16 +3344,16 @@ test('starý progress Strojů bez subject badge: 5/6 a doporučí točivé pole'
 
   const done = completeLessonFully('tocive-magneticke-pole', 'pruvodce-tocivym-polem');
   assert.equal(done.lessonBadgeAwarded, true);
-  assert.deepEqual(done.subjectBadgeIdsAwarded, ['strojarsky-elev']);
+  assert.deepEqual(done.subjectBadgeIdsAwarded, []);
   assert.equal(done.state.totalXp, 175 + 35);
   const { completed: c2, total: t2 } = getSubjectProgress(
     done.state,
     allLessons.map((l) => l.id),
   );
   assert.equal(c2, 6);
-  assert.equal(t2, 6);
+  assert.equal(t2, 7);
   assert.equal(done.state.earnedBadges.filter((b) => b === 'pruvodce-tocivym-polem').length, 1);
-  assert.equal(done.state.earnedBadges.filter((b) => b === 'strojarsky-elev').length, 1);
+  assert.equal(done.state.earnedBadges.filter((b) => b === 'strojarsky-elev').length, 0);
 });
 
 test('uložený strojarsky-elev, retry a projektor u točivého pole', () => {
@@ -3377,7 +3380,7 @@ test('uložený strojarsky-elev, retry a projektor u točivého pole', () => {
     allLessons.map((l) => l.id),
   );
   assert.equal(completed, 5);
-  assert.equal(total, 6);
+  assert.equal(total, 7);
 
   const afterNew = completeLessonFully('tocive-magneticke-pole', 'pruvodce-tocivym-polem');
   assert.equal(afterNew.lessonBadgeAwarded, true);
@@ -3516,8 +3519,8 @@ test('H8J: kontrakt prohloubené lekce asynchronni-motor', () => {
   assert.ok(activity);
   assert.equal(activity.type, 'scenario-choice');
   assert.equal(activity.scenarios.length, 4);
-  assert.equal(getMvpLessonsBySubject('stroje').length, 6);
-  assert.equal(lessons.length, 41);
+  assert.equal(getMvpLessonsBySubject('stroje').length, 7);
+  assert.equal(lessons.length, 42);
   assertQuizOptionLengthFairness('asynchronni-motor');
 });
 
@@ -3662,7 +3665,7 @@ test('H8J: SafetyNote a regrese InductionMotorDemo', () => {
 
 test('H8J: starý progress, retry, projektor a reset u motoru', () => {
   const allLessons = getMvpLessonsBySubject('stroje');
-  assert.equal(allLessons.length, 6);
+  assert.equal(allLessons.length, 7);
   const lessonsState: ProgressState['lessons'] = {};
   for (const l of allLessons) {
     lessonsState[l.id] = {
@@ -3691,8 +3694,8 @@ test('H8J: starý progress, retry, projektor a reset u motoru', () => {
     loaded,
     allLessons.map((l) => l.id),
   );
-  assert.equal(completed, 6);
-  assert.equal(total, 6);
+  assert.equal(completed, 7);
+  assert.equal(total, 7);
   assert.equal(isLessonComplete(loaded, 'asynchronni-motor'), true);
   assert.equal(loaded.earnedBadges.filter((b) => b === 'motorovy-elev').length, 1);
   assert.equal(loaded.earnedBadges.filter((b) => b === 'strojarsky-elev').length, 1);
@@ -3808,8 +3811,8 @@ test('H8L: kontrakt prohloubené lekce stykac-a-rele', () => {
   assert.ok(activity);
   assert.equal(activity.type, 'scenario-choice');
   assert.equal(activity.scenarios.length, 4);
-  assert.equal(getMvpLessonsBySubject('stroje').length, 6);
-  assert.equal(lessons.length, 41);
+  assert.equal(getMvpLessonsBySubject('stroje').length, 7);
+  assert.equal(lessons.length, 42);
   const topic = getTopicById('pristroje-nn');
   assert.ok(topic);
   assert.equal(topic.estimatedMinutes, 10);
@@ -3996,7 +3999,7 @@ test('H8L: aktivita, quiz, SafetyNote a demo regrese', () => {
 
 test('H8L: starý progress, retry, projektor a reset u stykače', () => {
   const allLessons = getMvpLessonsBySubject('stroje');
-  assert.equal(allLessons.length, 6);
+  assert.equal(allLessons.length, 7);
   const lessonsState: ProgressState['lessons'] = {};
   for (const l of allLessons) {
     lessonsState[l.id] = {
@@ -4025,8 +4028,8 @@ test('H8L: starý progress, retry, projektor a reset u stykače', () => {
     loaded,
     allLessons.map((l) => l.id),
   );
-  assert.equal(completed, 6);
-  assert.equal(total, 6);
+  assert.equal(completed, 7);
+  assert.equal(total, 7);
   assert.equal(isLessonComplete(loaded, 'stykac-a-rele'), true);
   assert.equal(loaded.earnedBadges.filter((b) => b === 'vladce-kontaktu').length, 1);
   assert.equal(loaded.earnedBadges.filter((b) => b === 'strojarsky-elev').length, 1);
@@ -4079,6 +4082,369 @@ test('H8L: starý progress, retry, projektor a reset u stykače', () => {
   assert.equal(afterReset.earnedBadges.includes('strojarsky-elev'), false);
   assert.equal(Object.keys(afterReset.lessons).length, 0);
 });
+
+
+// --- MVP-12H8N: Co elektrické přístroje dělají -------------------------------
+
+const PRE_H8N_STROJE_IDS = [
+  'co-je-transformator',
+  'prevod-transformatoru',
+  'tocive-magneticke-pole',
+  'asynchronni-motor',
+  'stykac-a-rele',
+  'pristroje-nn-vn-vvn',
+] as const;
+
+const H8N_BASE = '655a3dd042d19214ee1a4f7f7d3c3689edf12972';
+
+function extractStrojeLessonSource(src: string, id: string): string {
+  const start = src.indexOf(`    id: '${id}',`);
+  assert.ok(start >= 0, `lesson ${id} missing in source`);
+  const next = src.indexOf('\n  {\n    id: ', start + 1);
+  const end = next >= 0 ? next : src.length;
+  return src.slice(start, end);
+}
+
+function collectDeviceFunctionsProductionText(
+  lesson: NonNullable<ReturnType<typeof getLessonById>>,
+) {
+  return [
+    lesson.explanation,
+    lesson.safetyNote,
+    lesson.typicalMistake,
+    lesson.memorySentence,
+    lesson.goal,
+    lesson.hook,
+    lesson.teacherTip,
+    ...lesson.quiz.flatMap((q) => [
+      q.text,
+      q.explanation,
+      ...q.options.map((o) => o.text),
+    ]),
+    ...((getLessonActivity(lesson) as { scenarios?: { text: string; explanation: string }[] })
+      ?.scenarios ?? []
+    ).flatMap((s) => [s.text, s.explanation]),
+  ].join('\n');
+}
+
+function collectDeviceFunctionsExplanatoryText(
+  lesson: NonNullable<ReturnType<typeof getLessonById>>,
+) {
+  const activity = getLessonActivity(lesson) as {
+    scenarios?: { explanation: string }[];
+    successMessage?: string;
+  } | undefined;
+  return [
+    lesson.explanation,
+    lesson.typicalMistake,
+    lesson.memorySentence,
+    lesson.goal,
+    lesson.hook,
+    ...lesson.quiz.map((q) => q.explanation),
+    ...(activity?.scenarios ?? []).map((s) => s.explanation),
+    activity?.successMessage ?? '',
+  ].join('\n');
+}
+
+test('H8N: registrace, topic a pořadí co-delaji-elektricke-pristroje', () => {
+  const lesson = getLessonById('co-delaji-elektricke-pristroje');
+  assert.ok(lesson);
+  assert.equal(lesson.id, 'co-delaji-elektricke-pristroje');
+  assert.equal(lesson.title, 'Co elektrické přístroje dělají');
+  assert.equal(lesson.subjectId, 'stroje');
+  assert.equal(lesson.year, 2);
+  assert.equal(lesson.topicId, 'funkce-elektrickych-pristroju');
+  assert.equal(lesson.durationMinutes, 10);
+  assert.equal(lesson.interactiveDemo, undefined);
+  assert.equal(lesson.badgeId, 'znalec-funkci-pristroju');
+  assert.ok(getBadgeById('znalec-funkci-pristroju'));
+  assert.equal(lesson.activityXp, 20);
+  assert.equal(lesson.quizXp, 15);
+  assert.equal(lesson.quiz.length, 3);
+  const activity = getLessonActivity(lesson);
+  assert.ok(activity);
+  assert.equal(activity.type, 'scenario-choice');
+  assert.equal(activity.scenarios.length, 4);
+  assert.equal(getMvpLessonsBySubject('stroje').length, 7);
+  assert.equal(lessons.length, 42);
+  assert.equal(badges.length, 49);
+  const order = getMvpLessonsBySubject('stroje').map((l) => l.id);
+  assert.equal(order.indexOf('co-delaji-elektricke-pristroje'), order.indexOf('stykac-a-rele') + 1);
+  assert.equal(order.indexOf('pristroje-nn-vn-vvn'), order.indexOf('co-delaji-elektricke-pristroje') + 1);
+  const topic = getTopicById('funkce-elektrickych-pristroju');
+  assert.ok(topic);
+  assert.equal(topic.estimatedMinutes, 10);
+  assert.equal(topic.mvpAvailable, true);
+  assert.equal(topic.subjectId, 'stroje');
+  assert.equal(topics.length, 29);
+  assert.equal(topics.filter((t) => t.mvpAvailable).length, 23);
+  const topicIds = topics.map((t) => t.id);
+  assert.equal(topicIds.indexOf('funkce-elektrickych-pristroju'), topicIds.indexOf('pristroje-nn') + 1);
+  assert.equal(topicIds.indexOf('pristroje-vn-vvn'), topicIds.indexOf('funkce-elektrickych-pristroju') + 1);
+});
+
+test('H8N: návaznost H8L a zachování NN/VN/VVN', () => {
+  const neu = getLessonById('co-delaji-elektricke-pristroje');
+  const levels = getLessonById('pristroje-nn-vn-vvn');
+  assert.ok(neu);
+  assert.ok(levels);
+  const explain = collectDeviceFunctionsExplanatoryText(neu);
+  assert.ok(/Stykač.*předchozí lekce|příklad řízeného spínání/i.test(explain));
+  assert.ok(/napěťov/i.test(explain));
+  assert.ok(/funkci|funkce/i.test(explain));
+  assert.ok(/nejsou totéž|není totéž/i.test(explain));
+  assert.ok(/odstup|VN\/VVN/i.test(levels.explanation + levels.memorySentence + levels.goal));
+
+  const baseSrc = execFileSync('git', ['show', `${H8N_BASE}:src/data/lessons-stroje.ts`], {
+    encoding: 'utf8',
+  }).replace(/\r\n/g, '\n');
+  const headPath = path.join(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '../src/data/lessons-stroje.ts',
+  );
+  const current = fs.readFileSync(headPath, 'utf8').replace(/\r\n/g, '\n');
+  assert.equal(extractStrojeLessonSource(current, 'stykac-a-rele'), extractStrojeLessonSource(baseSrc, 'stykac-a-rele'));
+  assert.equal(
+    extractStrojeLessonSource(current, 'pristroje-nn-vn-vvn'),
+    extractStrojeLessonSource(baseSrc, 'pristroje-nn-vn-vvn'),
+  );
+
+  const demoPath = path.join(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '../src/components/demos/VoltageLevelSafetyDemo.tsx',
+  );
+  const hash = execFileSync('git', ['hash-object', demoPath], { encoding: 'utf8' }).trim();
+  assert.equal(hash, '9734b12be3502c86ebc3d316cafc9d3d330c6d23');
+});
+
+test('H8N: napěťová hladina versus funkce', () => {
+  const lesson = getLessonById('co-delaji-elektricke-pristroje');
+  assert.ok(lesson);
+  const explain = collectDeviceFunctionsExplanatoryText(lesson);
+  const distractors = lesson.quiz.flatMap((q) =>
+    q.options.filter((o) => o.id !== q.correctOptionId).map((o) => o.text),
+  ).join('\n');
+  assert.ok(/NN.*VN.*VVN|napěťovou hladinu \(NN, VN, VVN\)/i.test(explain));
+  assert.ok(/napěťová hladina a funkce \*\*nejsou totéž\*\*|nejsou totéž/i.test(explain));
+  assert.ok(/Stejná funkční kategorie může existovat na různých hladinách/i.test(explain));
+  assert.ok(/Fyzická velikost|vzhled/i.test(explain));
+  assert.ok(/automaticky neznamená\*\* vyšší proud|automaticky neznamená.*vyšší proud/i.test(explain));
+  assert.equal(/\b\d+\s*kV\b|\b1000\s*V\b|hranice NN/i.test(explain), false);
+  assert.equal(/Stejná funkční kategorie může existovat na různých hladinách/i.test(distractors), false);
+});
+
+test('H8N: funkční kategorie', () => {
+  const lesson = getLessonById('co-delaji-elektricke-pristroje');
+  assert.ok(lesson);
+  const explain = collectDeviceFunctionsExplanatoryText(lesson);
+  assert.ok(/\*\*Spínání:\*\*|Spínací přístroj/i.test(lesson.explanation));
+  assert.ok(/\*\*Odpojování:\*\*|Odpojovací funkce/i.test(lesson.explanation));
+  assert.ok(/\*\*Jištění a ochrana:\*\*|ochrannou funkci/i.test(lesson.explanation));
+  assert.ok(/\*\*Měření:\*\*|Měřicí funkce/i.test(lesson.explanation));
+  assert.ok(/Stykač.*příklad řízeného spínání|příklad řízeného spínání/i.test(explain));
+  assert.ok(/stykač sám automaticky není jistič/i.test(explain));
+  assert.ok(/Odpojovač.*není automaticky určen k vypínání libovolného poruchového proudu/i.test(explain));
+  assert.ok(/pojistka.*provozní|Pojistka není|pojistku jako běžný provozní/i.test(explain));
+  assert.ok(/Měření \*\*není\*\* spínání|Měření není spínání/i.test(explain));
+});
+
+test('H8N: bezpečný stav a zakázaný obsah', () => {
+  const lesson = getLessonById('co-delaji-elektricke-pristroje');
+  assert.ok(lesson);
+  const text = collectDeviceFunctionsProductionText(lesson);
+  const explain = collectDeviceFunctionsExplanatoryText(lesson);
+  assert.ok(/Vypnutý přístroj nemusí znamenat odpojené/i.test(explain));
+  assert.ok(/odpojení samo není pohledem důkazem beznapěťovosti|nepotvrzuje.*beznapěť/i.test(explain));
+  assert.ok(/Poloha páky, kontaktu nebo kontrolky/i.test(explain));
+  assert.ok(/dálkovým nebo automatickým povelem/i.test(explain));
+  assert.equal(/postup odpojování|postup uzemňování|postup zkratování|bezpečn(á|é) vzdálenost/i.test(text), false);
+  assert.equal(/otevři rozváděč|zapoj jistič|vyměň pojistku|měř na VN/i.test(text), false);
+  assert.equal(/\b\d+\s*kV\b|hranice NN\s*=|NN\s*=\s*\d/i.test(text), false);
+  assert.ok(/nepřipojuje ani nezapojuje skutečné/i.test(lesson.safetyNote));
+  assert.ok(/rozváděč|svorkovnici/i.test(lesson.safetyNote));
+  assert.ok(/Živé měření se neprovádí/i.test(lesson.safetyNote));
+  assert.ok(/VN a VVN se nepřibližuj/i.test(lesson.safetyNote));
+});
+
+test('H8N: aktivita a její jednoznačnost', () => {
+  const lesson = getLessonById('co-delaji-elektricke-pristroje');
+  assert.ok(lesson);
+  const activity = getLessonActivity(lesson) as {
+    type: string;
+    instruction?: string;
+    options: { id: string }[];
+    scenarios: { id: string; text: string; correctOptionId: string; explanation: string }[];
+  };
+  assert.equal(activity.type, 'scenario-choice');
+  assert.equal(activity.options.length, 4);
+  assert.deepEqual(
+    activity.options.map((o) => o.id),
+    ['spina-provozni-obvod', 'odpojuje-izoluje', 'jisti-nadproud', 'meri-velicinu'],
+  );
+  assert.equal(activity.scenarios.length, 4);
+  assert.deepEqual(
+    activity.scenarios.map((s) => s.correctOptionId),
+    ['spina-provozni-obvod', 'odpojuje-izoluje', 'jisti-nadproud', 'meri-velicinu'],
+  );
+  assert.ok(
+    /přímo odpovídá na.*závěrečnou otázku|závěrečnou otázku/i.test(activity.instruction ?? ''),
+  );
+  assert.equal(/co platí|vyber pravdivé tvrzení/i.test(activity.instruction ?? ''), false);
+  const [s1, s2, s3, s4] = activity.scenarios;
+  assert.ok(/Kterou funkci musí mít přístroj.*řízeně zapnout nebo vypnout motor/i.test(s1.text));
+  assert.ok(/Která funkce přístroje slouží k určenému oddělení/i.test(s2.text));
+  assert.ok(/Která funkce má podle určení reagovat na nadproud nebo zkrat/i.test(s3.text));
+  assert.ok(/Která funkce zařízení slouží k získání informace o elektrické veličině/i.test(s4.text));
+  assert.ok(/provozní spínání|Stykač z předchozí/i.test(s1.explanation));
+  assert.ok(/odpojovací|nepotvrzuje bezpečný stav/i.test(s2.explanation));
+  assert.ok(/jištění|není jistič/i.test(s3.explanation));
+  assert.ok(/měřicí funkci|není spínání ani jištění/i.test(s4.explanation));
+  assert.equal(/zapoj|vyměň pojistku|změř na rozváděči/i.test(activity.scenarios.map((s) => s.text + s.explanation).join('\n')), false);
+});
+
+test('H8N: quiz, pedagogická pole a fairness', () => {
+  const lesson = getLessonById('co-delaji-elektricke-pristroje');
+  assert.ok(lesson);
+  assert.equal(lesson.quiz[0].correctOptionId, 'c');
+  assert.equal(lesson.quiz[1].correctOptionId, 'b');
+  assert.equal(lesson.quiz[2].correctOptionId, 'd');
+  for (const q of lesson.quiz) {
+    assert.equal(q.options.filter((o) => o.id === q.correctOptionId).length, 1);
+  }
+  assertQuizOptionLengthFairness('co-delaji-elektricke-pristroje');
+  assert.ok(/napěťová hladina není funkce/i.test(lesson.typicalMistake));
+  assert.ok(/stykač spíná, ale není jistič/i.test(lesson.typicalMistake));
+  const h8l = getLessonById('stykac-a-rele');
+  assert.ok(h8l);
+  const wordCount = (s: string) => (s.match(/[\p{L}\p{N}]+/gu) || []).length;
+  assert.ok(wordCount(lesson.safetyNote) >= wordCount(h8l.safetyNote) - 5);
+  assert.ok(/Na jaké napěťové hladině|Jakou funkci vykonává/i.test(lesson.teacherTip));
+  assert.ok(/spíná|odpojuje|jistí|měří/i.test(lesson.teacherTip));
+  assert.ok(/Napěťová hladina říká.*spíná, odpojuje, jistí nebo měří/i.test(lesson.memorySentence));
+  assert.ok(/vypnuto ještě neznamená bezpečno/i.test(lesson.memorySentence));
+  assert.equal(lesson.interactiveDemo, undefined);
+  assert.equal(lesson.badgeId, 'znalec-funkci-pristroju');
+});
+
+test('H8N: starý progress, subject badge a projektor', () => {
+  const allLessons = getMvpLessonsBySubject('stroje');
+  assert.equal(allLessons.length, 7);
+  const lessonsState: ProgressState['lessons'] = {};
+  for (const id of PRE_H8N_STROJE_IDS) {
+    lessonsState[id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  saveProgress({
+    totalXp: 210,
+    earnedBadges: [
+      'mistr-transformatoru',
+      'pocitar-prevodu',
+      'pruvodce-tocivym-polem',
+      'motorovy-elev',
+      'vladce-kontaktu',
+      'bezpecny-u-vn',
+      'strojarsky-elev',
+    ],
+    lessons: lessonsState,
+    calmMode: false,
+  });
+  const loaded = loadProgress();
+  const { completed, total } = getSubjectProgress(
+    loaded,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 6);
+  assert.equal(total, 7);
+  assert.equal(loaded.earnedBadges.filter((b) => b === 'strojarsky-elev').length, 1);
+  assert.equal(loaded.totalXp, 210);
+  const next = allLessons.find((l) => !isLessonComplete(loaded, l.id));
+  assert.ok(next);
+  assert.equal(next.id, 'co-delaji-elektricke-pristroje');
+
+  const done = completeLessonFully('co-delaji-elektricke-pristroje', 'znalec-funkci-pristroju');
+  assert.equal(done.lessonBadgeAwarded, true);
+  assert.deepEqual(done.subjectBadgeIdsAwarded, []);
+  assert.equal(done.state.earnedBadges.filter((b) => b === 'znalec-funkci-pristroju').length, 1);
+  assert.equal(done.state.earnedBadges.filter((b) => b === 'strojarsky-elev').length, 1);
+  const { completed: c2, total: t2 } = getSubjectProgress(
+    done.state,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(c2, 7);
+  assert.equal(t2, 7);
+  assert.equal(done.state.totalXp, 210 + 35);
+
+  const worse = applyQuizCompletion(loadProgress(), {
+    lessonId: 'co-delaji-elektricke-pristroje',
+    xp: 15,
+    badgeId: 'znalec-funkci-pristroju',
+    correct: 1,
+    total: 3,
+  });
+  assert.equal(worse.xpAwarded, 0);
+  assert.equal(worse.lessonBadgeAwarded, false);
+  assert.deepEqual(worse.state.lessons['co-delaji-elektricke-pristroje']?.bestQuizScore, {
+    correct: 3,
+    total: 3,
+  });
+
+  const projector = applyQuizCompletion(
+    { totalXp: 0, earnedBadges: [], lessons: {}, calmMode: false },
+    {
+      lessonId: 'co-delaji-elektricke-pristroje',
+      xp: 15,
+      badgeId: 'znalec-funkci-pristroju',
+      correct: 3,
+      total: 3,
+      projectorMode: true,
+    },
+  );
+  assert.equal(projector.xpAwarded, 0);
+  assert.equal(projector.lessonBadgeAwarded, false);
+  assert.equal(projector.state.totalXp, 0);
+  assert.equal(Object.keys(projector.state.lessons).length, 0);
+
+  // Nový uživatel: 6/7 bez subject badge, 7/7 s subject badge
+  const freshLessons: ProgressState['lessons'] = {};
+  for (const id of PRE_H8N_STROJE_IDS) {
+    freshLessons[id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  saveProgress({
+    totalXp: 210,
+    earnedBadges: [
+      'mistr-transformatoru',
+      'pocitar-prevodu',
+      'pruvodce-tocivym-polem',
+      'motorovy-elev',
+      'vladce-kontaktu',
+      'bezpecny-u-vn',
+    ],
+    lessons: freshLessons,
+    calmMode: false,
+  });
+  assert.equal(loadProgress().earnedBadges.includes('strojarsky-elev'), false);
+  const finishNew = completeLessonFully('co-delaji-elektricke-pristroje', 'znalec-funkci-pristroju');
+  assert.deepEqual(finishNew.subjectBadgeIdsAwarded, ['strojarsky-elev']);
+  assert.equal(finishNew.state.earnedBadges.filter((b) => b === 'strojarsky-elev').length, 1);
+
+  const cleared = resetProgress(loadProgress());
+  saveProgress(cleared);
+  const afterReset = loadProgress();
+  assert.equal(afterReset.totalXp, 0);
+  assert.equal(afterReset.earnedBadges.includes('znalec-funkci-pristroju'), false);
+  assert.equal(afterReset.earnedBadges.includes('strojarsky-elev'), false);
+  assert.equal(Object.keys(afterReset.lessons).length, 0);
+});
+
 
 console.log('');
 console.log(`Passed: ${passed}`);

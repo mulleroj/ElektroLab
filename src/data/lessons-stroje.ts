@@ -754,6 +754,173 @@ export const strojeLessons: MicroLesson[] = [
     mvpAvailable: true,
   },
   {
+    id: 'co-delaji-elektricke-pristroje',
+    subjectId: 'stroje',
+    topicId: 'funkce-elektrickych-pristroju',
+    title: 'Co elektrické přístroje dělají',
+    year: 2,
+    durationMinutes: 10,
+    difficulty: 'základní',
+    goal:
+      'Rozlišíš napěťovou hladinu od funkce přístroje a rozhodneš, zda zařízení spíná, odpojuje, jistí nebo měří.',
+    hook:
+      'Stykač z minulé lekce spíná motor. Jistič, odpojovač a měřicí přístroj jsou také elektrické přístroje — dělají ale stejnou práci?',
+    explanation:
+      '**Dvě různé otázky:** U každého elektrického přístroje se ptáme, pro jaké podmínky a **napěťovou hladinu** (NN, VN, VVN) je určen. Samostatná otázka je, **jakou funkci** vykonává. Stykač, jistič, odpojovač nebo měřicí přístroj označují druh či funkci — napěťová hladina a funkce **nejsou totéž**.\n\n' +
+      '**Spínání:** Spínací přístroj mění provozní stav obvodu nebo zátěže — v mezích svého určení zapne nebo vypne. **Stykač** z předchozí lekce je příklad řízeného spínání. Spínání samo **není jištění** ani důkaz bezpečného stavu. Běžný ovládací prvek nesmí spínat libovolnou zátěž.\n\n' +
+      '**Odpojování:** Odpojovací funkce slouží k **určenému oddělení** části zařízení. **Odpojovač** není automaticky určen k vypínání libovolného poruchového proudu a odpojování není synonymum jištění. Poloha odpojovacího přístroje sama ještě **nepotvrzuje** ověřenou beznapěťovost. Přesné použití závisí na konstrukci, parametrech a určení — tato lekce neučí postup obsluhy.\n\n' +
+      '**Jištění a ochrana:** **Jistič** nebo **pojistka** mohou při nadproudu plnit určenou ochrannou funkci. Zkrat a přetížení nejsou běžný provozní povel. Jištění není totéž jako ovládání spotřebiče a **stykač sám automaticky není jistič**. Ochrana může poruchu vyhodnotit a vyvolat činnost **jiného** přístroje — ne každý ochranný prvek sám přímo přerušuje hlavní proud.\n\n' +
+      '**Měření:** Měřicí funkce získává informaci o elektrické veličině. Měření **není** spínání, odpojování ani jištění. Pro různé podmínky se používají určené přístroje a způsoby. Běžný školní multimetr **není** univerzální prostředek pro všechna zařízení. V této lekci se nic skutečně neměří.\n\n' +
+      '**Napěťová hladina není velikost ani funkce:** Hladina popisuje elektrické podmínky určení zařízení, ne to, zda spíná, odpojuje, jistí nebo měří. Stejná funkční kategorie může existovat na různých hladinách. **Fyzická velikost, barva ani počet izolátorů** nestačí k bezpečnému zařazení. Vyšší napětí **automaticky neznamená** vyšší proud.\n\n' +
+      '**Vypnuto ještě neznamená ověřeně bezpečno:** Vypnutý přístroj nemusí znamenat odpojené zařízení a odpojení samo není pohledem důkazem beznapěťovosti. Poloha páky, kontaktu nebo kontrolky **nestačí**. Stav se může změnit dálkovým nebo automatickým povelem. Tato lekce neučí praktický postup ověřování.',
+    safetyNote:
+      'Výuka probíhá pouze pomocí schématu, fotografie, simulace nebo učitelem zabezpečeného nízkonapěťového modelu. Žák nepřipojuje ani nezapojuje skutečné elektrické přístroje, neotevírá rozváděč, svorkovnici, rozvodnu ani oplocení a neovládá, nepřepíná ani nezkouší skutečné přístroje. Živé měření se neprovádí. K částem VN a VVN se nepřibližuj a elektrický oblouk se nevyvolává ani nepozoruje zblízka. Kontaktů, přípojnic, vodičů ani izolátorů se nedotýkej. Vypnutá poloha nepotvrzuje beznapěťovost. Kontrolka, zvuk ani poloha páky nepotvrzují bezpečný stav. Zařízení může být ovládáno dálkově nebo automaticky a může v něm zůstat elektrická nebo mechanická energie. Skutečná zařízení smí obsluhovat jen kvalifikované a pověřené osoby podle pravidel pracoviště. Pokyn učitele a pravidla školy mají přednost.',
+    memorySentence:
+      'Napěťová hladina říká, pro jaké podmínky je přístroj určen; jeho typ říká, zda spíná, odpojuje, jistí nebo měří — a vypnuto ještě neznamená bezpečno.',
+    typicalMistake:
+      'Žáci často berou NN, VN a VVN jako popis funkce nebo velikosti zařízení a myslí si, že vyšší napětí automaticky znamená vyšší proud. Časté je i směšovat vypínač, jistič a odpojovač, brát stykač jako jistič, odpojovač jako univerzální vypínač zkratu nebo pojistku jako běžný provozní spínač. Správně: napěťová hladina není funkce přístroje; fyzická velikost sama neurčuje NN, VN ani VVN; stykač spíná, ale není jistič; vypínač, jistič a odpojovač nejsou synonyma; odpojovač není univerzální vypínač poruchového proudu; pojistka není provozní spínač; vypnutá poloha sama nepotvrzuje ověřený bezpečný stav celého zařízení.',
+    teacherTip:
+      'Odděl dvě barvy a dvě otázky: „Na jaké napěťové hladině?“ a „Jakou funkci vykonává?“ Použij kartičky spíná, odpojuje, jistí, měří a přiřazuj příklady zařízení. Zdůrazni, že více funkcí smí mít jen přístroj podle svého určení. Navaž na stykač z H8L jako spínání a ukaž rozdíl stykač versus jistič. Nech žáky vysvětlit, proč odpojovač není automaticky vypínač zkratu. Poslední kartičku propoj s následující lekcí NN/VN/VVN. Fotografie nebo schémata ber jen z dokumentace; používej pouze simulaci nebo zabezpečený nízkonapěťový model — obsluhu skutečného rozváděče neprováděj.',
+    activity: {
+      scenarioChoice: {
+        type: 'scenario-choice',
+        instruction:
+          'U každé situace vyber možnost, která přímo odpovídá na závěrečnou otázku. Všechny čtyři musí být správně.',
+        options: [
+          {
+            id: 'spina-provozni-obvod',
+            label: 'Spíná nebo vypíná provozní obvod v rámci určení přístroje',
+          },
+          {
+            id: 'odpojuje-izoluje',
+            label: 'Vytváří určené odpojení nebo izolační oddělení části zařízení',
+          },
+          {
+            id: 'jisti-nadproud',
+            label: 'Reaguje na nadproud nebo zkrat jako určený ochranný prvek',
+          },
+          {
+            id: 'meri-velicinu',
+            label: 'Získává informaci o elektrické veličině',
+          },
+        ],
+        successMessage:
+          'Výborně! Odděluješ spínání, odpojování, jištění a měření — a víš, že napěťová hladina není totéž co funkce.',
+        scenarios: [
+          {
+            id: 's1',
+            text: 'Motor se má při běžném provozu řízeně zapnout nebo vypnout. Porucha ani zajištění pracoviště se teď neřeší. Kterou funkci musí mít přístroj, který má při běžném provozu řízeně zapnout nebo vypnout motor?',
+            correctOptionId: 'spina-provozni-obvod',
+            explanation:
+              'Jde o provozní spínání. Stykač z předchozí lekce může být příkladem. Spínání samo neznamená jištění a proud motoru neteče cívkou stykače.',
+          },
+          {
+            id: 's2',
+            text: 'Schéma řeší určené oddělení části zařízení. Nejde o vypínání zkratu ani o to, zda je zařízení už ověřeně bezpečné. Která funkce přístroje slouží k určenému oddělení části zařízení, aniž by sama potvrzovala ověřený beznapěťový stav?',
+            correctOptionId: 'odpojuje-izoluje',
+            explanation:
+              'Jde o odpojovací nebo izolační funkci. Odpojovač není automaticky univerzální přístroj pro vypínání poruchového proudu. Poloha přístroje sama nepotvrzuje bezpečný stav — nejde o návod k obsluze.',
+          },
+          {
+            id: 's3',
+            text: 'V obvodu vznikne nadproud nebo zkrat. Nejde o běžné provozní spínání. Která funkce má podle určení reagovat na nadproud nebo zkrat a omezit jejich následky?',
+            correctOptionId: 'jisti-nadproud',
+            explanation:
+              'Jde o jištění nebo určenou ochranu proti nadproudu. Stykač sám automaticky není jistič. Jistič ani pojistka nejsou univerzální ochranou proti každému možnému nebezpečí.',
+          },
+          {
+            id: 's4',
+            text: 'Potřebujeme získat informaci o proudu, napětí nebo jiné elektrické veličině. Praktický postup měření se neřeší. Která funkce zařízení slouží k získání informace o elektrické veličině, nikoli ke spínání nebo jištění obvodu?',
+            correctOptionId: 'meri-velicinu',
+            explanation:
+              'Jde o měřicí funkci. Měření není spínání ani jištění. Používají se pouze přístroje a postupy určené pro dané podmínky — žák nic neměří na skutečném rozváděči ani zařízení VN/VVN.',
+          },
+        ],
+      },
+    },
+    quiz: [
+      {
+        id: 'q1',
+        text: 'Co správně rozlišuje napěťovou hladinu a typ elektrického přístroje?',
+        options: [
+          {
+            id: 'a',
+            text: 'Napěťovou hladinu NN, VN nebo VVN spolehlivě určíš jen podle fyzické velikosti a vzhledu celého zařízení.',
+          },
+          {
+            id: 'b',
+            text: 'Vyšší napěťová hladina automaticky znamená, že zařízením vždy teče i vyšší provozní proud než u nižší hladiny.',
+          },
+          {
+            id: 'c',
+            text: 'Napěťová hladina popisuje elektrické podmínky zařízení, zatímco typ přístroje popisuje jeho funkci a určení.',
+          },
+          {
+            id: 'd',
+            text: 'Všechny přístroje jedné napěťové hladiny mají nutně stejnou funkci v obvodu, stejné určení i stejné chování.',
+          },
+        ],
+        correctOptionId: 'c',
+        explanation:
+          'NN, VN a VVN označují napěťovou hladinu. Stykač, jistič, odpojovač nebo měřicí přístroj označují druh či funkci. Velikost ani vyšší napětí samy neurčují funkci ani proud.',
+      },
+      {
+        id: 'q2',
+        text: 'Jak se liší stykač od určeného jištění proti nadproudu?',
+        options: [
+          {
+            id: 'a',
+            text: 'Stykač při každém provozu automaticky jistí motor proti zkratu i proti každému přetížení v silovém obvodu.',
+          },
+          {
+            id: 'b',
+            text: 'Stykač při běžném provozu spíná zátěž; jištění proti nadproudu zajišťuje určený ochranný prvek.',
+          },
+          {
+            id: 'c',
+            text: 'Pojistka slouží hlavně jako běžné provozní tlačítko pro zapínání a vypínání spotřebiče v denním provozu.',
+          },
+          {
+            id: 'd',
+            text: 'Cívka stykače zesiluje proud motoru, proto stykač nahrazuje jistič i pojistku současně bez dalšího prvku.',
+          },
+        ],
+        correctOptionId: 'b',
+        explanation:
+          'Stykač spíná v rámci svého určení. Jištění nadproudu má určený ochranný prvek. Stykač proud nezesiluje a pojistka není provozní tlačítko.',
+      },
+      {
+        id: 'q3',
+        text: 'Co platí o vypnuté nebo zdánlivě odpojené poloze přístroje a bezpečném stavu?',
+        options: [
+          {
+            id: 'a',
+            text: 'Zhasnutá kontrolka spolehlivě potvrzuje, že je celé zařízení ověřeně bez napětí a bez zbytkové energie.',
+          },
+          {
+            id: 'b',
+            text: 'Páka v poloze vypnuto je sama o sobě úplným důkazem bezpečného beznapěťového stavu celého zařízení.',
+          },
+          {
+            id: 'c',
+            text: 'Stojí-li připojený spotřebič, je tím vždy potvrzeno, že v zařízení už není žádné napětí ani energie.',
+          },
+          {
+            id: 'd',
+            text: 'Vypnutá nebo zdánlivě odpojená poloha sama nepotvrzuje ověřenou beznapěťovost zařízení.',
+          },
+        ],
+        correctOptionId: 'd',
+        explanation:
+          'Poloha páky, kontrolka ani stojící spotřebič samy nepotvrzují bezpečný stav. Stav se může změnit dálkově nebo automaticky. Tato lekce neučí postup ověřování.',
+      },
+    ],
+    activityXp: 20,
+    quizXp: 15,
+    badgeId: 'znalec-funkci-pristroju',
+    mvpAvailable: true,
+  },
+  {
     id: 'pristroje-nn-vn-vvn',
     subjectId: 'stroje',
     topicId: 'pristroje-vn-vvn',

@@ -179,6 +179,16 @@ export const topics: Topic[] = [
     mvpAvailable: true,
   },
   {
+    id: 'funkce-elektrickych-pristroju',
+    subjectId: 'stroje',
+    title: 'Funkce elektrických přístrojů',
+    description:
+      'Spínání, odpojování, jištění a měření — co přístroj v obvodu skutečně dělá.',
+    year: 2,
+    estimatedMinutes: 10,
+    mvpAvailable: true,
+  },
+  {
     id: 'pristroje-vn-vvn',
     subjectId: 'stroje',
     title: 'Elektrické přístroje vysokého a velmi vysokého napětí',

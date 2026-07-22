@@ -234,6 +234,12 @@ export const badges: Badge[] = [
     icon: '🕹️',
   },
   {
+    id: 'znalec-funkci-pristroju',
+    title: 'Znalec funkcí přístrojů',
+    description: 'Rozlišil spínání, odpojování, jištění a měření.',
+    icon: '🧭',
+  },
+  {
     id: 'bezpecny-u-vn',
     title: 'Bezpečný u vysokého napětí',
     description: 'Znáš napěťové hladiny a víš, že u VN/VVN rozhoduje odstup.',
