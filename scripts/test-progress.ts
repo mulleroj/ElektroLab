@@ -3746,6 +3746,340 @@ test('H8J: starý progress, retry, projektor a reset u motoru', () => {
   assert.equal(Object.keys(afterReset.lessons).length, 0);
 });
 
+// --- MVP-12H8L: Prohloubení stykac-a-rele ------------------------------------
+
+function collectContactorProductionText(
+  lesson: NonNullable<ReturnType<typeof getLessonById>>,
+) {
+  return [
+    lesson.explanation,
+    lesson.safetyNote,
+    lesson.typicalMistake,
+    lesson.memorySentence,
+    lesson.goal,
+    lesson.hook,
+    lesson.teacherTip,
+    ...lesson.quiz.flatMap((q) => [
+      q.text,
+      q.explanation,
+      ...q.options.map((o) => o.text),
+    ]),
+    ...((getLessonActivity(lesson) as { scenarios?: { text: string; explanation: string }[] })
+      ?.scenarios ?? []
+    ).flatMap((s) => [s.text, s.explanation]),
+  ].join('\n');
+}
+
+function collectContactorExplanatoryText(
+  lesson: NonNullable<ReturnType<typeof getLessonById>>,
+) {
+  const activity = getLessonActivity(lesson) as {
+    scenarios?: { explanation: string }[];
+    successMessage?: string;
+  } | undefined;
+  return [
+    lesson.explanation,
+    lesson.typicalMistake,
+    lesson.memorySentence,
+    lesson.goal,
+    lesson.hook,
+    ...lesson.quiz.map((q) => q.explanation),
+    ...(activity?.scenarios ?? []).map((s) => s.explanation),
+    activity?.successMessage ?? '',
+  ].join('\n');
+}
+
+test('H8L: kontrakt prohloubené lekce stykac-a-rele', () => {
+  const lesson = getLessonById('stykac-a-rele');
+  assert.ok(lesson);
+  assert.equal(lesson.id, 'stykac-a-rele');
+  assert.equal(lesson.title, 'Stykač a relé');
+  assert.equal(lesson.subjectId, 'stroje');
+  assert.equal(lesson.year, 2);
+  assert.equal(lesson.topicId, 'pristroje-nn');
+  assert.equal(lesson.durationMinutes, 10);
+  assert.equal(lesson.interactiveDemo?.type, 'contactor-relay');
+  assert.equal(lesson.badgeId, 'vladce-kontaktu');
+  assert.ok(getBadgeById('vladce-kontaktu'));
+  assert.equal(lesson.activityXp, 20);
+  assert.equal(lesson.quizXp, 15);
+  assert.equal(lesson.quiz.length, 3);
+  const activity = getLessonActivity(lesson);
+  assert.ok(activity);
+  assert.equal(activity.type, 'scenario-choice');
+  assert.equal(activity.scenarios.length, 4);
+  assert.equal(getMvpLessonsBySubject('stroje').length, 6);
+  assert.equal(lessons.length, 41);
+  const topic = getTopicById('pristroje-nn');
+  assert.ok(topic);
+  assert.equal(topic.estimatedMinutes, 10);
+  assert.equal(topic.mvpAvailable, true);
+  assertQuizOptionLengthFairness('stykac-a-rele');
+});
+
+test('H8L: návaznost motor → stykač a zachování H8J', () => {
+  const order = getMvpLessonsBySubject('stroje').map((l) => l.id);
+  const iMotor = order.indexOf('asynchronni-motor');
+  const iContactor = order.indexOf('stykac-a-rele');
+  assert.equal(iContactor, iMotor + 1);
+
+  const motor = getLessonById('asynchronni-motor');
+  const contactor = getLessonById('stykac-a-rele');
+  assert.ok(motor);
+  assert.ok(contactor);
+  assert.ok(/řízen[ée] zapnutí|řízené spínání|potřebuje spínat/i.test(contactor.hook + contactor.explanation));
+  assert.ok(/proud motoru nemá|neteče.*tlačítkem|nemá procházet běžným ovládacím tlačítkem/i.test(contactor.hook + contactor.explanation));
+  assert.ok(/ovládací obvod.*povel|dává povel/i.test(contactor.explanation));
+
+  assert.equal(motor.durationMinutes, 10);
+  assert.equal(motor.badgeId, 'motorovy-elev');
+  assert.equal(motor.interactiveDemo?.type, 'induction-motor');
+  const motorActivity = getLessonActivity(motor) as {
+    scenarios: { correctOptionId: string }[];
+  };
+  assert.deepEqual(
+    motorActivity.scenarios.map((s) => s.correctOptionId),
+    ['proud-a-moment', 'napeti-bez-proudu', 'zanika-indukce', 'bez-statoroveho-pole'],
+  );
+  assert.ok(/Točivé pole vůči rotoru indukuje proud/i.test(motor.memorySentence));
+});
+
+test('H8L: ovládací a silový obvod', () => {
+  const lesson = getLessonById('stykac-a-rele');
+  assert.ok(lesson);
+  const explain = collectContactorExplanatoryText(lesson);
+  assert.ok(/ovládací obvod napájí a řídí.*cívku|řídí \*\*cívku\*\*/i.test(lesson.explanation));
+  assert.ok(/silový obvod.*motor|energii ke spotřebiči/i.test(explain));
+  assert.ok(/jiné napětí a proud|rozdílné napětí/i.test(explain));
+  assert.ok(/energii motoru nedává ovládací|zdroj silového/i.test(explain));
+  assert.ok(/proud motoru \*\*neteče cívkou\*\*|neteče cívkou/i.test(explain));
+  assert.ok(/proud mezi nimi nepřeskakuje|nepřeskakuje/i.test(explain));
+  assert.equal(
+    /proud motoru teče cívkou|cívkou teče proud motoru/i.test(lesson.explanation),
+    false,
+  );
+});
+
+test('H8L: cívka, kotva a kontakty', () => {
+  const lesson = getLessonById('stykac-a-rele');
+  assert.ok(lesson);
+  const explain = collectContactorExplanatoryText(lesson);
+  assert.ok(/správného napětí|správné napětí/i.test(explain));
+  assert.ok(/proud.*cívkou|proteče proud/i.test(explain));
+  assert.ok(/magnetické pole/i.test(explain));
+  assert.ok(/kotv/i.test(explain));
+  assert.ok(/mechanicky.*kontakt|mechanický pohyb kontakt/i.test(explain));
+  assert.ok(/pružina/i.test(explain));
+  assert.ok(/hlavní kontakt/i.test(explain));
+  assert.ok(/pomocn[éeý].*kontakt/i.test(explain));
+  assert.ok(/bez pohybu nemění|bez mechanického pohybu/i.test(explain));
+});
+
+test('H8L: NO a NC ve vztahu ke klidovému stavu', () => {
+  const lesson = getLessonById('stykac-a-rele');
+  assert.ok(lesson);
+  const explain = collectContactorExplanatoryText(lesson);
+  const text = collectContactorProductionText(lesson);
+  assert.ok(/NO.*spínací|spínací.*NO/i.test(explain));
+  assert.ok(/NC.*rozpínací|rozpínací.*NC/i.test(explain));
+  assert.ok(/v klidu.*rozepnutý|bez buzení.*rozepnutý/i.test(explain));
+  assert.ok(/v klidu.*sepnutý|bez buzení.*sepnutý/i.test(explain));
+  assert.ok(/po buzení|po přitažení kotvy|stav změní/i.test(explain));
+  assert.ok(/klidový stav cívky|bez buzení cívky/i.test(explain));
+  assert.equal(/svorka A1|svorka 13|číslování svorek/i.test(text), false);
+  assert.equal(/zapoj START|schéma START|přidržení/i.test(text), false);
+});
+
+test('H8L: relé versus stykač a stykač versus ochrana', () => {
+  const lesson = getLessonById('stykac-a-rele');
+  assert.ok(lesson);
+  const explain = collectContactorExplanatoryText(lesson);
+  const text = collectContactorProductionText(lesson);
+  assert.ok(/podobném principu|cívku, kotvu a kontakty/i.test(explain));
+  assert.ok(/ovládání, signalizaci|menší zátěže/i.test(explain));
+  assert.ok(/výkonových zátěží|časté spínání/i.test(explain));
+  assert.ok(/jmenovité parametry|určení zařízení/i.test(explain));
+  assert.equal(/silnější relé/i.test(text), false);
+  assert.ok(/není jistič|nenahrazuje jistič/i.test(explain));
+  assert.ok(/ochranu proti|automaticky nenahrazuje|nechrání/i.test(explain));
+  assert.ok(/tepelné relé|ochranný prvek|určenou ochranu/i.test(explain));
+  assert.ok(/vypnutá cívka.*beznapěť|nepotvrzuje.*beznapěť|neznamená.*beznapěť/i.test(explain));
+});
+
+test('H8L: aktivita, quiz, SafetyNote a demo regrese', () => {
+  const lesson = getLessonById('stykac-a-rele');
+  assert.ok(lesson);
+  const activity = getLessonActivity(lesson) as {
+    type: string;
+    instruction?: string;
+    scenarios: { id: string; correctOptionId: string; explanation: string; text: string }[];
+    options: { id: string }[];
+  };
+  assert.equal(activity.type, 'scenario-choice');
+  assert.equal(activity.scenarios.length, 4);
+  assert.deepEqual(
+    activity.scenarios.map((s) => s.correctOptionId),
+    ['hlavni-no-sepne', 'pomocny-nc-rozepne', 'spina-nechrani', 'nelze-potvrdit-beznapeti'],
+  );
+  assert.ok(
+    /závěrečnou otázku|přímo odpovídá na.*otázk/i.test(activity.instruction ?? ''),
+    'instrukce musí odkazovat na závěrečnou otázku situace',
+  );
+  assert.equal(
+    /co platí pro stykač a jeho obvody/i.test(activity.instruction ?? ''),
+    false,
+    'instrukce nesmí zůstat u obecného „co platí“',
+  );
+
+  const [s1, s2, s3, s4] = activity.scenarios;
+  assert.ok(/hlavním NO kontaktem|hlavní NO kontakt/i.test(s1.text));
+  assert.ok(/silovým obvodem|silový obvod/i.test(s1.text));
+  assert.ok(/Co se.*stane.*hlavním NO|Co se v tomto okamžiku stane s hlavním NO/i.test(s1.text));
+  assert.equal(s1.correctOptionId, 'hlavni-no-sepne');
+  assert.equal(/automaticky ochrání|beznapěťovost/i.test(s1.text), false);
+
+  assert.ok(/pomocn(ým|ý) NC kontaktem|pomocný NC kontakt/i.test(s2.text));
+  assert.ok(/Co se.*stane.*pomocným NC|Co se v tomto okamžiku stane s pomocným NC/i.test(s2.text));
+  assert.equal(s2.correctOptionId, 'pomocny-nc-rozepne');
+  assert.equal(/automaticky ochrání|beznapěťovost/i.test(s2.text), false);
+
+  assert.ok(/Jak toto tvrzení správně posoudit|posoudit.*tvrzení|automaticky ochrání/i.test(s3.text));
+  assert.equal(s3.correctOptionId, 'spina-nechrani');
+
+  assert.ok(/Co lze.*potvrdit|skutečně potvrdit|beznapěť|bez napětí/i.test(s4.text));
+  assert.equal(s4.correctOptionId, 'nelze-potvrdit-beznapeti');
+
+  assert.ok(/napětí.*proud.*magnetické pole.*kotv/i.test(s1.explanation));
+  assert.ok(/klidu sepnutý|bez buzení/i.test(s2.explanation));
+  assert.ok(/není jistič/i.test(s3.explanation));
+  assert.ok(/svařený|beznapěťovosti/i.test(s4.explanation));
+
+  assert.equal(lesson.quiz[0].correctOptionId, 'b');
+  assert.equal(lesson.quiz[1].correctOptionId, 'd');
+  assert.equal(lesson.quiz[2].correctOptionId, 'c');
+  for (const q of lesson.quiz) {
+    assert.equal(q.options.filter((o) => o.id === q.correctOptionId).length, 1);
+  }
+  assertQuizOptionLengthFairness('stykac-a-rele');
+
+  const safety = lesson.safetyNote;
+  assert.ok(/nepřipojuje stykač, relé ani motor k síti/i.test(safety));
+  assert.ok(/rozvaděč ani svorkovnici|svorkovnici/i.test(safety));
+  assert.ok(/nepřepojuje vodiče, vinutí ani fáze/i.test(safety));
+  assert.ok(/živé měření|živých částech/i.test(safety));
+  assert.ok(/Nezajištěný motor|mechanismus se nespouští/i.test(safety));
+  assert.ok(/Kontaktů ani svorek/i.test(safety));
+  assert.ok(/Vypnutá cívka neznamená bezpečný silový/i.test(safety));
+  assert.ok(/Rozepnutý kontakt neznamená ověřenou beznapěťovost/i.test(safety));
+  assert.ok(/svařený/i.test(safety));
+  assert.ok(/neočekávaně rozběhnout/i.test(safety));
+  assert.ok(/zahřívat/i.test(safety));
+  assert.ok(/schématu, simulace|nízkonapěťového modelu/i.test(safety));
+  assert.ok(/školní pravidla|pokyn učitele/i.test(safety));
+
+  const text = collectContactorProductionText(lesson);
+  assert.equal(/připoj.*k síti a spusť|změň sled fází|hvězda\/trojúhelník|START–STOP/i.test(text), false);
+
+  const demoPath = path.join(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '../src/components/demos/ContactorRelayDemo.tsx',
+  );
+  const hash = execFileSync('git', ['hash-object', demoPath], {
+    encoding: 'utf8',
+  }).trim();
+  assert.equal(
+    hash,
+    'bd1e0dfb8aeb3add4fcaa8b8ec0d97fcac6c0262',
+    'ContactorRelayDemo musí zůstat blobově beze změny',
+  );
+});
+
+test('H8L: starý progress, retry, projektor a reset u stykače', () => {
+  const allLessons = getMvpLessonsBySubject('stroje');
+  assert.equal(allLessons.length, 6);
+  const lessonsState: ProgressState['lessons'] = {};
+  for (const l of allLessons) {
+    lessonsState[l.id] = {
+      activityCompleted: true,
+      quizCompleted: true,
+      completedAt: '2026-01-01T00:00:00.000Z',
+      bestQuizScore: { correct: 3, total: 3 },
+    };
+  }
+  saveProgress({
+    totalXp: 210,
+    earnedBadges: [
+      'mistr-transformatoru',
+      'pocitar-prevodu',
+      'pruvodce-tocivym-polem',
+      'motorovy-elev',
+      'vladce-kontaktu',
+      'bezpecny-u-vn',
+      'strojarsky-elev',
+    ],
+    lessons: lessonsState,
+    calmMode: false,
+  });
+  const loaded = loadProgress();
+  const { completed, total } = getSubjectProgress(
+    loaded,
+    allLessons.map((l) => l.id),
+  );
+  assert.equal(completed, 6);
+  assert.equal(total, 6);
+  assert.equal(isLessonComplete(loaded, 'stykac-a-rele'), true);
+  assert.equal(loaded.earnedBadges.filter((b) => b === 'vladce-kontaktu').length, 1);
+  assert.equal(loaded.earnedBadges.filter((b) => b === 'strojarsky-elev').length, 1);
+  assert.equal(loaded.totalXp, 210);
+
+  const worse = applyQuizCompletion(loadProgress(), {
+    lessonId: 'stykac-a-rele',
+    xp: 15,
+    badgeId: 'vladce-kontaktu',
+    correct: 1,
+    total: 3,
+  });
+  assert.equal(worse.xpAwarded, 0);
+  assert.equal(worse.lessonBadgeAwarded, false);
+  assert.deepEqual(worse.subjectBadgeIdsAwarded, []);
+  assert.equal(worse.state.totalXp, 210);
+  assert.deepEqual(worse.state.lessons['stykac-a-rele']?.bestQuizScore, {
+    correct: 3,
+    total: 3,
+  });
+  assert.equal(worse.state.earnedBadges.filter((b) => b === 'vladce-kontaktu').length, 1);
+  assert.equal(worse.state.earnedBadges.filter((b) => b === 'strojarsky-elev').length, 1);
+
+  const projector = applyQuizCompletion(
+    {
+      totalXp: 0,
+      earnedBadges: [],
+      lessons: {},
+      calmMode: false,
+    },
+    {
+      lessonId: 'stykac-a-rele',
+      xp: 15,
+      badgeId: 'vladce-kontaktu',
+      correct: 3,
+      total: 3,
+      projectorMode: true,
+    },
+  );
+  assert.equal(projector.xpAwarded, 0);
+  assert.equal(projector.lessonBadgeAwarded, false);
+  assert.equal(projector.state.totalXp, 0);
+  assert.equal(Object.keys(projector.state.lessons).length, 0);
+
+  const cleared = resetProgress(loadProgress());
+  saveProgress(cleared);
+  const afterReset = loadProgress();
+  assert.equal(afterReset.totalXp, 0);
+  assert.equal(afterReset.earnedBadges.includes('vladce-kontaktu'), false);
+  assert.equal(afterReset.earnedBadges.includes('strojarsky-elev'), false);
+  assert.equal(Object.keys(afterReset.lessons).length, 0);
+});
+
 console.log('');
 console.log(`Passed: ${passed}`);
 console.log(`Failed: ${failures.length}`);
