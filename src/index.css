@@ -1731,7 +1731,27 @@ input:focus-visible {
   border-left: 3px solid var(--color-primary);
 }
 
-/* ===== MVP-6: pokraÄovacÃ­ box ===== */
+.onboarding__section {
+  margin: 0 0 1.25rem;
+}
+
+.onboarding__section h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+}
+
+.onboarding__list {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.onboarding__list li {
+  line-height: 1.4;
+}
+
+/* ===== MVP-6: pokracovaci box ===== */
 
 .continue-box {
   background: var(--color-surface);
@@ -4787,7 +4807,7 @@ input:focus-visible {
   outline-offset: 2px;
 }
 
-/* ===== MVP-13C: anonymní hlášení problémù ===== */
+/* ===== MVP-13C: anonymnï¿½ hlï¿½enï¿½ problï¿½mï¿½ ===== */
 
 .report-problem-dialog {
   max-width: 640px;
