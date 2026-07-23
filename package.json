@@ -10,7 +10,7 @@
     "typecheck": "tsc -b --noEmit",
     "lint": "eslint .",
     "validate:content": "tsx scripts/validate-content.ts",
-    "test": "tsx scripts/test-progress.ts && tsx scripts/test-focus.ts && tsx scripts/test-lesson-rich-text.ts",
+    "test": "tsx scripts/test-progress.ts && tsx scripts/test-focus.ts && tsx scripts/test-lesson-rich-text.ts && tsx scripts/test-term-matching-shuffle.ts",
     "check": "npm run validate:content && npm run typecheck && npm run lint && npm run build"
   },
   "dependencies": {

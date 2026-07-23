@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { orderRightItemsWithoutRowHints } from '../lib/derangeShuffle';
 
 interface ClickMatchingActivityProps {
   instruction: string;
@@ -9,6 +10,8 @@ interface ClickMatchingActivityProps {
   leftTitle: string;
   rightTitle: string;
   onComplete: () => void;
+  /** Pouze pro testy — deterministický RNG v rozsahu [0, 1). */
+  rng?: () => number;
 }
 
 export function ClickMatchingActivity({
@@ -20,11 +23,16 @@ export function ClickMatchingActivity({
   rightTitle,
   correctPairs,
   onComplete,
+  rng,
 }: ClickMatchingActivityProps) {
   const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
   const [matched, setMatched] = useState<Record<string, string>>({});
   const [feedback, setFeedback] = useState<string | null>(null);
   const [feedbackType, setFeedbackType] = useState<'error' | 'success'>('error');
+  // Pořadí pravého sloupce je pevné po celý pokus; nové teprve při resetu.
+  const [rightOrder, setRightOrder] = useState(() =>
+    orderRightItemsWithoutRowHints(leftItems, rightItems, correctPairs, rng),
+  );
 
   const totalPairs = Object.keys(correctPairs).length;
   const matchedCount = Object.keys(matched).length;
@@ -67,6 +75,9 @@ export function ClickMatchingActivity({
     setSelectedLeft(null);
     setMatched({});
     setFeedback(null);
+    setRightOrder(
+      orderRightItemsWithoutRowHints(leftItems, rightItems, correctPairs, rng),
+    );
   };
 
   const isRightUsed = (rightId: string) => Object.values(matched).includes(rightId);
@@ -108,8 +119,12 @@ export function ClickMatchingActivity({
         </div>
         <div>
           <h3 className="matching-activity__col-title">{rightTitle}</h3>
-          <div className="matching-activity__items" role="group" aria-label={rightTitle}>
-            {rightItems.map((item) => {
+          <div
+            className="matching-activity__items"
+            role="group"
+            aria-label={`${rightTitle} — pořadí nesouvisí s pojmy vlevo`}
+          >
+            {rightOrder.map((item) => {
               const isUsed = isRightUsed(item.id);
               return (
                 <button
@@ -118,6 +133,7 @@ export function ClickMatchingActivity({
                   className={`match-item${isUsed ? ' match-item--matched' : ''}${!selectedLeft ? ' match-item--idle' : ''}`}
                   onClick={() => handleRightClick(item.id)}
                   disabled={isUsed || !selectedLeft}
+                  aria-label={item.label}
                 >
                   {isUsed && <span aria-hidden="true">✔ </span>}
                   {item.label}
