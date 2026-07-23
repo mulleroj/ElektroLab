@@ -4786,3 +4786,103 @@ input:focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
+
+/* ===== MVP-13C: anonymní hlášení problémù ===== */
+
+.report-problem-dialog {
+  max-width: 640px;
+}
+
+.report-problem-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.report-problem-dialog__header h2 {
+  margin: 0;
+}
+
+.report-problem-dialog__lead {
+  margin: 0 0 1rem;
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+}
+
+.report-problem-dialog__success {
+  display: grid;
+  gap: 1rem;
+}
+
+.report-problem-form__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1rem;
+}
+
+.report-problem-field {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+}
+
+.report-problem-field--full {
+  grid-column: 1 / -1;
+}
+
+.report-problem-field span {
+  font-weight: 600;
+}
+
+.report-problem-field input,
+.report-problem-field select,
+.report-problem-field textarea {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font: inherit;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.report-problem-field textarea {
+  min-height: 4.5rem;
+  resize: vertical;
+}
+
+.report-problem-field input:focus-visible,
+.report-problem-field select:focus-visible,
+.report-problem-field textarea:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.report-problem-field [aria-invalid='true'] {
+  border-color: var(--color-error);
+}
+
+.report-problem-form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.report-problem-honeypot {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+@media (max-width: 560px) {
+  .report-problem-form__grid {
+    grid-template-columns: 1fr;
+  }
+}

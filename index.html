@@ -8,6 +8,48 @@
   </head>
   <body>
     <div id="root"></div>
+    <!--
+      MVP-13C: skrytý statický formulář pro detekci Netlify Forms při buildu.
+      Name atributy musí odpovídat React formuláři (elektrolab-pilot-feedback).
+      Příjemce e-mailu se nastavuje pouze v Netlify UI — ne ve frontendu.
+    -->
+    <form
+      name="elektrolab-pilot-feedback"
+      method="POST"
+      data-netlify="true"
+      data-netlify-honeypot="bot-field"
+      hidden
+      aria-hidden="true"
+    >
+      <input type="hidden" name="form-name" value="elektrolab-pilot-feedback" />
+      <input name="bot-field" />
+      <input name="reportId" />
+      <input name="timestamp" />
+      <input name="currentUrl" />
+      <input name="hash" />
+      <input name="subjectId" />
+      <input name="subjectTitle" />
+      <input name="lessonId" />
+      <input name="lessonTitle" />
+      <input name="currentSection" />
+      <input name="mode" />
+      <input name="calmMode" />
+      <input name="viewport" />
+      <input name="userAgent" />
+      <input name="activityCompleted" />
+      <input name="quizCompleted" />
+      <input name="appVersion" />
+      <input name="testerRole" />
+      <input name="category" />
+      <input name="location" />
+      <textarea name="steps"></textarea>
+      <textarea name="actualResult"></textarea>
+      <textarea name="expectedResult"></textarea>
+      <input name="reproducibility" />
+      <input name="impact" />
+      <input name="progressImpact" />
+      <textarea name="optionalNote"></textarea>
+    </form>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

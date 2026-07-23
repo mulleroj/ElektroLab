@@ -209,6 +209,7 @@ function App() {
   return (
     <AppShell
       progress={progress}
+      route={route}
       calmMode={progress.calmMode}
       onCalmModeToggle={handleCalmModeToggle}
       projectorMode={projectorMode}
