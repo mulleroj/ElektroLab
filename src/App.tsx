@@ -49,6 +49,11 @@ function App() {
   const [showOnboarding, setShowOnboarding] = useState<boolean>(
     () => !loadOnboardingSeen(),
   );
+  // Při prvním spuštění jiný text tlačítka než při ručním otevření Úvodu.
+  const [onboardingCloseLabel, setOnboardingCloseLabel] = useState(
+    () =>
+      loadOnboardingSeen() ? 'Zpět do aplikace' : 'Rozumím, jdeme na to',
+  );
 
   useEffect(() => {
     const onHashChange = () => setRoute(parseHash());
@@ -214,9 +219,17 @@ function App() {
       onCalmModeToggle={handleCalmModeToggle}
       projectorMode={projectorMode}
       onProjectorModeToggle={() => setProjectorMode((prev) => !prev)}
-      onOpenOnboarding={() => setShowOnboarding(true)}
+      onOpenOnboarding={() => {
+        setOnboardingCloseLabel('Zpět do aplikace');
+        setShowOnboarding(true);
+      }}
     >
-      {showOnboarding && <Onboarding onClose={handleOnboardingClose} />}
+      {showOnboarding && (
+        <Onboarding
+          onClose={handleOnboardingClose}
+          closeLabel={onboardingCloseLabel}
+        />
+      )}
       {renderPage()}
     </AppShell>
   );
