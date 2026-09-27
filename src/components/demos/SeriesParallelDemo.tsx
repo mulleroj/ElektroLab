@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import type { SeriesParallelDemoConfig } from '../../types';
 import { AnimatedDemoControls } from '../animation/AnimatedDemoControls';
@@ -10,11 +10,12 @@ import { useMotionPolicy } from '../animation/useMotionPolicy';
  * scénáře mají vlastní úzký typ a vlastní (jen informativní) Set, takže je
  * typový systém nedovolí započítat do hlavního průchodu 2/2.
  */
-type MainScenarioId = 'serial' | 'parallel';
+export type MainScenarioId = 'serial' | 'parallel';
 
-type FaultScenarioId = 'serial-fault' | 'parallel-fault';
+export type FaultScenarioId = 'serial-fault' | 'parallel-fault';
 
-type AnyScenarioId = MainScenarioId | FaultScenarioId;
+export type SeriesParallelScenarioId = MainScenarioId | FaultScenarioId;
+type AnyScenarioId = SeriesParallelScenarioId;
 
 type DemoMode = 'main' | 'fault';
 
@@ -22,7 +23,7 @@ function isMainScenarioId(id: AnyScenarioId): id is MainScenarioId {
   return id === 'serial' || id === 'parallel';
 }
 
-interface DemoStep {
+export interface DemoStep {
   title: string;
   description: string;
 }
@@ -280,6 +281,12 @@ interface DemoVisual {
 function getSteps(scenarioId: AnyScenarioId): DemoStep[] {
   return STEPS_BY_SCENARIO[scenarioId];
 }
+
+const LazySeriesParallel3DView = lazy(() =>
+  import('../threeD/SeriesParallel3DView').then((module) => ({
+    default: module.SeriesParallel3DView,
+  })),
+);
 
 function deriveMainVisual(
   scenarioId: MainScenarioId,
@@ -1182,6 +1189,8 @@ function ParallelCircuitSvg({ visual, showFlowOverlay }: SvgProps) {
 interface ScenarioPlayerProps {
   scenarioId: AnyScenarioId;
   calmMode: boolean;
+  viewMode: '2d' | '3d';
+  onUse2D: () => void;
   onScenarioCompleted: (id: AnyScenarioId) => void;
   /**
    * Volá se jen při skutečné interakci s přehrávačem (Spustit / Další
@@ -1193,6 +1202,8 @@ interface ScenarioPlayerProps {
 function SeriesParallelScenarioPlayer({
   scenarioId,
   calmMode,
+  viewMode,
+  onUse2D,
   onScenarioCompleted,
   onScenarioStarted,
 }: ScenarioPlayerProps) {
@@ -1278,16 +1289,32 @@ function SeriesParallelScenarioPlayer({
 
       {/* Schéma je názorná grafika — úplný stav zapojení je vždy popsán
           textem ve výpisu stavu a v popisu kroku níže. */}
-      <div className={`animated-demo__stage${pausedMod}`}>
-        {isSerialDiagram ? (
-          <SerialCircuitSvg visual={visual} showFlowOverlay={showFlowOverlay} />
-        ) : (
-          <ParallelCircuitSvg
-            visual={visual}
-            showFlowOverlay={showFlowOverlay}
+      {viewMode === '3d' ? (
+        <Suspense
+          fallback={
+            <p className="three-d-fallback" role="status">
+              Načítám 3D pohled… 2D schéma zůstává kdykoli dostupné.
+            </p>
+          }
+        >
+          <LazySeriesParallel3DView
+            scenarioId={scenarioId}
+            stepIndex={stepIndex}
+            onUse2D={onUse2D}
           />
-        )}
-      </div>
+        </Suspense>
+      ) : (
+        <div className={`animated-demo__stage${pausedMod}`}>
+          {isSerialDiagram ? (
+            <SerialCircuitSvg visual={visual} showFlowOverlay={showFlowOverlay} />
+          ) : (
+            <ParallelCircuitSvg
+              visual={visual}
+              showFlowOverlay={showFlowOverlay}
+            />
+          )}
+        </div>
+      )}
 
       <ul className="animated-demo__state" aria-label="Stav zapojení textem">
         {visual.panelRows.map((row) => (
@@ -1318,6 +1345,7 @@ export function SeriesParallelDemoView({
   onContinue,
 }: SeriesParallelDemoProps) {
   const [mode, setMode] = useState<DemoMode>('main');
+  const [viewMode, setViewMode] = useState<'2d' | '3d'>('2d');
   const [activeMainScenarioId, setActiveMainScenarioId] =
     useState<MainScenarioId>('serial');
   const [activeFaultScenarioId, setActiveFaultScenarioId] =
@@ -1404,6 +1432,29 @@ export function SeriesParallelDemoView({
       <h3>{demo.title}</h3>
       <p>{demo.description}</p>
 
+      <div
+        className="series-parallel-demo-view-toggle"
+        role="group"
+        aria-label="Volba zobrazení zapojení"
+      >
+        <button
+          type="button"
+          className={`btn btn--secondary${viewMode === '2d' ? ' btn--active' : ''}`}
+          aria-pressed={viewMode === '2d'}
+          onClick={() => setViewMode('2d')}
+        >
+          2D schéma
+        </button>
+        <button
+          type="button"
+          className={`btn btn--secondary${viewMode === '3d' ? ' btn--active' : ''}`}
+          aria-pressed={viewMode === '3d'}
+          onClick={() => setViewMode('3d')}
+        >
+          3D model
+        </button>
+      </div>
+
       {mode === 'main' ? (
         <>
           {calmMode && (
@@ -1452,6 +1503,8 @@ export function SeriesParallelDemoView({
             key={`main:${activeMainScenarioId}`}
             scenarioId={activeMainScenarioId}
             calmMode={calmMode}
+            viewMode={viewMode}
+            onUse2D={() => setViewMode('2d')}
             onScenarioCompleted={handleScenarioCompleted}
           />
 
@@ -1521,6 +1574,8 @@ export function SeriesParallelDemoView({
             key={`fault:${activeFaultScenarioId}`}
             scenarioId={activeFaultScenarioId}
             calmMode={calmMode}
+            viewMode={viewMode}
+            onUse2D={() => setViewMode('2d')}
             onScenarioCompleted={handleScenarioCompleted}
             onScenarioStarted={handleScenarioStarted}
           />
