@@ -104,7 +104,7 @@ export function Contactor3DView({
             groups={contactorPartGroups}
             selectedPartId={selectedPartId}
             exploded={exploded}
-            coilActive={coilActive}
+            coilActive={coilState}
             onSelectPart={(partId) => setSelectedPartId(partId as ContactorPartId)}
             onToggleExploded={() => {
               setExploded((previous) => {

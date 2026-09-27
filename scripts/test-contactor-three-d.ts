@@ -74,6 +74,7 @@ assert.match(viewSource, /Použít 2D schéma/);
 assert.match(viewSource, /setCoilActive\(initialCoilActive\)/);
 assert.match(viewSource, /previousCoilState\.current = initialCoilActive/);
 assert.match(viewSource, /previousCoilState\.current = coilActive/);
+assert.match(viewSource, /coilActive=\{coilState\}/);
 assert.match(modelSource, /useFrame/);
 
 console.log('ElektroLab contactor 3D model tests');
