@@ -1,7 +1,5 @@
-import { useEffect, useState } from 'react';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import type { Object3D } from 'three';
 import type { ThreeDModelDefinition } from './types';
+import { useLocalGltfScene } from './useLocalGltfScene';
 
 interface ThreeDModelProps {
   definition: ThreeDModelDefinition;
@@ -22,20 +20,5 @@ export function ThreeDModel({ definition, children }: ThreeDModelProps) {
 }
 
 function LocalGltfModel({ url }: { url: string }) {
-  const [scene, setScene] = useState<Object3D | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    const loader = new GLTFLoader();
-    loader.load(url, (result) => {
-      if (mounted) {
-        setScene(result.scene);
-      }
-    });
-    return () => {
-      mounted = false;
-    };
-  }, [url]);
-
-  return scene ? <primitive object={scene} /> : null;
+  return <primitive object={useLocalGltfScene(url)} />;
 }

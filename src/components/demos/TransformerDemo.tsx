@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import type { TransformerDemoConfig } from '../../types';
 import { AnimatedDemoControls } from '../animation/AnimatedDemoControls';
 import { useAnimatedDemo } from '../animation/useAnimatedDemo';
@@ -10,7 +10,7 @@ interface TransformerDemoProps {
   onContinue: () => void;
 }
 
-type TurnsVariant = 'less' | 'same' | 'more';
+export type TurnsVariant = 'less' | 'same' | 'more';
 
 interface TransformerStep {
   title: string;
@@ -54,6 +54,12 @@ const STEPS: TransformerStep[] = [
 ];
 
 const RESULT_STEP = STEPS.length - 1;
+
+const LazyTransformer3DView = lazy(() =>
+  import('../threeD/Transformer3DView').then((module) => ({
+    default: module.Transformer3DView,
+  })),
+);
 
 // Svislé polohy závitů — počty (6 vs. 3/6/9) jsou jen názorný model poměru
 // závitů, ne skutečné počty závitů reálného transformátoru.
@@ -134,6 +140,7 @@ export function TransformerDemoView({
   const { status, stepIndex } = playback;
 
   const [variantId, setVariantId] = useState<TurnsVariant>('less');
+  const [viewMode, setViewMode] = useState<'2d' | '3d'>('2d');
   const [tried, setTried] = useState<Set<TurnsVariant>>(new Set());
 
   const variant = VARIANTS.find((v) => v.id === variantId) ?? VARIANTS[0];
@@ -207,6 +214,29 @@ export function TransformerDemoView({
       <h3>{demo.title}</h3>
       <p>{demo.description}</p>
 
+      <div
+        className="series-parallel-demo-view-toggle"
+        role="group"
+        aria-label="Volba zobrazení transformátoru"
+      >
+        <button
+          type="button"
+          className={`btn btn--secondary${viewMode === '2d' ? ' btn--active' : ''}`}
+          aria-pressed={viewMode === '2d'}
+          onClick={() => setViewMode('2d')}
+        >
+          2D schéma
+        </button>
+        <button
+          type="button"
+          className={`btn btn--secondary${viewMode === '3d' ? ' btn--active' : ''}`}
+          aria-pressed={viewMode === '3d'}
+          onClick={() => setViewMode('3d')}
+        >
+          3D model
+        </button>
+      </div>
+
       {!motion.allowAutoPlay && (
         <p className="calm-step-hint" role="status">
           Automatické přehrávání je vypnuté — ukázku procházej vlastním tempem
@@ -228,6 +258,22 @@ export function TransformerDemoView({
 
       {/* Schéma je názorná grafika — úplný stav transformátoru je vždy popsán
           textem ve výpisu stavu, v popisu kroku a u výběru varianty níže. */}
+      {viewMode === '3d' ? (
+        <Suspense
+          fallback={
+            <p className="three-d-fallback" role="status">
+              Načítám 3D pohled transformátoru… 2D schéma zůstává kdykoli dostupné.
+            </p>
+          }
+        >
+          <LazyTransformer3DView
+            stepIndex={stepIndex}
+            variantId={variantId}
+            calmMode={calmMode}
+            onUse2D={() => setViewMode('2d')}
+          />
+        </Suspense>
+      ) : (
       <div className="animated-demo__stage">
         <svg
           className="transformer-svg"
@@ -433,6 +479,7 @@ export function TransformerDemoView({
           </text>
         </svg>
       </div>
+      )}
 
       <ul className="animated-demo__state" aria-label="Stav transformátoru textem">
         <li>
