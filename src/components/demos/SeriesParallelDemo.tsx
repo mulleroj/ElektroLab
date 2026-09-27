@@ -1300,6 +1300,7 @@ function SeriesParallelScenarioPlayer({
           <LazySeriesParallel3DView
             scenarioId={scenarioId}
             stepIndex={stepIndex}
+            calmMode={calmMode}
             onUse2D={onUse2D}
           />
         </Suspense>

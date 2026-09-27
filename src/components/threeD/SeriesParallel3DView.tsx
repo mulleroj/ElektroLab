@@ -1,14 +1,18 @@
 import { Component, type ErrorInfo, type ReactNode, useMemo, useState } from 'react';
+import { useMotionPolicy } from '../animation/useMotionPolicy';
 import type { SeriesParallelScenarioId } from '../demos/SeriesParallelDemo';
 import { PartInfoPanel } from './PartInfoPanel';
 import { ThreeDControls } from './ThreeDControls';
 import { ThreeDScene } from './ThreeDScene';
 import { getSeriesParallel3DModel } from './seriesParallelModelConfig';
+import { derive3DState } from './seriesParallelState';
 import type { SeriesParallel3DState } from './SeriesParallelModel';
+import { isWebGLAvailable } from './webgl';
 
 interface SeriesParallel3DViewProps {
   scenarioId: SeriesParallelScenarioId;
   stepIndex: number;
+  calmMode: boolean;
   onUse2D: () => void;
 }
 
@@ -48,6 +52,7 @@ class WebglErrorBoundary extends Component<
 export function SeriesParallel3DView({
   scenarioId,
   stepIndex,
+  calmMode,
   onUse2D,
 }: SeriesParallel3DViewProps) {
   const [selectedPartId, setSelectedPartId] = useState<string | null>('source');
@@ -55,6 +60,7 @@ export function SeriesParallel3DView({
   const [cameraResetKey, setCameraResetKey] = useState(0);
   const model = useMemo(() => getSeriesParallel3DModel(scenarioId), [scenarioId]);
   const state = derive3DState(scenarioId, stepIndex);
+  const motion = useMotionPolicy(calmMode);
   const selectedPart = model.parts.find((part) => part.id === selectedPartId);
   const stateDescription = describeSelectedPart(selectedPartId, state, scenarioId);
 
@@ -77,6 +83,7 @@ export function SeriesParallel3DView({
             selectedPartId={selectedPartId}
             cameraResetKey={cameraResetKey}
             onSelectPart={setSelectedPartId}
+            reduceMotion={!motion.allowContinuousMotion}
           />
           <ThreeDControls
             parts={model.parts}
@@ -107,88 +114,6 @@ function ThreeDFallback({ onUse2D }: { onUse2D: () => void }) {
       </button>
     </div>
   );
-}
-
-function isWebGLAvailable(): boolean {
-  if (typeof document === 'undefined') {
-    return false;
-  }
-  try {
-    const canvas = document.createElement('canvas');
-    return Boolean(
-      canvas.getContext('webgl') || canvas.getContext('experimental-webgl'),
-    );
-  } catch {
-    return false;
-  }
-}
-
-function derive3DState(
-  scenarioId: SeriesParallelScenarioId,
-  stepIndex: number,
-): SeriesParallel3DState {
-  const serial = scenarioId === 'serial' || scenarioId === 'serial-fault';
-  const fault = scenarioId === 'serial-fault' || scenarioId === 'parallel-fault';
-  const serialFault = scenarioId === 'serial-fault';
-  const normal = !fault || stepIndex === 0;
-  const serialActive =
-    serial && normal && (scenarioId === 'serial-fault' || stepIndex >= 1);
-  const parallelActive = !serial && normal && stepIndex >= 2;
-  const upperActive = !serial && (normal || stepIndex === 0);
-  const lowerActive = !serial && (!fault || stepIndex >= 0);
-  const flowVisible = serial
-    ? serialFault
-      ? normal
-      : normal && stepIndex === 3
-    : (normal && (scenarioId === 'parallel-fault' || stepIndex === 3)) ||
-      (!normal && stepIndex === 2);
-
-  const activePartIds = new Set<string>();
-  if (serialActive) {
-    activePartIds.add('wire-series');
-    activePartIds.add('wire-return');
-  }
-  if (
-    !serial &&
-    (parallelActive || (scenarioId === 'parallel-fault' && normal) || (!normal && !serialFault))
-  ) {
-    activePartIds.add('wire-feed');
-    activePartIds.add('wire-return');
-  }
-  if (upperActive) activePartIds.add('branch-upper');
-  if (lowerActive) activePartIds.add('branch-lower');
-
-  const litPartIds = new Set<string>();
-  const faultyPartIds = new Set<string>();
-  const highlightedPartIds = new Set<string>();
-  if (serial) {
-    if (normal && (stepIndex === 4 || (serialFault && stepIndex === 0))) {
-      litPartIds.add('bulb-1');
-      litPartIds.add('bulb-2');
-    }
-    if (serialFault && !normal) faultyPartIds.add('bulb-1');
-  } else {
-    if (normal && (stepIndex === 4 || (scenarioId === 'parallel-fault' && stepIndex === 0))) {
-      litPartIds.add('bulb-1');
-      litPartIds.add('bulb-2');
-    }
-    if (!normal) {
-      faultyPartIds.add('bulb-1');
-      litPartIds.add('bulb-2');
-    }
-    if (stepIndex === 1) {
-      highlightedPartIds.add('node-split');
-      highlightedPartIds.add('node-merge');
-    }
-  }
-
-  return {
-    activePartIds,
-    litPartIds,
-    faultyPartIds,
-    highlightedPartIds,
-    flowVisible,
-  };
 }
 
 function describeSelectedPart(
