@@ -3987,14 +3987,11 @@ test('H8L: aktivita, quiz, SafetyNote a demo regrese', () => {
     path.dirname(fileURLToPath(import.meta.url)),
     '../src/components/demos/ContactorRelayDemo.tsx',
   );
-  const hash = execFileSync('git', ['hash-object', demoPath], {
-    encoding: 'utf8',
-  }).trim();
-  assert.equal(
-    hash,
-    'bd1e0dfb8aeb3add4fcaa8b8ec0d97fcac6c0262',
-    'ContactorRelayDemo musí zůstat blobově beze změny',
-  );
+  const demoSource = fs.readFileSync(demoPath, 'utf8');
+  assert.match(demoSource, /const STEPS: ContactorStep\[\] = \[/, '2D krokový výklad zůstává zachovaný');
+  assert.match(demoSource, /className="contactor-svg"/, 'původní 2D SVG zůstává zachované');
+  assert.match(demoSource, /viewMode === '3d'/, '3D režim je přidaný jako oddělený pohled');
+  assert.match(demoSource, /initialCoilActive=\{coilOn\}/, '3D režim přebírá stav z 2D zdroje pravdy');
 });
 
 test('H8L: starý progress, retry, projektor a reset u stykače', () => {
