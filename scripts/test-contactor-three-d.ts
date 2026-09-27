@@ -71,8 +71,8 @@ assert.doesNotMatch(demoSource, /contactor-educational\.glb/);
 assert.match(viewSource, /isWebGLAvailable/);
 assert.match(viewSource, /useMotionPolicy/);
 assert.match(viewSource, /Použít 2D schéma/);
-assert.match(viewSource, /initialCoilActiveRef/);
-assert.match(viewSource, /initialCoilActiveRef\.current === initialCoilActive/);
+assert.match(viewSource, /setCoilActive\(initialCoilActive\)/);
+assert.match(viewSource, /previousCoilState\.current = initialCoilActive/);
 assert.match(viewSource, /previousCoilState\.current = coilActive/);
 assert.match(modelSource, /useFrame/);
 
