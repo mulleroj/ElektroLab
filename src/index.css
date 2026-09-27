@@ -4728,6 +4728,121 @@ input:focus-visible {
   }
 }
 
+/* ===== 3D foundation: SeriesParallelDemo pilot ===== */
+
+.series-parallel-demo-view-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.series-parallel-3d__intro,
+.three-d-fallback {
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  background: var(--color-bg);
+  border-left: 4px solid var(--color-primary);
+  border-radius: var(--radius);
+}
+
+.series-parallel-3d__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(15rem, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.three-d-scene {
+  min-width: 0;
+}
+
+.three-d-scene canvas {
+  display: block;
+  width: 100% !important;
+  height: min(52vw, 28rem) !important;
+  min-height: 20rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  touch-action: none;
+}
+
+.three-d-scene__hint,
+.series-parallel-3d__fallback-note {
+  margin: 0.5rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.three-d-controls,
+.three-d-part-info {
+  padding: 0.75rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.three-d-controls__actions,
+.three-d-controls__parts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.three-d-controls__parts {
+  margin-top: 0.75rem;
+}
+
+.three-d-controls__label {
+  flex-basis: 100%;
+  margin: 0;
+  font-weight: 700;
+}
+
+.three-d-part-info {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.three-d-part-info h4 {
+  margin: 0 0 0.35rem;
+}
+
+.three-d-part-info p {
+  margin: 0.35rem 0 0;
+}
+
+.three-d-part-info__state {
+  font-weight: 600;
+}
+
+.three-d-fallback {
+  border-left-color: #d97706;
+}
+
+@media (max-width: 760px) {
+  .series-parallel-3d__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .three-d-scene canvas {
+    height: 70vw !important;
+    min-height: 17rem;
+  }
+
+  .three-d-part-info {
+    grid-column: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .three-d-scene canvas {
+    /* The 3D pilot uses discrete assembly states; camera motion remains
+       user-controlled and all information is repeated in text. */
+    scroll-behavior: auto;
+  }
+}
+
 /* ===== MVP-12A: skóre mini testu a reset pokroku ===== */
 
 .lesson-complete__quiz-score {
