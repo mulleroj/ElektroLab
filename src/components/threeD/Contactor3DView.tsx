@@ -51,9 +51,12 @@ export function Contactor3DView({
   const [exploded, setExploded] = useState(false);
   const [cameraResetKey, setCameraResetKey] = useState(0);
   const previousCoilState = useRef(initialCoilActive);
+  const initialCoilActiveRef = useRef(initialCoilActive);
   const motion = useMotionPolicy(calmMode);
 
   useEffect(() => {
+    if (initialCoilActiveRef.current === initialCoilActive) return;
+    initialCoilActiveRef.current = initialCoilActive;
     if (!exploded) setCoilActive(initialCoilActive);
   }, [exploded, initialCoilActive]);
 
