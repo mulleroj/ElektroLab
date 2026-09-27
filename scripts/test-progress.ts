@@ -3988,8 +3988,24 @@ test('H8L: aktivita, quiz, SafetyNote a demo regrese', () => {
     '../src/components/demos/ContactorRelayDemo.tsx',
   );
   const demoSource = fs.readFileSync(demoPath, 'utf8');
-  assert.match(demoSource, /const STEPS: ContactorStep\[\] = \[/, '2D krokový výklad zůstává zachovaný');
+  const stepsMatch = demoSource.match(/const STEPS: ContactorStep\[\] = \[([\s\S]*?)\n\];/);
+  assert.ok(stepsMatch, '2D krokový výklad zůstává zachovaný');
+  const stepTitles = [...(stepsMatch?.[1].matchAll(/title: '([^']+)'/g) ?? [])].map((match) => match[1]);
+  assert.deepEqual(
+    stepTitles,
+    ['Výchozí stav', 'Aktivace ovládacího obvodu', 'Pohyb kotvy', 'Sepnutí kontaktu', 'Motor běží', 'Vypnutí'],
+    '2D demo zachovává šest didaktických kroků ve správném pořadí',
+  );
   assert.match(demoSource, /className="contactor-svg"/, 'původní 2D SVG zůstává zachované');
+  assert.match(demoSource, /const coilOn = stepIndex >= 1 && stepIndex <= 4;/, 'stav cívky zůstává odvozený z kroku');
+  assert.match(demoSource, /const contactClosed = stepIndex >= 3 && stepIndex <= 4;/, 'stav hlavního kontaktu zůstává odvozený z kroku');
+  assert.match(demoSource, /const motorRunning = stepIndex === 4;/, 'stav motoru zůstává odvozený z kroku');
+  assert.match(demoSource, /const armatureTravel = contactClosed \? 24 : stepIndex === 2 \? 14 : 0;/, '2D pohyb kotvy zůstává krokově deterministický');
+  assert.match(demoSource, /stepCount=\{STEPS.length\}/, 'ovládání používá všech šest kroků');
+  assert.match(demoSource, /onReset=\{playback.reset\}/, 'reset 2D průchodu zůstává napojený');
+  assert.match(demoSource, /disabled=\{!playback.hasCompletedOnce\}/, 'lesson gating zůstává vázaný na dokončení ukázky');
+  assert.match(demoSource, /className="animated-demo__state"/, 'textový 2D source of truth zůstává dostupný');
+  assert.match(demoSource, /className="logic-gate__explain"/, 'krokové vysvětlení zůstává dostupné mimo canvas');
   assert.match(demoSource, /viewMode === '3d'/, '3D režim je přidaný jako oddělený pohled');
   assert.match(demoSource, /initialCoilActive=\{coilOn\}/, '3D režim přebírá stav z 2D zdroje pravdy');
 });
