@@ -1,3 +1,4 @@
+import { lazy, Suspense, useState } from 'react';
 import type { ContactorRelayDemoConfig } from '../../types';
 import { AnimatedDemoControls } from '../animation/AnimatedDemoControls';
 import { useAnimatedDemo } from '../animation/useAnimatedDemo';
@@ -49,12 +50,17 @@ const STEPS: ContactorStep[] = [
   },
 ];
 
+const LazyContactor3DView = lazy(() =>
+  import('../threeD/Contactor3DView').then(({ Contactor3DView }) => ({ default: Contactor3DView })),
+);
+
 export function ContactorRelayDemoView({
   demo,
   calmMode,
   onContinue,
 }: ContactorRelayDemoProps) {
   const motion = useMotionPolicy(calmMode);
+  const [viewMode, setViewMode] = useState<'2d' | '3d'>('2d');
   const playback = useAnimatedDemo({
     stepCount: STEPS.length,
     autoPlayAllowed: motion.allowAutoPlay,
@@ -104,8 +110,43 @@ export function ContactorRelayDemoView({
         onReset={playback.reset}
       />
 
+      <div className="contactor-view-toggle" role="group" aria-label="Volba zobrazení stykače">
+        <button
+          type="button"
+          className={`btn btn--secondary${viewMode === '2d' ? ' btn--active' : ''}`}
+          aria-pressed={viewMode === '2d'}
+          onClick={() => setViewMode('2d')}
+        >
+          2D schéma
+        </button>
+        <button
+          type="button"
+          className={`btn btn--secondary${viewMode === '3d' ? ' btn--active' : ''}`}
+          aria-pressed={viewMode === '3d'}
+          onClick={() => setViewMode('3d')}
+        >
+          3D model
+        </button>
+      </div>
+
       {/* Schéma je názorná grafika — úplný stav zařízení je vždy popsán
           textem ve výpisu stavu a v popisu kroku níže. */}
+      {viewMode === '3d' ? (
+        <Suspense
+          fallback={
+            <div className="three-d-fallback" role="status">
+              Načítám 3D pohled stykače… 2D schéma zůstává kdykoli dostupné.
+            </div>
+          }
+        >
+          <LazyContactor3DView
+            stepIndex={stepIndex}
+            initialCoilActive={coilOn}
+            calmMode={calmMode}
+            onUse2D={() => setViewMode('2d')}
+          />
+        </Suspense>
+      ) : (
       <div className="animated-demo__stage">
         <svg
           className="contactor-svg"
@@ -232,6 +273,7 @@ export function ContactorRelayDemoView({
           </text>
         </svg>
       </div>
+      )}
 
       <ul className="animated-demo__state" aria-label="Stav zařízení textem">
         <li>
