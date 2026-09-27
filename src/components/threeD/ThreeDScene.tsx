@@ -1,5 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
-import { Canvas, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import type { ThreeDModelDefinition } from './types';
 import type { SeriesParallel3DState } from './SeriesParallelModel';
@@ -113,6 +113,12 @@ function CameraOrbit({
     controlsRef.current?.target.set(...target);
     controlsRef.current?.update();
   }, [camera, initialPosition, resetKey, target]);
+
+  useFrame(() => {
+    if (!reduceMotion) {
+      controlsRef.current?.update();
+    }
+  });
 
   return null;
 }

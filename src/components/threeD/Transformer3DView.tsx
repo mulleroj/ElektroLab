@@ -5,6 +5,7 @@ import { PartInfoPanel } from './PartInfoPanel';
 import { ThreeDControls } from './ThreeDControls';
 import { ThreeDScene } from './ThreeDScene';
 import { TransformerModel } from './TransformerModel';
+import { isWebGLAvailable } from './webgl';
 import {
   getTransformer3DModel,
   TRANSFORMER_CAMERA_POSITION,
@@ -135,16 +136,6 @@ function Transformer3DFallback({ onUse2D }: { onUse2D: () => void }) {
       </button>
     </div>
   );
-}
-
-function isWebGLAvailable(): boolean {
-  if (typeof document === 'undefined') return false;
-  try {
-    const canvas = document.createElement('canvas');
-    return Boolean(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
-  } catch {
-    return false;
-  }
 }
 
 function getHighlightedPartIds(stepIndex: number): Set<string> {
