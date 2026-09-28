@@ -60,9 +60,11 @@ function LoadedRotatingFieldModel({
   }, [scene]);
 
   useEffect(() => {
-    rotationRef.current = fieldAngle;
+    if (!animateField || reduceMotion || stepIndex !== 5) {
+      rotationRef.current = fieldAngle;
+    }
     setRotation(fieldRef.current, rotationRef.current);
-  }, [fieldAngle, stepIndex]);
+  }, [animateField, fieldAngle, reduceMotion, stepIndex]);
 
   useFrame((_, delta) => {
     if (!animateField || reduceMotion || stepIndex !== 5) return;

@@ -11,6 +11,8 @@ import {
   ROTATING_FIELD_HIDDEN_NODES,
 } from '../src/components/threeD/rotatingFieldModelConfig';
 import {
+  getRotatingFieldDiscretePosition,
+  getRotatingFieldPlaybackState,
   ROTATING_FIELD_PHASES,
   ROTATING_FIELD_POSITION_ANGLES,
   ROTATING_FIELD_STEPS,
@@ -52,6 +54,30 @@ assert.deepEqual(
 assert.deepEqual(ROTATING_FIELD_PHASES, ['U', 'V', 'W']);
 assert.deepEqual(ROTATING_FIELD_POSITION_ANGLES, [0, 60, 120, 180, 240, 300]);
 
+const stepFive = getRotatingFieldPlaybackState(4, true, false, 3);
+assert.equal(stepFive.fieldVisible, true, 'krok 5 zobrazuje helper výsledného pole');
+assert.equal(stepFive.fieldSteppingAllowed, false, 'krok 5 nepovoluje ruční posun pole');
+assert.equal(stepFive.continuousRotationAllowed, false, 'krok 5 nepovoluje plynulou rotaci');
+assert.equal(stepFive.fieldPositionIndex, 0, 'krok 5 používá kanonickou polohu 0°');
+
+const stepSixRunning = getRotatingFieldPlaybackState(5, true, true, 2);
+assert.equal(stepSixRunning.fieldVisible, true, 'krok 6 zobrazuje helper výsledného pole');
+assert.equal(stepSixRunning.continuousRotationAllowed, true, 'standardní krok 6 umožňuje plynulou rotaci');
+assert.equal(stepSixRunning.continuousRotationActive, true, 'standardní krok 6 může být právě spuštěný');
+assert.equal(stepSixRunning.fieldSteppingAllowed, false, 'ruční krokování je při běžící rotaci vypnuté');
+
+const stepSixStopped = getRotatingFieldPlaybackState(5, true, false, 2);
+assert.equal(stepSixStopped.fieldSteppingAllowed, true, 'po zastavení lze v kroku 6 ručně krokovat');
+assert.equal(stepSixStopped.fieldAngleDegrees, 120, 'zastavený stav zachovává vybraný diskrétní úhel');
+
+const calmStepSix = getRotatingFieldPlaybackState(5, false, false, 0);
+assert.equal(calmStepSix.continuousRotationAllowed, false, 'klidný/reduced-motion krok 6 nepovoluje auto-rotaci');
+assert.equal(calmStepSix.fieldSteppingAllowed, true, 'klidný/reduced-motion krok 6 povoluje ruční krokování');
+assert.deepEqual(getRotatingFieldDiscretePosition(2), { fieldPositionIndex: 2, fieldAngleDegrees: 120 }, 'stop synchronizuje vizuální a textový úhel');
+
+const resetState = getRotatingFieldPlaybackState(4, true, false, 2);
+assert.equal(resetState.fieldPositionIndex, 0, 'návrat před finální krok resetuje polohu na 0°');
+
 const demoSource = readFileSync(resolve(process.cwd(), 'src/components/demos/RotatingFieldDemo.tsx'), 'utf8');
 const viewSource = readFileSync(resolve(process.cwd(), 'src/components/threeD/RotatingField3DView.tsx'), 'utf8');
 const modelSource = readFileSync(resolve(process.cwd(), 'src/components/threeD/RotatingFieldModel.tsx'), 'utf8');
@@ -68,11 +94,14 @@ assert.match(viewSource, /isWebGLAvailable/);
 assert.match(viewSource, /useMotionPolicy\(calmMode\)/);
 assert.match(viewSource, /Předchozí poloha/);
 assert.match(viewSource, /Další poloha/);
+assert.match(viewSource, /getRotatingFieldPlaybackState/);
+assert.match(viewSource, /setFieldPositionIndex\(0\)/);
 assert.match(viewSource, /reduceMotion=\{!motion\.allowContinuousMotion\}/);
 assert.match(viewSource, /Použít 2D schéma/);
 assert.match(modelSource, /useLocalGltfScene/);
 assert.match(modelSource, /rotating_field_guide/);
 assert.match(modelSource, /useFrame/);
+assert.match(modelSource, /!animateField \|\| reduceMotion \|\| stepIndex !== 5/);
 assert.match(configSource, /INDUCTION_MOTOR_MODEL_PATH/);
 assert.match(lessonSource, /type: 'rotating-field'/);
 assert.match(lessonSource, /RotatingFieldDemo/);

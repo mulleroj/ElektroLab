@@ -1,8 +1,9 @@
 import { Component, type ErrorInfo, type ReactNode, useEffect, useMemo, useState } from 'react';
 import { useMotionPolicy } from '../animation/useMotionPolicy';
 import {
+  getRotatingFieldPlaybackState,
+  normalizeRotatingFieldPositionIndex,
   ROTATING_FIELD_PHASES,
-  ROTATING_FIELD_POSITION_ANGLES,
   ROTATING_FIELD_STEPS,
   type RotatingFieldPhase,
 } from '../demos/rotatingFieldState';
@@ -66,24 +67,39 @@ export function RotatingField3DView({
   const [fieldPositionIndex, setFieldPositionIndex] = useState(0);
   const [fieldRunning, setFieldRunning] = useState(false);
   const [cameraResetKey, setCameraResetKey] = useState(0);
-  const fieldVisible = stepIndex >= 4;
 
   useEffect(() => {
-    setFieldRunning(stepIndex === 5 && motion.allowContinuousMotion);
+    if (stepIndex !== 5) {
+      setFieldPositionIndex(0);
+      setFieldRunning(false);
+      return;
+    }
+    setFieldRunning(motion.allowContinuousMotion);
   }, [motion.allowContinuousMotion, stepIndex]);
 
-  const fieldAngle = (ROTATING_FIELD_POSITION_ANGLES[fieldPositionIndex] * Math.PI) / 180;
-  const fieldState = !fieldVisible
+  const playback = getRotatingFieldPlaybackState(
+    stepIndex,
+    motion.allowContinuousMotion,
+    fieldRunning,
+    fieldPositionIndex,
+  );
+  const fieldAngle = (playback.fieldAngleDegrees * Math.PI) / 180;
+  const fieldState = !playback.fieldVisible
     ? 'Výsledné magnetické pole zatím není zobrazeno.'
-    : fieldRunning
+    : playback.continuousRotationActive
       ? 'Výsledné magnetické pole se pomalu otáčí v prostoru.'
-      : `Výsledné magnetické pole je nyní natočeno přibližně o ${ROTATING_FIELD_POSITION_ANGLES[fieldPositionIndex]}°.`;
+      : `Výsledné magnetické pole je nyní natočeno přibližně o ${playback.fieldAngleDegrees}°.`;
   const selectedPart = useMemo(
     () => rotatingFieldModel.parts.find((part) => part.id === selectedPartId),
     [selectedPartId],
   );
 
   if (!isWebGLAvailable()) return <RotatingField3DFallback onUse2D={onUse2D} />;
+
+  const moveFieldPosition = (delta: number) => {
+    if (!playback.fieldSteppingAllowed) return;
+    setFieldPositionIndex((index) => normalizeRotatingFieldPositionIndex(index + delta));
+  };
 
   return (
     <RotatingField3DErrorBoundary onUse2D={onUse2D}>
@@ -147,14 +163,14 @@ export function RotatingField3DView({
             <div className="rotating-field-3d-controls__section" role="group" aria-label="Poloha výsledného pole">
               <p className="three-d-controls__label">Výsledné pole</p>
               <div className="rotating-field-3d-controls__row">
-                <button type="button" className="btn btn--secondary" onClick={() => setFieldPositionIndex((index) => (index + ROTATING_FIELD_POSITION_ANGLES.length - 1) % ROTATING_FIELD_POSITION_ANGLES.length)} disabled={!fieldVisible || fieldRunning}>
+                <button type="button" className="btn btn--secondary" onClick={() => moveFieldPosition(-1)} disabled={!playback.fieldSteppingAllowed}>
                   Předchozí poloha
                 </button>
-                <button type="button" className="btn btn--secondary" onClick={() => setFieldPositionIndex((index) => (index + 1) % ROTATING_FIELD_POSITION_ANGLES.length)} disabled={!fieldVisible || fieldRunning}>
+                <button type="button" className="btn btn--secondary" onClick={() => moveFieldPosition(1)} disabled={!playback.fieldSteppingAllowed}>
                   Další poloha
                 </button>
-                <button type="button" className="btn btn--secondary" onClick={() => setFieldRunning((running) => !running)} disabled={stepIndex !== 5 || !motion.allowContinuousMotion} aria-pressed={fieldRunning}>
-                  {fieldRunning ? 'Zastavit rotaci' : 'Spustit rotaci'}
+                <button type="button" className="btn btn--secondary" onClick={() => setFieldRunning((running) => !running)} disabled={!playback.continuousRotationAllowed} aria-pressed={playback.continuousRotationActive}>
+                  {playback.continuousRotationActive ? 'Zastavit rotaci' : 'Spustit rotaci'}
                 </button>
               </div>
               <p className="rotating-field-3d-controls__hint" role="status">

@@ -4,6 +4,7 @@ import { AnimatedDemoControls } from '../animation/AnimatedDemoControls';
 import { useAnimatedDemo } from '../animation/useAnimatedDemo';
 import { useMotionPolicy } from '../animation/useMotionPolicy';
 import {
+  getRotatingFieldPlaybackState,
   ROTATING_FIELD_PHASES,
   ROTATING_FIELD_STEPS,
   type RotatingFieldPhase,
@@ -147,8 +148,11 @@ function RotatingField2DSchema({
   selectedPhase: RotatingFieldPhase;
   allowContinuousMotion: boolean;
 }) {
-  const fieldVisible = stepIndex >= 4;
-  const fieldMoving = stepIndex === 5 && allowContinuousMotion;
+  const { fieldVisible, continuousRotationAllowed: fieldMoving } = getRotatingFieldPlaybackState(
+    stepIndex,
+    allowContinuousMotion,
+    false,
+  );
 
   return (
     <>
