@@ -18,6 +18,7 @@ import { FeedbackDemoView } from './demos/FeedbackDemo';
 import { AutomationLogicDemoView } from './demos/AutomationLogicDemo';
 import { TransformerDemoView } from './demos/TransformerDemo';
 import { InductionMotorDemoView } from './demos/InductionMotorDemo';
+import { RotatingFieldDemoView } from './demos/RotatingFieldDemo';
 import { ContactorRelayDemoView } from './demos/ContactorRelayDemo';
 import { VoltageLevelSafetyDemoView } from './demos/VoltageLevelSafetyDemo';
 
@@ -96,6 +97,10 @@ export function InteractiveDemoRenderer({
     case 'induction-motor':
       return (
         <InductionMotorDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />
+      );
+    case 'rotating-field':
+      return (
+        <RotatingFieldDemoView demo={demo} calmMode={calmMode} onContinue={onContinue} />
       );
     case 'contactor-relay':
       return (

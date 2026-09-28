@@ -350,6 +350,7 @@ function validateDemo(c: IssueCollector, lesson: MicroLesson, demo: InteractiveD
     case 'automation-logic':
     case 'transformer-demo':
     case 'induction-motor':
+    case 'rotating-field':
     case 'contactor-relay':
     case 'voltage-level-safety':
       // Konfigurace těchto dem je { type, title, description } — ověřeno výše.
