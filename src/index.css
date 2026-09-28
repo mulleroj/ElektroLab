@@ -4919,6 +4919,164 @@ input:focus-visible {
   }
 }
 
+/* Točivé magnetické pole: 2D source of truth + stator-only 3D supplement. */
+
+.rotating-field-demo__phase-picker {
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.rotating-field-demo__phase-buttons,
+.rotating-field-3d-controls__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.45rem;
+}
+
+.rotating-field-demo__phase-description,
+.rotating-field-3d-controls__hint {
+  margin: 0.5rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.rotating-field-demo__stage {
+  overflow: hidden;
+}
+
+.rotating-field-demo__svg {
+  display: block;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.rotating-field-demo__svg-label {
+  fill: var(--color-text-muted);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.rotating-field-demo__stator {
+  fill: none;
+  stroke: var(--color-border);
+  stroke-width: 14;
+}
+
+.rotating-field-demo__airgap {
+  fill: var(--color-bg);
+  stroke: #cbd5e1;
+  stroke-width: 2;
+  stroke-dasharray: 4 4;
+}
+
+.rotating-field-demo__coil {
+  fill: #e8f0f8;
+  stroke: var(--color-border);
+  stroke-width: 1.5;
+  transition: fill 0.35s ease, stroke 0.35s ease, stroke-width 0.35s ease;
+}
+
+.rotating-field-demo__coil--active {
+  fill: #dbeafe;
+  stroke: var(--color-primary);
+  stroke-width: 2;
+}
+
+.rotating-field-demo__coil--selected {
+  fill: #fef3c7;
+  stroke: #b45309;
+  stroke-width: 3;
+}
+
+.rotating-field-demo__phase-label {
+  fill: var(--color-text);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+.rotating-field-demo__field {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.rotating-field-demo__field line {
+  stroke: var(--color-primary);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.rotating-field-demo__field polygon {
+  fill: var(--color-primary);
+}
+
+.rotating-field-demo__field path {
+  fill: none;
+  stroke: #94a3b8;
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+}
+
+.rotating-field-demo__field--spinning {
+  animation: rotating-field-demo-spin 7s linear infinite;
+}
+
+@keyframes rotating-field-demo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rotating-field-demo__state {
+  margin-top: 0.75rem;
+}
+
+.rotating-field-3d__intro {
+  border-left-color: #2563eb;
+}
+
+.rotating-field-3d-controls {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.rotating-field-3d-controls__section {
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.rotating-field-3d__status {
+  display: grid;
+  gap: 0.3rem;
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+@media (max-width: 760px) {
+  .rotating-field-3d__status {
+    grid-column: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rotating-field-demo__coil {
+    transition: none;
+  }
+
+  .rotating-field-demo__field--spinning {
+    animation: none;
+  }
+}
+
 /* ===== MVP-12A: skóre mini testu a reset pokroku ===== */
 
 .lesson-complete__quiz-score {

@@ -278,7 +278,13 @@ export const strojeLessons: MicroLesson[] = [
     typicalMistake:
       'Žáci si myslí, že statorové cívky se mechanicky otáčejí, že jedna střídavá cívka vytváří stejné točivé pole jako třífázový stator, nebo že fáze se jen postupně zapínají a vypínají. Časté je i tvrzení, že všechny tři proudy mají stále stejnou okamžitou hodnotu, že točivé pole vytváří jako první rotor, že proud přeskakuje ze statoru do rotoru, nebo že je nutné počítat fázory. Správně: stator stojí, otáčí se výsledný směr magnetického pole, proudové průběhy se mění plynule a nutné je prostorové rozložení i časový posun.',
     teacherTip:
-      'Použij tři barevné šipky nebo kartičky A, B, C rozmístěné kolem kruhu a několik časových snímků společného pole. Nejdřív ukaž jednu cívku a pulzující pole, pak přidej prostorové rozmístění tří vinutí a nakonec časový posun proudů. Nech žáky ukázat, kam se výsledná šipka pole posune. InductionMotorDemo použij až jako kvalitativní návaznost v následující lekci — neměň demo komponentu ani ji nepřidávej do této lekce. Výslovně řekni, že jde o model, ne o praktické zapojování motoru. Zakázáno je žákovské přepojování motoru, živé měření, práce s odkrytými svorkami a manipulace s rotujícími částmi.',
+      'Použij tři barevné šipky nebo kartičky A, B, C rozmístěné kolem kruhu a několik časových snímků společného pole. Nejdřív ukaž jednu cívku a pulzující pole, pak přidej prostorové rozmístění tří vinutí a nakonec časový posun proudů. Nech žáky ukázat, kam se výsledná šipka pole posune. RotatingFieldDemo použij jako názorný doplněk této lekce; InductionMotorDemo zůstává kvalitativní návazností až v následující lekci. Výslovně řekni, že jde o model, ne o praktické zapojování motoru. Zakázáno je žákovské přepojování motoru, živé měření, práce s odkrytými svorkami a manipulace s rotujícími částmi.',
+    interactiveDemo: {
+      type: 'rotating-field',
+      title: 'Od tří vinutí k točivému poli',
+      description:
+        'Projdi šest názorných kroků: od prostorového rozmístění vinutí U/V/W až k prostorové rotaci výsledného magnetického pole.',
+    },
     activity: {
       scenarioChoice: {
         type: 'scenario-choice',

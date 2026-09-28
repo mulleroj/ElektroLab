@@ -128,6 +128,12 @@ export interface InductionMotorDemoConfig {
   description: string;
 }
 
+export interface RotatingFieldDemoConfig {
+  type: 'rotating-field';
+  title: string;
+  description: string;
+}
+
 export interface ContactorRelayDemoConfig {
   type: 'contactor-relay';
   title: string;
@@ -159,6 +165,7 @@ export type InteractiveDemo =
   | AutomationLogicDemoConfig
   | TransformerDemoConfig
   | InductionMotorDemoConfig
+  | RotatingFieldDemoConfig
   | ContactorRelayDemoConfig
   | VoltageLevelSafetyDemoConfig;
 

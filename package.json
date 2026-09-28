@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "validate:content": "tsx scripts/validate-content.ts",
     "pretest": "npm run build",
-    "test": "tsx scripts/test-progress.ts && tsx scripts/test-focus.ts && tsx scripts/test-lesson-rich-text.ts && tsx scripts/test-term-matching-shuffle.ts && tsx scripts/test-three-d.ts && tsx scripts/test-transformer-three-d.ts && tsx scripts/test-contactor-three-d.ts && tsx scripts/test-induction-motor-three-d.ts && tsx scripts/test-report-problem.ts && tsx scripts/test-intro-help.ts",
+    "test": "tsx scripts/test-progress.ts && tsx scripts/test-focus.ts && tsx scripts/test-lesson-rich-text.ts && tsx scripts/test-term-matching-shuffle.ts && tsx scripts/test-three-d.ts && tsx scripts/test-transformer-three-d.ts && tsx scripts/test-contactor-three-d.ts && tsx scripts/test-induction-motor-three-d.ts && tsx scripts/test-rotating-field-three-d.ts && tsx scripts/test-report-problem.ts && tsx scripts/test-intro-help.ts",
     "check": "npm run validate:content && npm run typecheck && npm run lint && npm run build"
   },
   "dependencies": {

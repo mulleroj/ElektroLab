@@ -1,8 +1,10 @@
 # 3D architektura ElektroLabu
 
-Tento checkpoint přidává první 3D renderer jako volitelný doplněk k lekci
-`seriove-paralelni`. 3D není nový výukový stav: `SeriesParallelDemo` zůstává
-zdrojem kroků, fault scénářů, autoplayu, pauzy, Calm Mode a gatingu.
+3D vrstvy ElektroLabu jsou volitelné doplňky k 2D lekcím. 2D demo zůstává
+zdrojem kroků, autoplayu, pauzy, Calm Mode a gatingu; 3D pouze zrcadlí stejný
+didaktický stav. Aktuální GLB-backed doplňky jsou transformátor, stykač,
+asynchronní motor a statorový pohled pro `tocive-magneticke-pole`. Procedurální
+3D pilot zůstává u `seriove-paralelni`.
 
 ## Rozhodnutí technologie
 
@@ -11,11 +13,11 @@ zdrojem kroků, fault scénářů, autoplayu, pauzy, Calm Mode a gatingu.
 - `@react-three/fiber` zapouzdřuje scénu v React 19 + TypeScriptu.
 - Orbit kamera používá přímo `THREE.OrbitControls`; nepřidáváme další UI nebo
   animační knihovnu.
-- 3D chunk se načítá lazy až po přepnutí na „3D model“. Homepage ani lekce bez
-  3D ho proto nenačítají.
-- Pilotní obvod je procedurální nízkopolygonový model bez externích assetů.
-  `ThreeDModelDefinition.assetUrl` a `ThreeDModel` už tvoří hranici pro budoucí
-  lokální GLB/GLTF modely.
+- 3D chunk se načítá lazy až po přepnutí na „3D model“. Homepage ani 2D lekce
+  proto GLB nenačítají.
+- Lokální assety jsou v `public/models/*`; rotating-field view reuseuje bez
+  kopie `public/models/induction-motor/induction-motor-educational.glb`.
+  `ThreeDModelDefinition.assetUrl` tvoří hranici mezi lesson view a GLB loaderem.
 
 ## Vrstvy
 
@@ -29,13 +31,21 @@ SeriesParallelDemo
             ├─ ThreeDControls
             ├─ ExplodedViewController
             └─ PartInfoPanel
+
+RotatingFieldDemo
+  └─ useAnimatedDemo + useMotionPolicy + AnimatedDemoControls
+       ├─ 2D SVG renderer (source of truth)
+       └─ lazy RotatingField3DView
+            ├─ ThreeDScene + OrbitControls
+            ├─ stator-only RotatingFieldModel
+            └─ PartInfoPanel + U/V/W + field-position controls
 ```
 
-Modelová konfigurace je v `threeD/seriesParallelModelConfig.ts`, oddělená od
-konkrétní lekce. Součásti mají stabilní ID, název, textovou funkci, složenou a
-rozloženou polohu a případně lokální segmentovou geometrii. Stejný kontrakt je
-připravený pro transformátor (jádro, primární/sekundární vinutí, svorky), motor
-(stator, rotor, hřídel) i stykač (cívka, kotva, kontakty).
+Modelová konfigurace je v `threeD/*ModelConfig.ts`, oddělená od konkrétní
+lekce. Součásti mají stabilní ID, název, textovou funkci a GLB node mapping.
+Motorový asset poskytuje společné nodes pro `InductionMotorModel` i
+`RotatingFieldModel`; druhý view pouze izoluje stator, fáze U/V/W a
+`rotating_field_guide`.
 
 ## Přístupnost a fallback
 

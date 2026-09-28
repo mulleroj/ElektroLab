@@ -3097,7 +3097,7 @@ test('téma Asynchronní stroje má 20 minut a dvě aktivní lekce', () => {
   assert.equal(topics.filter((t) => t.mvpAvailable).length, 23);
 });
 
-test('lekce Jak vzniká točivé magnetické pole je scenario-choice bez dema', () => {
+test('lekce Jak vzniká točivé magnetické pole má 2D source-of-truth demo a scenario-choice', () => {
   const lesson = getLessonById('tocive-magneticke-pole');
   assert.ok(lesson);
   assert.equal(lesson.title, 'Jak vzniká točivé magnetické pole');
@@ -3105,7 +3105,7 @@ test('lekce Jak vzniká točivé magnetické pole je scenario-choice bez dema', 
   assert.equal(lesson.year, 2);
   assert.equal(lesson.topicId, 'asynchronni-stroje');
   assert.equal(lesson.durationMinutes, 10);
-  assert.equal(lesson.interactiveDemo, undefined);
+  assert.equal(lesson.interactiveDemo?.type, 'rotating-field');
   assert.equal(lesson.quiz.length, 3);
   assert.equal(lesson.badgeId, 'pruvodce-tocivym-polem');
   assert.ok(getBadgeById('pruvodce-tocivym-polem'));
