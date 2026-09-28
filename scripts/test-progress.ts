@@ -3653,14 +3653,21 @@ test('H8J: SafetyNote a regrese InductionMotorDemo', () => {
     path.dirname(fileURLToPath(import.meta.url)),
     '../src/components/demos/InductionMotorDemo.tsx',
   );
-  const hash = execFileSync('git', ['hash-object', demoPath], {
-    encoding: 'utf8',
-  }).trim();
-  assert.equal(
-    hash,
-    'ed1a0968839689ea7ea45156e67a4cc7b56bee2b',
-    'InductionMotorDemo musí zůstat blobově beze změny',
-  );
+  const demoSource = fs.readFileSync(demoPath, 'utf8');
+  for (const anchor of [
+    'Klidový stav',
+    'Třífázové proudy ve statoru',
+    'Točivé magnetické pole',
+    'Indukované proudy v rotoru',
+    'Vznik momentu a rozběh',
+    'Ustálený chod a skluz',
+  ]) {
+    assert.match(demoSource, new RegExp(anchor));
+  }
+  assert.match(demoSource, /useAnimatedDemo/);
+  assert.match(demoSource, /2D schéma/);
+  assert.match(demoSource, /3D model/);
+  assert.doesNotMatch(demoSource, /induction-motor-educational\.glb/);
 });
 
 test('H8J: starý progress, retry, projektor a reset u motoru', () => {

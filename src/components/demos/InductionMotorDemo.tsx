@@ -1,3 +1,4 @@
+import { lazy, Suspense, useState } from 'react';
 import type { InductionMotorDemoConfig } from '../../types';
 import { AnimatedDemoControls } from '../animation/AnimatedDemoControls';
 import { useAnimatedDemo } from '../animation/useAnimatedDemo';
@@ -55,11 +56,18 @@ const MOTOR_CY = 210;
 const ROTOR_BARS = 6;
 const PHASE_LABELS = ['U', 'V', 'W'] as const;
 
+const LazyInductionMotor3DView = lazy(() =>
+  import('../threeD/InductionMotor3DView').then((module) => ({
+    default: module.InductionMotor3DView,
+  })),
+);
+
 export function InductionMotorDemoView({
   demo,
   calmMode,
   onContinue,
 }: InductionMotorDemoProps) {
+  const [viewMode, setViewMode] = useState<'2d' | '3d'>('2d');
   const motion = useMotionPolicy(calmMode);
   const playback = useAnimatedDemo({
     stepCount: STEPS.length,
@@ -159,6 +167,29 @@ export function InductionMotorDemoView({
       <h3>{demo.title}</h3>
       <p>{demo.description}</p>
 
+      <div
+        className="series-parallel-demo-view-toggle"
+        role="group"
+        aria-label="Volba zobrazení asynchronního motoru"
+      >
+        <button
+          type="button"
+          className={`btn btn--secondary${viewMode === '2d' ? ' btn--active' : ''}`}
+          aria-pressed={viewMode === '2d'}
+          onClick={() => setViewMode('2d')}
+        >
+          2D schéma
+        </button>
+        <button
+          type="button"
+          className={`btn btn--secondary${viewMode === '3d' ? ' btn--active' : ''}`}
+          aria-pressed={viewMode === '3d'}
+          onClick={() => setViewMode('3d')}
+        >
+          3D model
+        </button>
+      </div>
+
       {!motion.allowAutoPlay && (
         <p className="calm-step-hint" role="status">
           Automatické přehrávání je vypnuté — ukázku procházej vlastním tempem
@@ -178,6 +209,22 @@ export function InductionMotorDemoView({
         onReset={playback.reset}
       />
 
+      {viewMode === '3d' ? (
+        <Suspense
+          fallback={
+            <p className="three-d-fallback" role="status">
+              Načítám 3D pohled motoru… 2D schéma zůstává kdykoli dostupné.
+            </p>
+          }
+        >
+          <LazyInductionMotor3DView
+            stepIndex={stepIndex}
+            calmMode={calmMode}
+            onUse2D={() => setViewMode('2d')}
+          />
+        </Suspense>
+      ) : (
+        <>
       {/* Schéma je názorná grafika — úplný stav motoru je vždy popsán textem
           ve výpisu stavu, v popisu kroku a u skluzu níže. */}
       <div className="animated-demo__stage">
@@ -364,6 +411,8 @@ export function InductionMotorDemoView({
             nedostával indukované proudy a motor by nevytvářel moment.
           </p>
         </div>
+      )}
+        </>
       )}
 
       <div className="logic-gate__explain">
