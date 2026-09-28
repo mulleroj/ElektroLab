@@ -53,6 +53,8 @@ function LoadedInductionMotorModel({
   const rotorRef = useRef<Object3D | null>(null);
   const fanRef = useRef<Object3D | null>(null);
   const fieldRef = useRef<Object3D | null>(null);
+  const rotationState = useRef({ rotor: 0, fan: 0, field: 0 });
+  const previousManualRotation = useRef(manualRotation);
 
   useEffect(() => {
     scene.traverse((object) => {
@@ -63,17 +65,33 @@ function LoadedInductionMotorModel({
   }, [scene]);
 
   useEffect(() => {
+    const delta = manualRotation - previousManualRotation.current;
+    if (delta !== 0) {
+      rotationState.current.rotor += delta;
+      rotationState.current.fan += delta;
+      rotationState.current.field += delta * 1.25;
+      setRotation(rotorRef.current, rotationState.current.rotor);
+      setRotation(fanRef.current, rotationState.current.fan);
+      setRotation(fieldRef.current, rotationState.current.field);
+    }
+    previousManualRotation.current = manualRotation;
+  }, [manualRotation]);
+
+  useEffect(() => {
     applySceneState(scene, definition.parts, viewMode, isolation, showAirGap, showField, exploded);
-    setRotation(rotorRef.current, manualRotation);
-    setRotation(fanRef.current, manualRotation);
-    setRotation(fieldRef.current, manualRotation * 1.25);
-  }, [definition.parts, exploded, isolation, manualRotation, scene, showAirGap, showField, viewMode]);
+    setRotation(rotorRef.current, rotationState.current.rotor);
+    setRotation(fanRef.current, rotationState.current.fan);
+    setRotation(fieldRef.current, rotationState.current.field);
+  }, [definition.parts, exploded, isolation, scene, showAirGap, showField, viewMode]);
 
   useFrame((_, delta) => {
     if (runState !== 'running' || reduceMotion || exploded) return;
-    if (rotorRef.current) rotorRef.current.rotation.x += delta * INDUCTION_MOTOR_MOTION.rotorRadiansPerSecond;
-    if (fanRef.current) fanRef.current.rotation.x += delta * INDUCTION_MOTOR_MOTION.rotorRadiansPerSecond;
-    if (fieldRef.current) fieldRef.current.rotation.x += delta * INDUCTION_MOTOR_MOTION.fieldRadiansPerSecond;
+    rotationState.current.rotor += delta * INDUCTION_MOTOR_MOTION.rotorRadiansPerSecond;
+    rotationState.current.fan += delta * INDUCTION_MOTOR_MOTION.rotorRadiansPerSecond;
+    rotationState.current.field += delta * INDUCTION_MOTOR_MOTION.fieldRadiansPerSecond;
+    setRotation(rotorRef.current, rotationState.current.rotor);
+    setRotation(fanRef.current, rotationState.current.fan);
+    setRotation(fieldRef.current, rotationState.current.field);
   });
 
   return (

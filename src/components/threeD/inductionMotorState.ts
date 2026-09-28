@@ -17,12 +17,12 @@ export function getInductionMotorPartState(
 ): string {
   const stepState = `2D krok ${stepIndex + 1} z 6 zůstává zdrojem pravdy. `;
   const viewState =
-    viewMode === 'cutaway'
-      ? 'Je zapnutý výukový řez. '
-      : isolation === 'stator'
-        ? 'Je zobrazena izolovaná skupina statoru. '
-        : isolation === 'rotor'
-          ? 'Je zobrazena izolovaná skupina rotoru. '
+    isolation === 'stator'
+      ? 'Je zobrazena izolovaná skupina statoru. '
+      : isolation === 'rotor'
+        ? 'Je zobrazena izolovaná skupina rotoru. '
+        : viewMode === 'cutaway'
+          ? 'Je zapnutý výukový řez. '
           : '';
 
   const partState: Record<InductionMotorPartId, string> = {

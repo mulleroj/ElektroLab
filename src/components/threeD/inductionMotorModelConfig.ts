@@ -197,7 +197,11 @@ export const inductionMotorParts: ThreeDPartDefinition[] = [
 export const inductionMotorPartGroups: InductionMotorPartGroup[] = [
   { id: 'stator', label: 'Stator', parts: inductionMotorParts.slice(1, 5) },
   { id: 'rotor', label: 'Rotor', parts: inductionMotorParts.slice(5, 10) },
-  { id: 'mechanical', label: 'Mechanické části', parts: inductionMotorParts.slice(10, 16) },
+  {
+    id: 'mechanical',
+    label: 'Mechanické části',
+    parts: inductionMotorParts.slice(0, 1).concat(inductionMotorParts.slice(10, 16)),
+  },
   { id: 'connection', label: 'Připojení', parts: inductionMotorParts.slice(16, 18) },
   { id: 'layers', label: 'Výukové vrstvy', parts: inductionMotorParts.slice(18) },
 ];

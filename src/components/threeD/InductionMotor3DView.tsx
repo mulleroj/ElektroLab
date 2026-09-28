@@ -70,6 +70,8 @@ export function InductionMotor3DView({ stepIndex, calmMode, onUse2D }: Induction
   }, [motion.allowContinuousMotion]);
   const highlightedPartIds = useMemo(() => getHighlightedPartIds(stepIndex), [stepIndex]);
   const selectedPart = inductionMotorModel.parts.find((part) => part.id === selectedPartId);
+  const effectiveAirGap = showAirGap && isolation !== 'stator';
+  const effectiveField = showField && !exploded && isolation !== 'rotor';
 
   const toggleExploded = useCallback(() => {
     setExploded((previous) => {
@@ -155,8 +157,8 @@ export function InductionMotor3DView({ stepIndex, calmMode, onUse2D }: Induction
           <strong>Stav výukového modelu</strong>
           <span>2D krok {stepIndex + 1} z 6 je zdrojem pravdy pro výklad.</span>
           <span>Motor: {runState === 'running' && !exploded ? 'názorný chod' : 'v klidu'}</span>
-          <span>Točivé pole: {showField && !exploded ? 'zobrazeno jako názorný helper' : 'skryto'}</span>
-          <span>Vzduchová mezera: {showAirGap ? 'zvýrazněna názornou vrstvou' : 'skryta'}</span>
+          <span>Točivé pole: {effectiveField ? 'zobrazeno jako názorný helper' : 'skryto'}</span>
+          <span>Vzduchová mezera: {effectiveAirGap ? 'zvýrazněna názornou vrstvou' : 'skryta'}</span>
           {exploded && <span>Exploded stav: funkční pohyb je zastaven.</span>}
         </div>
         <p className="series-parallel-3d__fallback-note">

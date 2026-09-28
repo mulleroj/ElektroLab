@@ -9,6 +9,7 @@ import {
   inductionMotorParts,
 } from '../src/components/threeD/inductionMotorModelConfig';
 import { getExplodedPartPosition } from '../src/components/threeD/ExplodedViewController';
+import { getInductionMotorPartState } from '../src/components/threeD/inductionMotorState';
 
 const modelPath = resolve(process.cwd(), 'public', INDUCTION_MOTOR_MODEL_PATH.slice(1));
 const ids = inductionMotorParts.map((part) => part.id);
@@ -20,6 +21,12 @@ assert.equal(statSync(modelPath).size, 1249712, 'GLB odpovídá ověřené velik
 assert.equal(new Set(ids).size, ids.length, 'části motoru mají unikátní ID');
 assert.equal(new Set(nodeNames).size, nodeNames.length, 'node mapping motoru je jednoznačný');
 assert.equal(inductionMotorPartGroups.length, 5, 'motor má pět didaktických skupin');
+const groupedIds = inductionMotorPartGroups.flatMap((group) => group.parts.map((part) => part.id));
+assert.deepEqual(
+  ids.filter((id) => !groupedIds.includes(id)),
+  [],
+  'každá mapovaná část motoru je dostupná v didaktické skupině',
+);
 
 for (const part of inductionMotorParts) {
   assert.ok(part.nodeNames && part.nodeNames.length > 0, `${part.id} má GLB node mapping`);
@@ -73,6 +80,7 @@ assert.match(viewSource, /Použít 2D schéma/);
 assert.match(viewSource, /previousFunctionalState/);
 assert.match(modelSource, /rotorRadiansPerSecond/);
 assert.match(modelSource, /fieldRadiansPerSecond/);
+assert.match(modelSource, /rotationState/);
 assert.match(modelSource, /useFrame/);
 assert.match(modelSource, /air_gap_guide/);
 assert.match(modelSource, /rotating_field_guide/);
@@ -82,6 +90,16 @@ assert.match(controlsSource, /Stator/);
 assert.match(controlsSource, /Rotor/);
 assert.match(controlsSource, /Pootočit rotor/);
 assert.match(demoSource, /Ustálený chod a skluz/);
+assert.match(viewSource, /effectiveAirGap/);
+assert.match(viewSource, /effectiveField/);
+assert.match(
+  getInductionMotorPartState('stator_core', 0, 'cutaway', 'stator'),
+  /izolovaná skupina statoru/,
+);
+assert.match(
+  getInductionMotorPartState('rotor_core', 0, 'cutaway', 'rotor'),
+  /izolovaná skupina rotoru/,
+);
 
 const lessonSource = readFileSync(resolve(process.cwd(), 'src/data/lessons-stroje.ts'), 'utf8');
 assert.match(lessonSource, /type: 'induction-motor'/);
