@@ -5097,3 +5097,58 @@ input:focus-visible {
     grid-template-columns: 1fr;
   }
 }
+
+/* 3D induction motor: grouped controls and text-first state output. */
+.induction-motor-3d__intro {
+  margin-bottom: 0.75rem;
+}
+
+.induction-motor-3d__layout {
+  align-items: start;
+}
+
+.induction-motor-3d-controls {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.induction-motor-3d-controls__section {
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.induction-motor-3d-controls__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.45rem;
+}
+
+.induction-motor-3d-controls__hint {
+  margin: 0.5rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.induction-motor-3d__status {
+  display: grid;
+  gap: 0.3rem;
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+@media (max-width: 760px) {
+  .induction-motor-3d__status {
+    grid-column: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .induction-motor-3d-controls__row button {
+    transition: none;
+  }
+}
